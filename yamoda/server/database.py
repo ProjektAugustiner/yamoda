@@ -100,3 +100,29 @@ class Entry(db.Model):
 
     def __repr__(self):
         return '<Entry({0},{1})>'.format(self.id,self.value)
+
+
+class DescriptionMixin(object):
+    """Mixin class, which adds a brief and a long description column"""
+    brief = db.Column(db.String(80))
+    description = db.Column(db.Text)
+
+
+class Context(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(255))
+
+    parameter = db.relationship('Parameter', backref='context')
+
+    def __init__(self, description):
+        self.description = description
+
+    def __repr__(self):
+        return '<Context({0},{1}>'.format(self.id, self.description)
+
+
+class Parameter(db.Model, DescriptionMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    context_id = db.Column(db.Integer, db.ForeignKey('context.id'))
+
+
