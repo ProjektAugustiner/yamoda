@@ -8,6 +8,9 @@ Set   -- Used to group Datas
 Data  -- represents a Datafile
 Entry -- Contains a single information of a Datafile, e.g the Sample 
          Temperature
+Context   -- The Context class is used to group several parameters
+Parameter -- Describes a Entry instance
+DescriptionMixin -- Mixin class, which adds a brief and a long description column
 
 Functions:
 ----------
@@ -96,10 +99,17 @@ class Data(db.Model):
 class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))
+    parameter_id = db.Column(db.Integer, db.ForeignKey('parameter.id'), nullable=False)
     value = db.Column(db.PickleType)
 
+    parameter = db.relationship('Parameter')
+
+    def __init__(self, value, parameter_id):
+        self.value = value
+        self.parameter_id = parameter_id 
+
     def __repr__(self):
-        return '<Entry({0},{1})>'.format(self.id,self.value)
+        return '<Entry({0},{1},{2})>'.format(self.id,self.value,self.parameter_id)
 
 
 class DescriptionMixin(object):
@@ -108,21 +118,28 @@ class DescriptionMixin(object):
     description = db.Column(db.Text)
 
 
-class Context(db.Model):
+# Todo:
+# -----
+# * add hirarchical structure to Parameters (e.g. groups)
+class Context(db.Model, DescriptionMixin):
+    """The Context class is used to group several parameters"""
     id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(255))
+    type = db.Column(db.String(60))
+    name = db.Column(db.String(60))
 
     parameter = db.relationship('Parameter', backref='context')
 
-    def __init__(self, description):
-        self.description = description
-
-    def __repr__(self):
-        return '<Context({0},{1}>'.format(self.id, self.description)
+    __mapper_args_ = {
+        'polymorphic_identity':'context',
+        'polymorphic_on':type
+    }
 
 
 class Parameter(db.Model, DescriptionMixin):
+    """Describes a Entry instance"""
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60))
     context_id = db.Column(db.Integer, db.ForeignKey('context.id'))
+    visible = db.Column(db.Boolean)
 
 

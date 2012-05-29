@@ -1,7 +1,7 @@
 """starts the yamoda server
 
 The runserver.py script starts the yamoda server. It accepts several command line
-arguments. For a complete list pass the "--help" option.
+arguments. For a complete list pass the "--help" option. STRG+c stops the server.
 
 """
 from optparse import OptionParser
