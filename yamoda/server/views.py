@@ -9,6 +9,7 @@ register -- handles the user registration
 """
 from flask import render_template, request, flash, redirect, url_for, session
 from flask.ext.login import login_user, login_required, logout_user
+from sqlalchemy.exc import IntegrityError
 
 from yamoda.server import app, db
 from yamoda.server.database import User
@@ -55,14 +56,14 @@ def register():
         username = request.form['username']
         password = request.form['password']
 
-        user = User.query.filter_by( name=username ).first()
-        if user is None:
+        try:
             new_user = User(name=username, password=password)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
             flash('Registered successfully.')
             return redirect(request.args.get("next") or url_for("index"))
-        else:
+        except IntegrityError:
+            db.session.rollback()
             error = 'Invalid username.'
     return render_template('register.html', error=error)    
