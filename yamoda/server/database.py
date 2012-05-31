@@ -111,9 +111,9 @@ class Entry(db.Model):
 
     parameter = db.relationship('Parameter')
 
-    def __init__(self, value, parameter_id):
-        self.value = value
-        self.parameter_id = parameter_id
+    #def __init__(self, value, parameter_id):
+    #    self.value = value
+    #    self.parameter_id = parameter_id
 
     def __repr__(self):
         return '<Entry({0},{1},{2})>'.format(self.id,self.value,self.parameter_id)
@@ -125,9 +125,7 @@ class DescriptionMixin(object):
     description = db.Column(db.Text)
 
 
-# Todo:
-# -----
-# * add hierarchical structure to Parameters (e.g. groups)
+# TODO: add hierarchical structure to Parameters (e.g. groups)
 class Context(db.Model, DescriptionMixin):
     """The Context class is used to group several parameters"""
     id = db.Column(db.Integer, primary_key=True)
@@ -137,8 +135,8 @@ class Context(db.Model, DescriptionMixin):
     parameter = db.relationship('Parameter', backref='context')
 
     __mapper_args_ = {
-        'polymorphic_identity':'context',
-        'polymorphic_on':type
+        'polymorphic_identity': 'context',
+        'polymorphic_on': type,
     }
 
 
