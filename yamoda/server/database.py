@@ -1,4 +1,9 @@
-"""The database module contains all database models
+#  -*- coding: utf-8 -*-
+#
+# yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
+
+"""
+The database module contains all database models.
 
 Classes:
 --------
@@ -6,7 +11,7 @@ User  -- Handles the usernames, passwords and login status
 Group -- Used for unix-style access control
 Set   -- Used to group Datas
 Data  -- represents a Datafile
-Entry -- Contains a single information of a Datafile, e.g the Sample 
+Entry -- Contains a single information of a Datafile, e.g the Sample
          Temperature
 Context   -- The Context class is used to group several parameters
 Parameter -- Describes a Entry instance
@@ -34,7 +39,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False, unique=True)
     _hashed_pw = db.Column(db.String(60), nullable=False)
-    
+
     @hybrid_property
     def password(self):
         return self._hashed_pw
@@ -53,7 +58,7 @@ class User(db.Model, UserMixin):
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
-    users = db.relationship('User', secondary=_usergroup_table, 
+    users = db.relationship('User', secondary=_usergroup_table,
                             backref='groups')
 
     def __repr__(self):
@@ -77,7 +82,7 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
 
 
 class Set(db.Model):
-    """The Set class is used to Datas and other Sets"""
+    """The Set class is used to group Datas and other Sets"""
     id = db.Column(db.Integer, primary_key=True)
     datas = db.relationship('Data', secondary=_set_to_data, backref='sets')
     children = db.relationship('Set', secondary=_set_to_set,
@@ -88,7 +93,8 @@ class Set(db.Model):
         return '<DataSet({0})>'.format(self.id)
 
 
-class Data(db.Model):    
+class Data(db.Model):
+    """A Data is a collection of Entries"""
     id = db.Column(db.Integer, primary_key=True)
     entries = db.relationship('Entry', backref='data')
 
@@ -97,6 +103,7 @@ class Data(db.Model):
 
 
 class Entry(db.Model):
+    """And Entry is a single bit of information (scalar or array) in a Data"""
     id = db.Column(db.Integer, primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))
     parameter_id = db.Column(db.Integer, db.ForeignKey('parameter.id'), nullable=False)
@@ -106,7 +113,7 @@ class Entry(db.Model):
 
     def __init__(self, value, parameter_id):
         self.value = value
-        self.parameter_id = parameter_id 
+        self.parameter_id = parameter_id
 
     def __repr__(self):
         return '<Entry({0},{1},{2})>'.format(self.id,self.value,self.parameter_id)
@@ -120,7 +127,7 @@ class DescriptionMixin(object):
 
 # Todo:
 # -----
-# * add hirarchical structure to Parameters (e.g. groups)
+# * add hierarchical structure to Parameters (e.g. groups)
 class Context(db.Model, DescriptionMixin):
     """The Context class is used to group several parameters"""
     id = db.Column(db.Integer, primary_key=True)
@@ -141,5 +148,3 @@ class Parameter(db.Model, DescriptionMixin):
     name = db.Column(db.String(60))
     context_id = db.Column(db.Integer, db.ForeignKey('context.id'))
     visible = db.Column(db.Boolean)
-
-

@@ -1,10 +1,14 @@
+#  -*- coding: utf-8 -*-
+#
+# yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
+
 """
 Functions:
 ----------
 index    -- displays the main index page
 login    -- handles the user login
 logout   -- logs the current user out
-register -- handles the user registration 
+register -- handles the user registration
 
 """
 from flask import render_template, request, flash, redirect, url_for, session
@@ -66,4 +70,4 @@ def register():
         except IntegrityError:
             db.session.rollback()
             error = 'Invalid username.'
-    return render_template('register.html', error=error)    
+    return render_template('register.html', error=error)
