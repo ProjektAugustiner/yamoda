@@ -11,7 +11,7 @@ logout   -- logs the current user out
 register -- handles the user registration
 
 """
-from flask import render_template, request, flash, redirect, url_for, session
+from flask import render_template, request, flash, redirect, url_for
 from flask.ext.login import login_user, login_required, logout_user
 from sqlalchemy.exc import IntegrityError
 
@@ -34,8 +34,8 @@ def login():
         password = request.form['password']
         remember = request.form.get("remember", "no") == "yes"
 
-        user = User.query.filter_by( name=username ).first()
-        if (user is not None) and user.valid_password( password ):
+        user = User.query.filter_by(name=username).first()
+        if (user is not None) and user.valid_password(password):
             login_user(user, remember=remember)
             flash('Logged in successfully.')
             return redirect(request.args.get("next") or url_for("index"))
@@ -61,13 +61,17 @@ def register():
         password = request.form['password']
 
         try:
+            # XXX: this check could also be done in the User constructor
+            if not username or not password:
+                raise ValueError
             new_user = User(name=username, password=password)
             db.session.add(new_user)
             db.session.commit()
+        except (ValueError, IntegrityError):
+            db.session.rollback()
+            error = 'Invalid username or password is empty.'
+        else:
             login_user(new_user)
             flash('Registered successfully.')
             return redirect(request.args.get("next") or url_for("index"))
-        except IntegrityError:
-            db.session.rollback()
-            error = 'Invalid username.'
     return render_template('register.html', error=error)
