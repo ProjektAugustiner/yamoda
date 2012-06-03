@@ -1,6 +1,16 @@
 yamoda
 ======
 
+Dependencies
+------------
+
+* SQLAlchemy
+* Flask
+* Flask-Login
+* Flask-SQLAlchemy
+* py-bcrypt
+* numpy
+
 Licensing
 ---------
 
