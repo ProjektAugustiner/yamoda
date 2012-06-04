@@ -36,8 +36,8 @@ if options.init_db and os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
     db.session.add(ctx)
 
     print 'adding some test parameters'
-    par_T = Parameter(name='T', brief='Temperature', context=ctx, visible=True)
-    par_om = Parameter(name='om', brief='Rocking angle', context=ctx, visible=True)
+    par_T = Parameter(name='T', brief='Temperature', unit='K', context=ctx, visible=True)
+    par_om = Parameter(name='om', brief='Rocking angle', unit='deg', context=ctx, visible=True)
     db.session.add(par_T)
     db.session.add(par_om)
 

@@ -107,7 +107,8 @@ class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))
     parameter_id = db.Column(db.Integer, db.ForeignKey('parameter.id'), nullable=False)
-    value = db.Column(db.PickleType)
+    value = db.Column(db.Float)
+    value_complex = db.Column(db.PickleType)
 
     parameter = db.relationship('Parameter')
 
@@ -116,7 +117,11 @@ class Entry(db.Model):
     #    self.parameter_id = parameter_id
 
     def __repr__(self):
-        return '<Entry({0},{1},{2})>'.format(self.id,self.value,self.parameter_id)
+        if self.value is not None:
+            return '<Entry({0},{1},{2})>'.format(self.id, self.parameter.name,
+                                                 self.value)
+        return '<Entry({0},{1},{2!r})>'.format(self.id, self.parameter.name,
+                                               self.value_complex)
 
 
 class DescriptionMixin(object):
@@ -147,3 +152,6 @@ class Parameter(db.Model, DescriptionMixin):
     context_id = db.Column(db.Integer, db.ForeignKey('context.id'))
     visible = db.Column(db.Boolean)
     unit = db.Column(db.String(60))  # TODO: decide on a Unit table
+
+    def __repr__(self):
+        return '<Parameter({0})>'.format(self.name)
