@@ -35,7 +35,7 @@ _usergroup_table = db.Table('usergroup_table', db.metadata,
 
 
 class User(db.Model, UserMixin):
-    """Handles the usernames,passwords and the login status"""
+    """Handles the usernames, passwords and the login status"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False, unique=True)
     _hashed_pw = db.Column(db.String(60), nullable=False)
@@ -132,7 +132,7 @@ class Context(db.Model, DescriptionMixin):
     type = db.Column(db.String(60))
     name = db.Column(db.String(60))
 
-    parameter = db.relationship('Parameter', backref='context')
+    parameters = db.relationship('Parameter', backref='context')
 
     __mapper_args_ = {
         'polymorphic_identity': 'context',
@@ -146,3 +146,4 @@ class Parameter(db.Model, DescriptionMixin):
     name = db.Column(db.String(60))
     context_id = db.Column(db.Integer, db.ForeignKey('context.id'))
     visible = db.Column(db.Boolean)
+    unit = db.Column(db.String(60))  # TODO: decide on a Unit table
