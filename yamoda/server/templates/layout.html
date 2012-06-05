@@ -1,17 +1,59 @@
-<!doctype html>
-<title>yamoda</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div class=page>
-  <h1>yamoda</h1>
-  <div class=metanav>
-  {% if current_user.is_authenticated() %}
-    Welcome, {{ current_user.name }} | <a href="{{ url_for('logout') }}">log out</a>
-  {% else %}
-    You are not logged in | <a href="{{ url_for('login') }}">log in</a> | <a href="{{ url_for('register') }}">register</a>
-  {% endif %}
-  </div>
-  {% for message in get_flashed_messages() %}
-    <div class=flash>{{ message }}</div>
-  {% endfor %}
-  {% block body %}{% endblock %}
-</div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>yamoda &mdash; {{ title }}</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap-responsive.css') }}">
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="{{ url_for('index') }}">YAMODA</a>
+          <div class="nav-collapse">
+            <ul class="nav pull-right">
+              {% if current_user.is_authenticated() %}
+              <li><a href="#">Welcome, {{ current_user.name }}</a></li>
+              <li><a href="{{ url_for('logout') }}">log out</a></li>
+              {% else %}
+              <li><a href="#">You are not logged in</a></li>
+              <li><a href="{{ url_for('login') }}">log in</a></li>
+              <li><a href="{{ url_for('register') }}">register</a></li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span2">
+          {# sidebar here #}
+        </div>
+        <div class="span10">
+          {#
+          <div class="page-header">
+            <h1>yamoda</h1>
+          </div>
+          #}
+          {% for message in get_flashed_messages() %}
+          <div class="alert">
+            <a class="close" data-dismiss="alert" href="#">×</a>
+            {{ message }}
+          </div>
+          {% endfor %}
+          {% block body %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
