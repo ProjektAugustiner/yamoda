@@ -1,17 +1,18 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>Context</h2>
+  <div class="page-header">
   <h1>{{ context.name }}</h1>
-  {% if context.brief %}
-    <p>
-      <b>{{ context.brief }}
+      {% if context.brief %}
+  </div>
+    <p class="lead">
+      {{ context.brief }}
       {% if context.description %}
         <a href="#context_description">More...</a>
       {% endif %}
-      </b>
     </p>
-  {% endif %}  
-  <table class=param>
+  {% endif %}
+
+  <table class="table-bordered table-striped">
     <tr>
       <th>Parameter</th>
       <th></th>
@@ -25,18 +26,17 @@
     {% endfor %}
   </table>
   {% if context.description %}
-    <h3 id="context_description">Detailed Description</h3>
+    <div class="page-header">
+      <h2 id="context_description">Description</h2>
+    </div>
     {{ context.description }}
   {% endif %}
-    <h3>Parameter</h3>
-  {% for param in context.parameters %}
-    <div class=param>
-    {% if param.brief and param.description %}
-    <h4 id="param_{{ param.name }}">{{ param.name }}</h4>
-    {{ param.brief }}
-    <p>{{ param.description }}</p>
-    {% endif %}
-    </div>
-  {% endfor %}
 
+  <div class="page-header">
+    <h2>Parameter <small>A detailed description of the Parameters</small></h2>
+  </div>
+    {% for param in context.parameters %}
+    <h3 id="param_{{ param.name }}">{{ param.name }}</h3>
+    <p>{{ param.description }}</p>
+    {% endfor %}
 {% endblock %}
