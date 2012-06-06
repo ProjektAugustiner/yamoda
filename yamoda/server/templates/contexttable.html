@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+  <table class=Parameter>
+    <tr>
+      <th>Context</th>
+      <th></th>
+    </tr>
+    {% for ctx in contextlist %}
+      <tr>
+        <td><i>{{ ctx.name }}</i></td>
+        <td>{{ ctx.brief }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

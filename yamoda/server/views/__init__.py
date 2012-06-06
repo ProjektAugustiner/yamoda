@@ -18,6 +18,11 @@ from sqlalchemy.exc import IntegrityError
 from yamoda.server import app, db
 from yamoda.server.database import Context, User
 
+@app.route('/context')
+def contexttable():
+    contextlist = Context.query.all()
+    return render_template('contexttable.html', contextlist=contextlist)
+
 @app.route('/context/<ctx_name>')
 def context(ctx_name):
     ctx = Context.query.filter_by(name=ctx_name).first()
