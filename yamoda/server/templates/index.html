@@ -1,12 +1,15 @@
 {% extends "layout.html" %}
 {% block body %}
-    <ul class=entries>
-    <li><h2>Welcome to yamoda</h2>
-    yamoda is a database driven measurement data storage application.
-    </ul>
+  <div class="page-header">
+    <h1>
+      Welcome to Yamoda 
+      <small>
+        the measurement data organizer
+      </small>
+    </h1>
+    </div>
     {% if session.logged_in %}
 
-    
 
     {% endif %}
 {% endblock %}
