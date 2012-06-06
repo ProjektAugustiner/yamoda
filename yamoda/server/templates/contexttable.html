@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block body %}
-  <table class=Parameter>
+  <table class=param>
     <tr>
       <th>Context</th>
       <th></th>
     </tr>
     {% for ctx in contextlist %}
       <tr>
-        <td><i>{{ ctx.name }}</i></td>
+        <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
         <td>{{ ctx.brief }}</td>
       </tr>
     {% endfor %}
