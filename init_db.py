@@ -22,13 +22,29 @@ if options.testdata:
     admin = User(name='admin', password='password')
     db.session.add(admin)
 
-    print 'adding "test" context'
-    ctx = Context(name='test')
+    print 'adding "TestContext" context'
+    brief = 'This is the short description of the test context.'
+    desc = """
+    Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor
+    incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+    nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi 
+    consequat. Quis aute iure reprehenderit in voluptate velit esse cillum
+    dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non 
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    """
+    ctx = Context(name='TestContext', brief=brief, description=desc)
     db.session.add(ctx)
 
     print 'adding some test parameters'
-    par_T = Parameter(name='T', brief='Temperature', unit='K', context=ctx, visible=True)
-    par_om = Parameter(name='om', brief='Rocking angle', unit='deg', context=ctx, visible=True)
+    par_T = Parameter(
+        name='T', brief='Temperature', 
+        description='This is the description of the temperature',
+        unit='K', context=ctx, visible=True)
+    par_om = Parameter(
+        name='omega', brief='Rocking angle',
+        description='The omega parameter represents the rocking angle.',
+        unit='deg', context=ctx, visible=True)
+
     db.session.add(par_T)
     db.session.add(par_om)
 

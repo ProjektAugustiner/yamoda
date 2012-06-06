@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block body %}
+  <div class="page-header">
+  <h1>{{ context.name }}</h1>
+      {% if context.brief %}
+  </div>
+    <p class="lead">
+      {{ context.brief }}
+      {% if context.description %}
+        <a href="#context_description">More...</a>
+      {% endif %}
+    </p>
+  {% endif %}
+
+  <table class="table-bordered table-striped">
+    <tr>
+      <th>Parameter</th>
+      <th></th>
+    </tr>
+    {% for param in context.parameters %}
+      <tr>
+        <td>
+            <a href="#param_{{ param.name }}">{{ param.name }}</a></td>
+        <td>{{ param.brief }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+  {% if context.description %}
+    <div class="page-header">
+      <h2 id="context_description">Description</h2>
+    </div>
+    {{ context.description }}
+  {% endif %}
+
+  <div class="page-header">
+    <h2>Parameter <small>A detailed description of the Parameters</small></h2>
+  </div>
+    {% for param in context.parameters %}
+    <h3 id="param_{{ param.name }}">{{ param.name }}</h3>
+    <p>{{ param.description }}</p>
+    {% endfor %}
+{% endblock %}
