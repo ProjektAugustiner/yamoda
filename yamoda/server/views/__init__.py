@@ -16,8 +16,12 @@ from flask.ext.login import login_user, login_required, logout_user
 from sqlalchemy.exc import IntegrityError
 
 from yamoda.server import app, db
-from yamoda.server.database import User
+from yamoda.server.database import Context, User
 
+@app.route('/context/<ctx_name>')
+def context(ctx_name):
+    ctx = Context.query.filter_by(name=ctx_name).first()
+    return render_template('context.html', context=ctx)
 
 @app.route('/')
 def index():

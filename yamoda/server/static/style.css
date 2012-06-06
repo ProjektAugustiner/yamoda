@@ -17,3 +17,24 @@ h2              { font-size: 1.2em; }
                   border: 1px solid #AACBE2; }
 .error          { background: #F0D6D6; padding: 0.5em; }
 
+table.Parameter {
+  background: whitesmoke;
+  border-collapse: collapse;
+}
+
+table.Parameter th, table.Parameter td {
+  border: 1px silver gainsboro;
+  padding: 0.2em;
+}
+table.Parameter th {
+  background: gainsboro;
+  text-align: left;
+}
+table.Parameter tr:hover td {
+   background: #CEE5F5 !important;
+}
+table.Parameter caption {
+  margin-left: inherit;
+  margin-right: inherit;
+}
+
