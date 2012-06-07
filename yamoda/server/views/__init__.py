@@ -109,6 +109,11 @@ def register():
             return redirect(request.args.get("next") or url_for("index"))
     return render_template('register.html', error=error)
 
+@app.route('/settings')
+def usersettings():
+    """user settings stub"""
+    return ''
+
 
 @app.route('/data')
 @login_required
