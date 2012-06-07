@@ -12,4 +12,28 @@
       </tr>
     {% endfor %}
   </table>
+  <a class="btn" data-toggle="modal" href="#new_context">New Context</a>
+  <div class="modal hide" id="new_context">
+    <form class="modal-form" action="{{ url_for('contexttable') }}" method="post">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h3>New Context</h3>
+      </div>
+      <div class="modal-body">
+        <label>Name</label>
+        <input type="text" class="span3" placeholder="Context name…" name="ctx_name">
+        <label>Brief</label>
+        <input type="text" class="span12" placeholder="A brief description…" name="ctx_brief">
+        <label>Description</label>
+        <textarea class="span12" name="ctx_description" placeholder="A full description…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="icon-ok-sign icon-white"></i>
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
 {% endblock %}
