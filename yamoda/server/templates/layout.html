@@ -32,6 +32,7 @@
                   <li><a href="{{ url_for('data_view') }}">View mine</a></li>
                 </ul>
               </li>
+              <li><a href="{{ url_for('contexttable') }}">Contexts</a></li>
             </ul>
             <ul class="nav pull-right">
               {% if current_user.is_authenticated() %}
