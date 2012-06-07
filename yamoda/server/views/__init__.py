@@ -23,6 +23,7 @@ from yamoda.server.database import Context, User, Set
 @login_required
 def contexttable():
     """shows every context in the database"""
+    error = None
     if request.method == 'POST':
         name = request.form['ctx_name']
         brief = request.form['ctx_brief']
@@ -36,12 +37,13 @@ def contexttable():
             db.session.commit()
         except (ValueError, IntegrityError):
             db.session.rollback()
-            error = 'Invalid Input.'
+            error = 'Invalid input.'
         else:
             flash('Created new context: {0}'.format(name))
 
     contextlist = Context.query.all()
-    return render_template('contexttable.html', contextlist=contextlist)
+    return render_template('contexttable.html', contextlist=contextlist,
+                           error=error)
 
 
 @app.route('/context/<ctx_name>')

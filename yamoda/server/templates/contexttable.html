@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+  {% if error %}<div class="alert alert-error"><strong>Error:</strong> {{ error }}</div>{% endif %}
   <table class="table table-striped table-condensed">
     <tr>
       <th>Context</th>
