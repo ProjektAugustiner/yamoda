@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h2>Datasets</h2>
+  <table id="datatable" class="table table-condensed table-bordered table-striped">
+  <thead><tr><th>#</th><th>Name</th><th>Subsets</th><th>Datas</th></tr></thead>
+  <tbody>
+  {% for set in sets %}
+  <tr><td>{{ loop.index }}</td><td>{{ set.name }}</td><td>{{ set.children|length }}</td>
+  <td>{{ set.datas|length }}</td></tr>
+  {% endfor %}
+  </tbody>
+  </table>
+  <script>
+    $(document).ready(function() { $('#datatable').dataTable({
+    "bLengthChange": false, "bPaginate": false}); });
+  </script>
+{% endblock %}>

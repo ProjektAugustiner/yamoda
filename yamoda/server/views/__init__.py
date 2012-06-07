@@ -16,7 +16,7 @@ from flask.ext.login import login_user, login_required, logout_user
 from sqlalchemy.exc import IntegrityError
 
 from yamoda.server import app, db
-from yamoda.server.database import Context, User
+from yamoda.server.database import Context, User, Set
 
 
 @app.route('/context')
@@ -26,12 +26,14 @@ def contexttable():
     contextlist = Context.query.all()
     return render_template('contexttable.html', contextlist=contextlist)
 
+
 @app.route('/context/<ctx_name>')
 @login_required
 def context(ctx_name):
     """displays the requested context"""
     ctx = Context.query.filter_by(name=ctx_name).first_or_404()
     return render_template('context.html', context=ctx)
+
 
 @app.route('/')
 def index():
@@ -89,3 +91,10 @@ def register():
             flash('Registered successfully.')
             return redirect(request.args.get("next") or url_for("index"))
     return render_template('register.html', error=error)
+
+
+@app.route('/data')
+@login_required
+def data_view(all=False):
+    setlist = Set.query.all()
+    return render_template('setlist.html', sets=setlist)

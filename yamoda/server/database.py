@@ -84,6 +84,7 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
 class Set(db.Model):
     """The Set class is used to group Datas and other Sets"""
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60))
     datas = db.relationship('Data', secondary=_set_to_data, backref='sets')
     children = db.relationship('Set', secondary=_set_to_set,
                                primaryjoin=id==_set_to_set.c.child_id,
