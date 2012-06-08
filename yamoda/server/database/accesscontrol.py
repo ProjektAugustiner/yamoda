@@ -5,8 +5,10 @@
 
 Classes:
 --------
-User  -- Handles the usernames, passwords and login status
-Group -- Used for unix-style access control
+Permission      -- Stores User/Group/All read & write permissions.
+PermissionError -- Raised when a row level access is denied
+User            -- Handles the usernames, passwords and login status
+Group           -- Used for unix-style access control
 
 Functions:
 ----------
@@ -18,6 +20,70 @@ from flask.ext.login import UserMixin
 import bcrypt
 
 from yamoda.server import db, login_manager
+
+
+class PermissionError(Exception):
+    """Raised when a row level access is denied"""
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class Permission(object):
+    """Stores User/Group/All read & write permissions.
+
+    The Permission class stores read and write permissions for User,
+    Group and All as binary flags of an integer. Unlike unix, the 
+    first three bits represent the read permissions, followed by the
+    write permissions.
+    
+    Bit - permission
+    ---------------
+      0 - User read permission
+      1 - Group read permission
+      2 - All read permission
+      3 - User write permission
+      4 - Group write permission
+      5 - All write permission
+
+    """
+    def __init__(self, **kw):
+        if 'permission' in kw:
+            self.permission = kw['permission']
+        else:            
+            self.permission = 0
+            self.user_readable = kw.get('user_readable', True)
+            self.user_writeable = kw.get('user_readable', True)
+            self.group_readable = kw.get('group_readable', True)
+            self.group_writeable = kw.get('group_writeable', True)
+            self.all_readable = kw.get('all_readable', True)
+            self.all_writeable = kw.get('all_writeable', False)
+
+    def __perm_getter__(i):
+        def get(self): #get bit
+            return bool(self.permission & (1 << i))
+        return get
+
+    def __perm_setter__(i):
+        def set(self, value):
+            if value: #set bit
+                self.permission |= 1 << i
+            else: #clear bit
+                self.permission &= ~(1 << i)
+        return set
+
+    def __repr__(self):
+        return '<Permission({0})>'.format(bin(self.permission))
+
+    user_readable   = hybrid_property(__perm_getter__(0), __perm_setter__(0))
+    group_readable  = hybrid_property(__perm_getter__(1), __perm_setter__(1))
+    all_readable    = hybrid_property(__perm_getter__(2), __perm_setter__(2))
+
+    user_writeable  = hybrid_property(__perm_getter__(3), __perm_setter__(3))
+    group_writeable = hybrid_property(__perm_getter__(4), __perm_setter__(4))
+    all_writeable   = hybrid_property(__perm_getter__(5), __perm_setter__(5))
 
 
 _usergroup_table = db.Table('usergroup_table', db.metadata,
