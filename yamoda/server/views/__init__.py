@@ -36,9 +36,9 @@ def contexttable():
             db.session.commit()
         except (ValueError, IntegrityError):
             db.session.rollback()
-            error = 'Invalid Input.'
+            flash('Invalid Input','error')
         else:
-            flash('Created new context: {0}'.format(name))
+            flash('Created new context: {0}'.format(name), 'info')
 
     contextlist = Context.query.all()
     return render_template('contexttable.html', contextlist=contextlist)
@@ -59,7 +59,6 @@ def index():
 @app.route('/login', methods=['GET','POST'])
 def login():
     """handles the user login"""
-    error = None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -71,8 +70,8 @@ def login():
             flash('Logged in successfully.')
             return redirect(request.args.get("next") or url_for("index"))
         else:
-            error = 'Invalid password or username.'
-    return render_template('login.html', error=error)
+            flash('Invalid password or username.','error')
+    return render_template('login.html')
 
 
 @app.route("/logout")
@@ -86,7 +85,6 @@ def logout():
 @app.route('/register', methods=['GET','POST'])
 def register():
     """handles the user registration"""
-    error = None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -100,9 +98,9 @@ def register():
             db.session.commit()
         except (ValueError, IntegrityError):
             db.session.rollback()
-            error = 'Invalid username or password is empty.'
+            flash('Invalid username or password is empty.','error')
         else:
             login_user(new_user)
             flash('Registered successfully.')
             return redirect(request.args.get("next") or url_for("index"))
-    return render_template('register.html', error=error)
+    return render_template('register.html')

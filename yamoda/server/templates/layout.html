@@ -45,12 +45,24 @@
             <h1>yamoda</h1>
           </div>
           #}
-          {% for message in get_flashed_messages() %}
-          <div class="alert">
-            <a class="close" data-dismiss="alert" href="#">×</a>
-            {{ message }}
-          </div>
-          {% endfor %}
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if category == "error" %}
+                  <div class="alert alert-error">
+                {% elif category == "info" %}      
+                  <div class="alert alert-info">
+                {% elif category == "success" %}      
+                  <div class="alert alert-success">
+                {% else %}
+                  <div class="alert">
+                {% endif %}
+                    <a class="close" data-dismiss="alert" href="#">×</a>
+                  {{ message }}
+                  </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
           {% block body %}{% endblock %}
         </div>
       </div>
