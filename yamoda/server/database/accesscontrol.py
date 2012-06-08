@@ -142,7 +142,9 @@ class AccessControl(object):
         """returns the read access of the current user."""
         if self.user == current_user and self.permission.user_readable:
             return True
-        if self.group in current_user.groups and self.permission.group_readable:
+        if ((self.group == current_user.primary_group) or
+           (self.group in current_user.groups) and 
+            self.permission.group_readable):
             return True
         if self.permission.all_readable:
             return True
@@ -152,7 +154,9 @@ class AccessControl(object):
         """returns the write access of the current user."""
         if self.user == current_user and self.permission.user_writeable:
             return True
-        if self.group in current_user.groups and self.permission.group_writeable:
+        if ((self.group == current_user.primary_group) or
+           (self.group in current_user.groups) and
+            self.permission.group_writeable):
             return True
         if self.permission.all_writeable:
             return True
@@ -178,8 +182,11 @@ class AccessControl(object):
 class User(db.Model, UserMixin):
     """Handles the usernames, passwords and the login status"""
     id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     name = db.Column(db.String(60), nullable=False, unique=True)
     _hashed_pw = db.Column(db.String(60), nullable=False)
+
+    primary_group = db.relationship('Group')
 
     @hybrid_property
     def password(self):

@@ -95,7 +95,9 @@ def register():
             # XXX: this check could also be done in the User constructor
             if not username or not password:
                 raise ValueError
-            new_user = User(name=username, password=password)
+            primary_group = Group(name=username)
+            new_user = User(name=username, password=password, 
+                            primary_group=primary_group)
             db.session.add(new_user)
             db.session.commit()
         except (ValueError, IntegrityError):

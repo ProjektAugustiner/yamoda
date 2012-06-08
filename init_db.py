@@ -5,7 +5,7 @@ import random
 from optparse import OptionParser
 
 from yamoda.server import db
-from yamoda.server.database import User, Context, Parameter, Set, Data, Entry
+from yamoda.server.database import User,Group, Context, Parameter, Set, Data, Entry
 
 
 parser = OptionParser()
@@ -19,7 +19,8 @@ db.create_all()
 
 if options.testdata:
     print 'adding user:admin pw:password'
-    admin = User(name='admin', password='password')
+    admin_group = Group(name='admin')
+    admin = User(name='admin', password='password', primary_group=admin_group)
     db.session.add(admin)
 
     print 'adding "TestContext" context'
@@ -61,3 +62,4 @@ if options.testdata:
     db.session.add(superset)
 
     db.session.commit()
+    print Group.query.all()
