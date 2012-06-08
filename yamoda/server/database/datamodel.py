@@ -63,10 +63,6 @@ class Entry(db.Model):
 
     parameter = db.relationship('Parameter')
 
-    #def __init__(self, value, parameter_id):
-    #    self.value = value
-    #    self.parameter_id = parameter_id
-
     def __repr__(self):
         if self.value is not None:
             return '<Entry({0},{1},{2})>'.format(self.id, self.parameter.name,

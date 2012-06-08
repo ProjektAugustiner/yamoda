@@ -7,15 +7,19 @@ Classes:
 --------
 Permission      -- Stores User/Group/All read & write permissions.
 PermissionError -- Raised when a row level access is denied
+PermissionType  -- Simple TypeDecorator, wrapping the parameter class.
 User            -- Handles the usernames, passwords and login status
 Group           -- Used for unix-style access control
+AccessControl   -- Mixin class, adding row level security to the DB model.
 
 Functions:
 ----------
 load_user -- User loader callback neccessary for flask-login
 
 """
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from flask import _request_ctx_stack
 from flask.ext.login import UserMixin
 import bcrypt
 
@@ -106,6 +110,71 @@ class PermissionType(db.TypeDecorator):
         return value
 
 
+class AccessControl(object):
+    """Mixin class, adding row level security to the database model.
+
+    The AccessControl mixin adds row level security to a sqlalchemy database
+    model inside the request context. The permission is tested hierarchically.
+    First the *user*, second the *group* and finally the *all* permission 
+    level is tested.
+    """
+    @declared_attr
+    def permission(cls):
+        return db.Column(PermissionType, nullable=False)
+
+    @declared_attr
+    def user_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    @declared_attr
+    def user(cls):
+        return db.relationship('User')
+
+    @declared_attr
+    def group_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)        
+
+    @declared_attr
+    def group(cls):
+        return db.relationship('Group')
+
+    def readable(self):
+        """returns the read access of the current user."""
+        if self.user == current_user and self.permission.user_readable:
+            return True
+        if self.group in current_user.groups and self.permission.group_readable:
+            return True
+        if self.permission.all_readable:
+            return True
+        return  False
+
+    def writeable(self):
+        """returns the write access of the current user."""
+        if self.user == current_user and self.permission.user_writeable:
+            return True
+        if self.group in current_user.groups and self.permission.group_writeable:
+            return True
+        if self.permission.all_writeable:
+            return True
+        return  False
+
+    def __getattribute__(self,name):
+        """intecepts column read access."""
+        if _request_ctx_stack.top:
+            columns = object.__getattribute__(self,'__table__').columns.keys()
+            if (name in columns) and (not self.readable):
+                raise PermissionError('read access denied')
+        return object.__getattribute__(self, name)
+
+    def __setattr__(self, name, value):
+        """intecepts column write access."""
+        if _request_ctx_stack.top:
+            columns = object.__getattribute__(self,'__table__').columns.keys()
+            if (name in columns) and (not self.writeable):
+                raise PermissionError('write access denied')
+        object.__setattr__(self, name, value)
+
+
 class User(db.Model, UserMixin):
     """Handles the usernames, passwords and the login status"""
     id = db.Column(db.Integer, primary_key=True)
@@ -128,6 +197,7 @@ class User(db.Model, UserMixin):
 
 
 class Group(db.Model):
+    """Used for unix-style access control."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     users = db.relationship('User', secondary=_usergroup_table,
