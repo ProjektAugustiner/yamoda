@@ -91,6 +91,21 @@ _usergroup_table = db.Table('usergroup_table', db.metadata,
     db.Column('group_id', db.Integer, db.ForeignKey('group.id')))
 
 
+class PermissionType(db.TypeDecorator):
+    """Simple TypeDecorator, wrapping the parameter class."""
+    impl = db.Integer
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = value.permission
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = Permission(permission=value)
+        return value
+
+
 class User(db.Model, UserMixin):
     """Handles the usernames, passwords and the login status"""
     id = db.Column(db.Integer, primary_key=True)
