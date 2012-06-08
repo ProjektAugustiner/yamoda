@@ -135,7 +135,7 @@ class Context(db.Model, DescriptionMixin):
     """The Context class is used to group several parameters"""
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(60))
-    name = db.Column(db.String(60))
+    name = db.Column(db.String(60), unique=True)
 
     parameters = db.relationship('Parameter', backref='context')
 
