@@ -1,17 +1,25 @@
 {% extends "layout.html" %}
 {% block body %}
-  <table class="table">
-    <tr>
-      <th>Context</th>
-      <th></th>
-    </tr>
-    {% for ctx in contextlist %}
+  <table id="contexttable" class="table table-condensed table-bordered table-striped">
+    <thead>
       <tr>
-        <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
-        <td>{{ ctx.brief }}</td>
-      </tr>
-    {% endfor %}
+        <th>Context</th>
+        <th>Brief</th>
+    </tr>
+    </thead>
+    <tbody>    
+      {% for ctx in contextlist %}
+        <tr>
+          <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
+          <td>{{ ctx.brief }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
   </table>
+  <script>
+    $(document).ready(function() { $('#contexttable').dataTable({
+    "bLengthChange": false, "bPaginate": false}); });
+  </script>
   <a class="btn" data-toggle="modal" href="#new_context">New Context</a>
   <div class="modal hide" id="new_context">
     <form class="modal-form" action="{{ url_for('contexttable') }}" method="post">
@@ -36,4 +44,5 @@
       </div>
     </form>
   </div>
+
 {% endblock %}
