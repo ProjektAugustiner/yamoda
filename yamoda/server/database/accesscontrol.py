@@ -120,7 +120,7 @@ class AccessControl(object):
     """
     @declared_attr
     def permission(cls):
-        return db.Column(PermissionType, nullable=False)
+        return db.Column(PermissionType, nullable=False, default=Permission())
 
     @declared_attr
     def user_id(cls):

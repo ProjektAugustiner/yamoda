@@ -90,24 +90,30 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        confirm = request.form['confirm']
 
         try:
             # XXX: this check could also be done in the User constructor
             if not username or not password:
-                raise ValueError
+                raise ValueError('Empty Username or Password')
+            if password != confirm:
+                raise ValueError("Password mismatch")
             primary_group = Group(name=username)
             new_user = User(name=username, password=password, 
                             primary_group=primary_group)
             db.session.add(new_user)
             db.session.commit()
-        except (ValueError, IntegrityError):
+        except ValueError, e:
+            flash(str(e), 'error')
+        except IntegrityError:
             db.session.rollback()
-            flash('Invalid username or password is empty.','error')
+            flash('Invalid username','error')
         else:
             login_user(new_user)
             flash('Registered successfully.')
             return redirect(request.args.get("next") or url_for("index"))
     return render_template('register.html')
+
 
 @app.route('/settings')
 def usersettings():
