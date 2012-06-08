@@ -3,10 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>yamoda &mdash; {{ title }}</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.css') }}">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap-responsive.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-responsive.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='yamoda.css') }}">
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.dataTables.js') }}"></script>
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -20,14 +22,26 @@
         <div class="container">
           <a class="brand" href="{{ url_for('index') }}">YAMODA</a>
           <div class="nav-collapse">
+            <ul class="nav">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  Data <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="{{ url_for('data_view', all=1) }}">View all</a></li>
+                  <li><a href="{{ url_for('data_view') }}">View mine</a></li>
+                </ul>
+              </li>
+              <li><a href="{{ url_for('contexttable') }}">Contexts</a></li>
+            </ul>
             <ul class="nav pull-right">
               {% if current_user.is_authenticated() %}
-              <li><a href="#">Welcome, {{ current_user.name }}</a></li>
-              <li><a href="{{ url_for('logout') }}">log out</a></li>
+              <li><a href="{{ url_for('usersettings') }}">Welcome, {{ current_user.name }}</a></li>
+              <li><a href="{{ url_for('logout') }}">Logout</a></li>
               {% else %}
               <li><a href="#">You are not logged in</a></li>
-              <li><a href="{{ url_for('login') }}">log in</a></li>
-              <li><a href="{{ url_for('register') }}">register</a></li>
+              <li><a href="{{ url_for('login') }}">Login</a></li>
+              <li><a href="{{ url_for('register') }}">Register</a></li>
               {% endif %}
             </ul>
           </div>
@@ -36,15 +50,12 @@
     </div>
     <div class="container-fluid">
       <div class="row-fluid">
+        {#
         <div class="span2">
-          {# sidebar here #}
+          <!-- sidebar here -->
         </div>
-        <div class="span10">
-          {#
-          <div class="page-header">
-            <h1>yamoda</h1>
-          </div>
-          #}
+		#}
+        <div class="span12">   
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, message in messages %}

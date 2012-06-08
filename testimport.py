@@ -13,7 +13,7 @@ impname = sys.argv[1]
 filenames = sys.argv[2:]
 
 ctx = Context.query.get(1)
-baseset = Set()
+baseset = Set(name='imported')
 
 importer = load_importer(impname)(ctx, baseset)
 try:
