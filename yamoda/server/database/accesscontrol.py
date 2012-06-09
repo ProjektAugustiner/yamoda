@@ -141,30 +141,30 @@ class AccessControl(object):
         return db.relationship('Group')
 
     def readable(self):
-        """returns the read access of the current user."""
-        user = object.__getattribute__(self,'user')
-        group = object.__getattribute__(self,'group')
-        permission = object.__getattribute__(self,'permission')
+        """Return the read access of the current user."""
+        user = object.__getattribute__(self, 'user')
+        group = object.__getattribute__(self, 'group')
+        permission = object.__getattribute__(self, 'permission')
         if user == current_user and permission.user_readable:
             return True
-        if((group == current_user.primary_group or
-            group in current_user.groups) and
-            permission.group_readable):
+        if ((group == current_user.primary_group or
+             group in current_user.groups) and
+             permission.group_readable):
             return True
         if permission.all_readable:
             return True
         return False
 
     def writeable(self):
-        """returns the write access of the current user."""
-        user = object.__getattribute__(self,'user')
-        group = object.__getattribute__(self,'group')
-        permission = object.__getattribute__(self,'permission')
+        """Return the write access of the current user."""
+        user = object.__getattribute__(self, 'user')
+        group = object.__getattribute__(self, 'group')
+        permission = object.__getattribute__(self, 'permission')
         if user == current_user and permission.user_writeable:
             return True
-        if((group == current_user.primary_group or
-            group in current_user.groups) and
-            permission.group_writeable):
+        if ((group == current_user.primary_group or
+             group in current_user.groups) and
+             permission.group_writeable):
             return True
         if permission.all_writeable:
             return True
@@ -227,4 +227,4 @@ class Group(db.Model):
 @login_manager.user_loader
 def load_user(userid):
     """User loader callback neccessary for flask-login"""
-    return User.query.filter_by( id=int(userid) ).first()
+    return User.query.get(int(userid))

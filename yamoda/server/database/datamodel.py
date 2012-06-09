@@ -17,7 +17,7 @@ DescriptionMixin -- Mixin class, which adds a brief and a long description colum
 
 
 """
-from yamoda.server import db, login_manager
+from yamoda.server import db
 from yamoda.server.database.accesscontrol import User, Group, AccessControl
 
 
