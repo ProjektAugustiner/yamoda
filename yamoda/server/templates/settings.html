@@ -2,4 +2,22 @@
 {% block body %}
   <h2>Account settings</h2>
   <p>User name: {{ user.name }}</p>
+  <hr>
+  <div>
+    <h3>Change password</h3>
+    <form action="{{ url_for('settings') }}" method="POST">
+      <input type="hidden" name="action" value="pwchange">
+      <dl>
+        <dt>Old password:
+        <dd><input type="password" name="old_password">
+        <dt>New password:
+        <dd><input type="password" name="password">
+        <dt>Confirm new password:
+        <dd><input type="password" name="confirm">
+      </dl>
+      <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i>
+        Change password</button> &nbsp;
+      <button type="reset" class="btn"><i class="icon-remove"></i> Reset</button>
+    </form>
+  </div>
 {% endblock %}

@@ -64,7 +64,7 @@ def register():
             flash(str(e), 'error')
         except IntegrityError:
             db.session.rollback()
-            flash('Invalid username','error')
+            flash('Invalid username', 'error')
         else:
             login_user(new_user)
             flash('Registered successfully.')
@@ -72,8 +72,24 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
     """Render the user settings page."""
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'pwchange':
+            old_pw = request.form['old_password']
+            password = request.form['password']
+            confirm = request.form['confirm']
+            if not current_user.valid_password(old_pw):
+                flash('Old password incorrect.', 'error')
+            elif password != confirm:
+                flash('New passwords do not match.', 'error')
+            elif not password:
+                flash('New password is empty.', 'error')
+            else:
+                current_user.password = password
+                db.session.commit()
+                flash('Password changed successfully.')
     return render_template('settings.html', user=current_user)
