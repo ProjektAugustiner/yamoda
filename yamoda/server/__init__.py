@@ -22,7 +22,7 @@ db = SQLAlchemy(app)
 # login
 login_manager = LoginManager()
 login_manager.setup_app(app)
-login_manager.login_view = 'yamoda.server.views.login'
+login_manager.login_view = 'login'
 
 
 import yamoda.server.views
