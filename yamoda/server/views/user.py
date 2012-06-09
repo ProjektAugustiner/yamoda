@@ -7,7 +7,8 @@ User related views.
 """
 
 from flask import render_template, request, flash, redirect, url_for
-from flask.ext.login import login_user, login_required, logout_user
+from flask.ext.login import login_user, login_required, logout_user, \
+     current_user
 from sqlalchemy.exc import IntegrityError
 
 from yamoda.server import app, db
@@ -40,7 +41,7 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route('/register', methods=['GET','POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     """handles the user registration"""
     if request.method == 'POST':
@@ -72,6 +73,7 @@ def register():
 
 
 @app.route('/settings')
+@login_required
 def settings():
-    """user settings stub"""
-    return ''
+    """Render the user settings page."""
+    return render_template('settings.html', user=current_user)
