@@ -1,7 +1,9 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
-"""The accesscontrol module handles the user access control
+
+"""
+Handle user access control.
 
 Classes:
 --------
@@ -27,7 +29,7 @@ from yamoda.server import db, login_manager
 
 
 class PermissionError(Exception):
-    """Raised when a row level access is denied"""
+    """Raised when a row level access is denied."""
     def __init__(self, value):
         self.value = value
 
@@ -39,12 +41,12 @@ class Permission(object):
     """Stores User/Group/All read & write permissions.
 
     The Permission class stores read and write permissions for User,
-    Group and All as binary flags of an integer. Unlike unix, the 
+    Group and All as binary flags of an integer. Unlike unix, the
     first three bits represent the read permissions, followed by the
     write permissions.
-    
+
     Bit - permission
-    ---------------
+    ----------------
       0 - User read permission
       1 - Group read permission
       2 - All read permission
@@ -56,7 +58,7 @@ class Permission(object):
     def __init__(self, **kw):
         if 'permission' in kw:
             self.permission = kw['permission']
-        else:            
+        else:
             self.permission = 0
             self.user_readable = kw.get('user_readable', True)
             self.user_writeable = kw.get('user_writeable', True)
@@ -115,7 +117,7 @@ class AccessControl(object):
 
     The AccessControl mixin adds row level security to a sqlalchemy database
     model inside the request context. The permission is tested hierarchically.
-    First the *user*, second the *group* and finally the *all* permission 
+    First the *user*, second the *group* and finally the *all* permission
     level is tested.
     """
     @declared_attr
@@ -132,7 +134,7 @@ class AccessControl(object):
 
     @declared_attr
     def group_id(cls):
-        return db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)        
+        return db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
 
     @declared_attr
     def group(cls):
@@ -145,14 +147,13 @@ class AccessControl(object):
         permission = object.__getattribute__(self,'permission')
         if user == current_user and permission.user_readable:
             return True
-        if((group == current_user.primary_group or 
-            group in current_user.groups) and 
+        if((group == current_user.primary_group or
+            group in current_user.groups) and
             permission.group_readable):
             return True
         if permission.all_readable:
             return True
         return False
-
 
     def writeable(self):
         """returns the write access of the current user."""
@@ -161,8 +162,8 @@ class AccessControl(object):
         permission = object.__getattribute__(self,'permission')
         if user == current_user and permission.user_writeable:
             return True
-        if((group == current_user.primary_group or 
-            group in current_user.groups) and 
+        if((group == current_user.primary_group or
+            group in current_user.groups) and
             permission.group_writeable):
             return True
         if permission.all_writeable:
@@ -170,19 +171,19 @@ class AccessControl(object):
         return False
 
     def __getattribute__(self,name):
-        """intecepts column read access."""
-        get = lambda x: object.__getattribute__(self,x)
+        """intercepts column read access."""
+        get = lambda x: object.__getattribute__(self, x)
         if _request_ctx_stack.top:
-            columns = object.__getattribute__(self,'__table__').columns.keys()
+            columns = object.__getattribute__(self, '__table__').columns.keys()
             if name in columns and not get('readable')():
                 raise PermissionError('read access denied')
         return object.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
-        """intecepts column write access."""
-        get = lambda x: object.__getattribute__(self,x)
+        """intercepts column write access."""
+        get = lambda x: object.__getattribute__(self, x)
         if _request_ctx_stack.top:
-            columns = object.__getattribute__(self,'__table__').columns.keys()
+            columns = object.__getattribute__(self, '__table__').columns.keys()
             if name in columns and not get('writeable')():
                 raise PermissionError('write access denied')
         object.__setattr__(self, name, value)
