@@ -16,7 +16,7 @@ from flask.ext.login import login_user, login_required, logout_user
 from sqlalchemy.exc import IntegrityError
 
 from yamoda.server import app, db
-from yamoda.server.database import Context, User, Set
+from yamoda.server.database import Context, User, Group, Set
 
 
 @app.route('/context', methods=['GET','POST'])
@@ -125,4 +125,6 @@ def usersettings():
 @login_required
 def data_view(all=False):
     setlist = Set.query.all()
+    for s in setlist:
+        print s.readable()
     return render_template('setlist.html', sets=setlist)

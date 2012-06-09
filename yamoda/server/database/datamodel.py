@@ -18,7 +18,7 @@ DescriptionMixin -- Mixin class, which adds a brief and a long description colum
 
 """
 from yamoda.server import db, login_manager
-from yamoda.server.database.accesscontrol import User, Group
+from yamoda.server.database.accesscontrol import User, Group, AccessControl
 
 
 _set_to_data = db.Table('set_to_data', db.Model.metadata,
@@ -31,7 +31,7 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
     db.Column('parent_id', db.Integer, db.ForeignKey('set.id'), primary_key=True))
 
 
-class Set(db.Model):
+class Set(db.Model, AccessControl):
     """The Set class is used to group Datas and other Sets"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))

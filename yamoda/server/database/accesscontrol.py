@@ -20,7 +20,7 @@ load_user -- User loader callback neccessary for flask-login
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import _request_ctx_stack
-from flask.ext.login import UserMixin
+from flask.ext.login import UserMixin, current_user
 import bcrypt
 
 from yamoda.server import db, login_manager
@@ -59,7 +59,7 @@ class Permission(object):
         else:            
             self.permission = 0
             self.user_readable = kw.get('user_readable', True)
-            self.user_writeable = kw.get('user_readable', True)
+            self.user_writeable = kw.get('user_writeable', True)
             self.group_readable = kw.get('group_readable', True)
             self.group_writeable = kw.get('group_writeable', True)
             self.all_readable = kw.get('all_readable', True)
@@ -140,41 +140,50 @@ class AccessControl(object):
 
     def readable(self):
         """returns the read access of the current user."""
-        if self.user == current_user and self.permission.user_readable:
+        user = object.__getattribute__(self,'user')
+        group = object.__getattribute__(self,'group')
+        permission = object.__getattribute__(self,'permission')
+        if user == current_user and permission.user_readable:
             return True
-        if ((self.group == current_user.primary_group) or
-           (self.group in current_user.groups) and 
-            self.permission.group_readable):
+        if((group == current_user.primary_group or 
+            group in current_user.groups) and 
+            permission.group_readable):
             return True
-        if self.permission.all_readable:
+        if permission.all_readable:
             return True
-        return  False
+        return False
+
 
     def writeable(self):
         """returns the write access of the current user."""
-        if self.user == current_user and self.permission.user_writeable:
+        user = object.__getattribute__(self,'user')
+        group = object.__getattribute__(self,'group')
+        permission = object.__getattribute__(self,'permission')
+        if user == current_user and permission.user_writeable:
             return True
-        if ((self.group == current_user.primary_group) or
-           (self.group in current_user.groups) and
-            self.permission.group_writeable):
+        if((group == current_user.primary_group or 
+            group in current_user.groups) and 
+            permission.group_writeable):
             return True
-        if self.permission.all_writeable:
+        if permission.all_writeable:
             return True
-        return  False
+        return False
 
     def __getattribute__(self,name):
         """intecepts column read access."""
+        get = lambda x: object.__getattribute__(self,x)
         if _request_ctx_stack.top:
             columns = object.__getattribute__(self,'__table__').columns.keys()
-            if (name in columns) and (not self.readable):
+            if name in columns and not get('readable')():
                 raise PermissionError('read access denied')
         return object.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
         """intecepts column write access."""
+        get = lambda x: object.__getattribute__(self,x)
         if _request_ctx_stack.top:
             columns = object.__getattribute__(self,'__table__').columns.keys()
-            if (name in columns) and (not self.writeable):
+            if name in columns and not get('writeable')():
                 raise PermissionError('write access denied')
         object.__setattr__(self, name, value)
 
