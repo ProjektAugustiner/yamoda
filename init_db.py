@@ -5,7 +5,8 @@ import random
 from optparse import OptionParser
 
 from yamoda.server import db
-from yamoda.server.database import User, Group, Permission, Context, Parameter, Set, Data, Entry
+from yamoda.server.database import User, Group, Permission, Context, \
+     Parameter, Set, Data, Entry
 
 
 parser = OptionParser()
@@ -18,19 +19,22 @@ db.drop_all()
 db.create_all()
 
 if options.testdata:
-    print 'adding user:admin pw:password'
+    print 'adding users: admin:admin and user:user'
     admin_group = Group(name='admin')
-    admin = User(name='admin', password='password', primary_group=admin_group)
+    user_group = Group(name='users')
+    admin = User(name='admin', password='admin', primary_group=admin_group)
+    user = User(name='user', password='user', primary_group=user_group)
     db.session.add(admin)
+    db.session.add(user)
 
     print 'adding "TestContext" context'
     brief = 'This is the short description of the test context.'
     desc = """
     Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor
     incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-    nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi 
+    nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi
     consequat. Quis aute iure reprehenderit in voluptate velit esse cillum
-    dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non 
+    dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non
     proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
     """
     ctx = Context(name='TestContext', brief=brief, description=desc)
@@ -38,7 +42,7 @@ if options.testdata:
 
     print 'adding some test parameters'
     par_T = Parameter(
-        name='T', brief='Temperature', 
+        name='T', brief='Temperature',
         description='This is the description of the temperature',
         unit='K', context=ctx, visible=True)
     par_om = Parameter(
@@ -57,14 +61,13 @@ if options.testdata:
             e1 = Entry(value=random.random()*270, parameter=par_T)
             e2 = Entry(value=random.random()*50, parameter=par_om)
             datas.append(Data(entries=[e1, e2]))
-        children.append(Set(datas=datas, user=admin, group=admin_group))
+        children.append(Set(datas=datas, user=user, group=user_group))
     #create admin only visible set
     perm = Permission(group_readable=False, all_readable=False)
-    admin_set = Set(name="admin", user=admin, 
+    admin_set = Set(name="admin-only", user=admin,
                     group=admin_group, permission=perm)
     children.append(admin_set)
     superset = Set(children=children, user=admin, group=admin_group)
     db.session.add(superset)
 
     db.session.commit()
-    print Group.query.all()
