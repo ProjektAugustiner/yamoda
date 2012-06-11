@@ -10,7 +10,7 @@
         <th>Brief description</th>
     </tr>
     </thead>
-    <tbody>    
+    <tbody>
       {% for ctx in contextlist %}
         <tr>
           <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
