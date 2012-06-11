@@ -61,16 +61,18 @@ if options.testdata:
         for j in range(10):
             e1 = Entry(value=random.random()*270, parameter=par_T)
             e2 = Entry(value=random.random()*50, parameter=par_om)
-            datas.append(Data(entries=[e1, e2], created=datetime.now()))
-        children.append(Set(datas=datas, user=user, group=user_group,
+            datas.append(Data(name='random data', entries=[e1, e2],
+                              created=datetime.now()))
+        children.append(Set(name='set %d' % i, datas=datas,
+                            user=user, group=user_group,
                             created=datetime.now()))
     #create admin only visible set
     perm = Permission(group_readable=False, all_readable=False)
     admin_set = Set(name="admin-only", user=admin, group=admin_group,
                     permission=perm, created=datetime.now())
     children.append(admin_set)
-    superset = Set(children=children, user=admin, group=admin_group,
-                   created=datetime.now())
+    superset = Set(name='superset', children=children,
+                   user=admin, group=admin_group, created=datetime.now())
     db.session.add(superset)
 
     db.session.commit()
