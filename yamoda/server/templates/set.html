@@ -1,27 +1,26 @@
 {% extends "layout.html" %}
-{% set title = "Datasets" %}
+{% set title = "Dataset" %}
 {% block body %}
-  <h2>Datasets</h2>
+  <h2>Dataset</h2>
+  <p>Data in this set:</p>
   <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
         <th>#</th>
         <th>Name</th>
-        <th>Subsets</th>
-        <th>Datas</th>
+        <th>Entries</th>
         <th>Created</th>
       </tr>
     </thead>
   <tbody>
-  {% for set in sets %}
-    {% if set.readable() %}
+  {% for data in set.datas %}
+    {# if data.readable() #}
       <tr>
         <td>{{ loop.index }}</td>
-        <td><a href="{{ url_for('set', id=set.id) }}">{{ set.name }}</a></td>
-        <td>{{ set.children|length }}</td>
-        <td>{{ set.datas|length }}</td>
-        <td>{{ set.created|dtformat }}</td></tr>
-    {% endif %}
+        <td><a href="{{ url_for('data', id=data.id) }}">{{ data.name }}</a></td>
+        <td>{{ data.entries|length }}</td>
+        <td>{{ data.created|dtformat }}</td></tr>
+    {# endif #}
   {% endfor %}
   </tbody>
   </table>

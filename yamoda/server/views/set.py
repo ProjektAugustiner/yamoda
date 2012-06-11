@@ -13,9 +13,17 @@ from yamoda.server import app
 from yamoda.server.database import Set
 
 
-@app.route('/data/<which>')
+@app.route('/set/<id>')
 @login_required
-def data_view(which='mine'):
+def set(id):
+    s = Set.query.get_or_404(id)
+    return render_template('set.html', set=s)
+
+
+@app.route('/sets')
+@app.route('/sets/<which>')
+@login_required
+def setlist(which='mine'):
     if which == 'all':
         setlist = Set.query.all()
     else:
