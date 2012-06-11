@@ -5,7 +5,11 @@
   <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
-        <th>#</th><th>Name</th><th>Subsets</th><th>Datas</th>
+        <th>#</th>
+        <th>Name</th>
+        <th>Subsets</th>
+        <th>Datas</th>
+        <th>Created</th>
       </tr>
     </thead>
   <tbody>
@@ -15,7 +19,8 @@
         <td>{{ loop.index }}</td>
         <td>{{ set.name }}</td>
         <td>{{ set.children|length }}</td>
-        <td>{{ set.datas|length }}</td></tr>
+        <td>{{ set.datas|length }}</td>
+        <td>{{ set.created|dtformat }}</td></tr>
     {% endif %}
   {% endfor %}
   </tbody>
