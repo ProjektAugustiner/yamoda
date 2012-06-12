@@ -7,6 +7,7 @@ Importer for MIRA single counter data.
 """
 
 import time
+from datetime import datetime
 
 import numpy
 
@@ -17,15 +18,18 @@ from yamoda.importer.base import ImporterBase, ReadFailed, \
 class Importer(ImporterBase):
 
     def read_file(self, filename):
-        entries = []
+        entries = {}
         fp = open(filename, 'rb')
         dtline = fp.readline()
         if not dtline.startswith('### NICOS data file'):
             raise ReadFailed('%r does not appear to be a NICOS data file' %
                                filename)
-        entries.append(ImportEntry(name='created', value=time.mktime(time.strptime(
+        ctime = time.mktime(time.strptime(
             dtline[len('### NICOS data file, created at '):].strip(),
-            '%Y-%m-%d %H:%M:%S'))))
+            '%Y-%m-%d %H:%M:%S'))
+        entries['created'] = ImportEntry(name='created', value=ctime)
+        entries['__created__'] = ImportEntry(name='created',
+                                             value=datetime.fromtimestamp(ctime))
         for line in iter(fp.readline, ''):
             if line.startswith('### Scan data'):
                 break
@@ -43,7 +47,9 @@ class Importer(ImporterBase):
                 key = items[1]
                 if key.endswith('_value'):
                     key = key[:-6]
-                entries.append(ImportEntry(name=key, value=val, unit=unit))
+                entries[key] = ImportEntry(name=key, value=val, unit=unit)
+        if 'filename' in entries:
+            entries['__name__'] = entries['filename']
         colnames = fp.readline()[1:].split()
         colunits = fp.readline()[1:].split()
         def convert_value(s):
@@ -56,5 +62,5 @@ class Importer(ImporterBase):
         usecols = cvdict.keys()
         coldata = numpy.loadtxt(fp, converters=cvdict, usecols=usecols, unpack=True)
         for (name, unit, data) in zip(colnames, colunits, coldata):
-            entries.append(ImportEntry(name=name, value=data, unit=unit))
+            entries[name] = ImportEntry(name=name, value=data, unit=unit)
         return entries
