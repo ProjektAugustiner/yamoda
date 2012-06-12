@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% set title = "Import" %}
+{% block body %}
+  <h2>Import Data</h2>
+  {% if error %}<div class="alert alert-error"><strong>Error:</strong> {{ error }}</div>{% endif %}
+  <p>Import data into set <a href="{{ url_for('set', id=set.id) }}">{{ set.name }}</a>:</p>
+  <form action="{{ url_for('setimport', id=set.id) }}" method="post" enctype="multipart/form-data">
+    <dl>
+      <dt>Importer:
+      <dd><select name="importer">
+          {% for key, info in importers %}<option value="{{ key }}">{{ info[0] }}</option>{% endfor %}
+          </select>
+      <dt>Context:
+      <dd><select name="context">
+          {% for ctx in contexts %}<option value="{{ ctx.id }}">{{ ctx.name }}</option>{% endfor %}
+          </select>
+      <dt>File(s):
+      <dd>
+        <input type="file" name="file0" id="file0" style="display: block">
+        <input type="file" name="file1" id="file1" style="display: block">
+        <input type="file" name="file2" id="file2" style="display: block">
+        <button class="btn" onclick="addfile(); return false;">
+          <i class="icon-plus-sign"></i> More</button>
+      <dt>
+      <dd><button type="submit" class="btn btn-primary"><i class="icon-upload icon-white"></i>
+      Import</button>
+    </dl>
+  </form>
+  <script>
+    var nfiles = 2;
+    function addfile() {
+      var oldid = '#file' + nfiles;
+      nfiles += 1;
+      var newname = 'file' + nfiles;
+      $('<input type="file" style="display: block">').
+        attr('name', newname).attr('id', newname).insertAfter(oldid);
+    }
+  </script>
+{% endblock %}
