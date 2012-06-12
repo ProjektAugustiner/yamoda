@@ -41,15 +41,18 @@ def setimport(id):
             fstorage.save(fd, 1024*1024)
             fd.close()
             to_import.append(fname)
-        importer = load_importer(request.form['importer'])(ctx, s)
-        try:
-            importer.import_items(*to_import)
-            db.session.commit()
-        except Exception, err:
-            db.session.rollback()
-            error = str(err)
+        if not to_import:
+            error = 'Nothing to import.'
         else:
-            flash('Import successful')
+            importer = load_importer(request.form['importer'])(ctx, s)
+            try:
+                importer.import_items(*to_import)
+                db.session.commit()
+            except Exception, err:
+                db.session.rollback()
+                error = str(err)
+            else:
+                flash('Import successful')
     contexts = iter(Context.query)
     return render_template('setimport.html', set=s, error=error,
                            importers=list_importers(), contexts=contexts)
