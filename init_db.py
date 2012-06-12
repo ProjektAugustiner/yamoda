@@ -5,7 +5,7 @@ import random
 from optparse import OptionParser
 
 from yamoda.server import db
-from yamoda.server.database import User, Group, Permission, Context, Parameter, Set, Data, Entry
+from yamoda.server.database import User, Group, Context, Parameter, Set, Data, Entry
 
 
 parser = OptionParser()
@@ -59,9 +59,8 @@ if options.testdata:
             datas.append(Data(entries=[e1, e2]))
         children.append(Set(datas=datas, user=admin, group=admin_group))
     #create admin only visible set
-    perm = Permission(group_readable=False, all_readable=False)
     admin_set = Set(name="admin", user=admin, 
-                    group=admin_group, permission=perm)
+                    group=admin_group, group_readable=False, all_readable=False)
     children.append(admin_set)
     superset = Set(children=children, user=admin, group=admin_group)
     db.session.add(superset)
