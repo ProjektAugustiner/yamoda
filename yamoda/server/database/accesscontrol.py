@@ -21,8 +21,11 @@ load_user -- User loader callback neccessary for flask-login
 """
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.util import _entity_descriptor
+from sqlalchemy.sql import and_, or_
 from flask import _request_ctx_stack
 from flask.ext.login import UserMixin, current_user
+from flask.ext.sqlalchemy import BaseQuery
 import bcrypt
 
 from yamoda.server import db, login_manager
@@ -46,11 +49,11 @@ def _bit_property(bit, name='permission'):
 
     def _get(self):
         """Gets the *bit* bit."""
-        return attr(self) & (1 << bit)
+        return bool(attr(self) & (1 << bit))
 
     def _exp(self):
         """Gets the bit on DB side.(SQLAlchemy treats *&* as logical *and*)"""
-        return attr(self).op('&')(1 << bit)
+        return attr(self).op('&')(1 << bit) != 0
 
     def _set(self, value):
         """Sets the *bit* bit dependant on value."""
@@ -59,6 +62,52 @@ def _bit_property(bit, name='permission'):
         else: #clear bit
             set_attr(self, attr(self) & (~(1 << bit)))
     return hybrid_property( _get, _set, expr=_exp)
+
+
+class AccessControlledQuery(BaseQuery):
+    """Custom query class."""
+
+    def _filter_readable(self):
+        """filter the query.
+
+        _filter_readable filters the query the same way the AccessControl 
+        class does inside the readable() function. But the filtering is done
+        on the DB side.
+
+        Note:
+        -----
+        Checks for the secondary groups are not implemented yet.
+
+        """
+        clause = lambda name, value: _entity_descriptor(self._joinpoint_zero(), name)==value
+        return self.filter( or_(
+            and_(clause('user_readable', True),
+                 clause('user_id', current_user.id)), 
+            and_(clause('group_readable',True),
+                 clause('group_id',current_user.primary_id)),
+            and_(clause('all_readable', True))))
+
+    def all_readable(self):
+        raise NotImplementedError
+
+    def all_writeable(self):
+        raise NotImplementedError
+
+    def first_readable(self):
+        raise NotImplementedError
+
+    def first_writeable(self):
+        raise NotImplementedError
+
+    def get_readable(self, ident):
+        """gets the row if it's readable, returns None otherwise"""
+        row = self.query.get(ident)
+        return row if row.readable() else None
+
+    def get_writeable(self, ident):
+        """gets the row if it's writeable, returns None otherwise"""
+        row = self.query.get(ident)
+        return row if row.writeable() else None
 
 
 class AccessControl(object):
@@ -75,6 +124,8 @@ class AccessControl(object):
     guaranteed that the __init__ method is called.
 
     """
+    query_class = AccessControlledQuery
+
     def __init__(self, *args, **kw):
         """AccessControl constructor.
 
@@ -145,15 +196,12 @@ class AccessControl(object):
             user = object.__getattribute__(self, 'user')
             group = object.__getattribute__(self, 'group')
             if user == current_user and get('user_readable'):
-                print 'user readable'
                 return True
             if ((group == current_user.primary_group or
                  group in current_user.groups) and
                  get('group_readable')):
-                print 'group readable'
                 return True
             if get('all_readable'):
-                print 'all readable'
                 return True
             return False
         return True
