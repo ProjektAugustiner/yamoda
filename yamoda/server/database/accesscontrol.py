@@ -65,12 +65,19 @@ def _bit_property(bit, name='permission'):
 
 
 class AccessControlledQuery(BaseQuery):
-    """Custom query class."""
+    """Custom query class, allowing access control filtered queries.
+
+    The AccessControlledQuery class enhances the flask-sqlalchemy query class
+    with several access control filtered queries. Since the access control is
+    checked on the database side, checks on the python side aren't neccessary
+    anymore.
+    
+    """
 
     def _filter_readable(self):
         """filter the query.
 
-        _filter_readable filters the query the same way the AccessControl 
+        _filter_readable filters the query the same way the AccessControl
         class does inside the readable() function. But the filtering is done
         on the DB side.
 
@@ -82,7 +89,7 @@ class AccessControlledQuery(BaseQuery):
         clause = lambda name, value: _entity_descriptor(self._joinpoint_zero(), name)==value
         return self.filter( or_(
             and_(clause('user_readable', True),
-                 clause('user_id', current_user.id)), 
+                 clause('user_id', current_user.id)),
             and_(clause('group_readable',True),
                  clause('group_id',current_user.primary_id)),
             and_(clause('all_readable', True))))
@@ -124,6 +131,7 @@ class AccessControl(object):
     guaranteed that the __init__ method is called.
 
     """
+    #: Custom query class, allowing access control filtered queries.
     query_class = AccessControlledQuery
 
     def __init__(self, *args, **kw):
