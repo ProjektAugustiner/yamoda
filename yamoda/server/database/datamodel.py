@@ -40,7 +40,7 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
     db.Column('parent_id', db.Integer, db.ForeignKey('set.id'), primary_key=True))
 
 
-class Set(db.Model, AccessControl, TimeStamp):
+class Set(AccessControl, TimeStamp, db.Model):
     """The Set class is used to group Datas and other Sets"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)

@@ -12,18 +12,17 @@
         <th>Created</th>
       </tr>
     </thead>
-  <tbody>
-  {% for set in sets %}
-    {% if set.readable() %}
+    <tbody>
+      {% for set in sets %}
       <tr>
         <td>{{ loop.index }}</td>
         <td><a href="{{ url_for('set', id=set.id) }}">{{ set.name }}</a></td>
         <td>{{ set.children|length }}</td>
         <td>{{ set.datas|length }}</td>
-        <td>{{ set.created|dtformat }}</td></tr>
-    {% endif %}
-  {% endfor %}
-  </tbody>
+        <td>{{ set.created|dtformat }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
   </table>
   <script>
     $(document).ready(function() { $('#datatable').dataTable({
