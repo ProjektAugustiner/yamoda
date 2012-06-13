@@ -80,6 +80,12 @@ class Entry(db.Model, TimeStamp):
         return '<Entry({0},{1},{2!r})>'.format(self.id, self.parameter.name,
                                                self.value_complex)
 
+    @property
+    def value_any(self):
+        if self.value is None:
+            return self.value_complex
+        return self.value
+
 
 class DescriptionMixin(object):
     """Mixin class, which adds a brief and a long description column"""

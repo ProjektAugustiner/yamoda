@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% set title = "Data" %}
+{% block body %}
+  <h2>Data: {{ data.name }}
+  <small>Created {{ data.created|dtformat }}</small></h2>
+  <p>Entries:</p>
+  <table id="datatable" class="table table-condensed table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Value</th>
+        <th>Unit</th>
+      </tr>
+    </thead>
+  <tbody>
+  {% for entry in data.entries %}
+      <tr>
+        <td>{{ entry.parameter.name }}</td>
+        <td>{{ entry.value_any }}</td>
+        <td>{{ entry.parameter.unit }}</td>
+      </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+  <script>
+    $(document).ready(function() { $('#datatable').dataTable({
+    "bLengthChange": false, "bPaginate": false}); });
+  </script>
+{% endblock %}
