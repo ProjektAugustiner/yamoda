@@ -61,7 +61,8 @@ if options.testdata:
         for j in range(10):
             e1 = Entry(value=random.random()*270, parameter=par_T)
             e2 = Entry(value=random.random()*50, parameter=par_om)
-            datas.append(Data(name='random data', entries=[e1, e2]))
+            datas.append(Data(name='random data', entries=[e1, e2],
+                              context=ctx))
         children.append(Set(name='set %d' % i, datas=datas,
                             user=user, group=user_group))
     #create admin only visible set

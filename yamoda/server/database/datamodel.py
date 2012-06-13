@@ -58,6 +58,8 @@ class Data(db.Model, TimeStamp):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     entries = db.relationship('Entry', backref='data')
+    context_id = db.Column(db.Integer, db.ForeignKey('context.id'), nullable=False)
+    context = db.relationship('Context')
 
     def __repr__(self):
         return '<Data({0})>'.format(self.id)
