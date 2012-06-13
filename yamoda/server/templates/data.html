@@ -17,7 +17,7 @@
       <tr>
         <td>{{ entry.parameter.name }}</td>
         <td>{{ entry.value_any }}</td>
-        <td>{{ entry.parameter.unit }}</td>
+        <td>{{ entry.parameter.unit or '' }}</td>
       </tr>
   {% endfor %}
   </tbody>
