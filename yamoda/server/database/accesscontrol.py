@@ -74,37 +74,39 @@ class AccessControlledQuery(BaseQuery):
     
     """
 
-    def _filter_readable(self):
+    def _filter(self,access):
         """filter the query.
 
-        _filter_readable filters the query the same way the AccessControl
-        class does inside the readable() function. But the filtering is done
-        on the DB side.
-
-        Note:
-        -----
-        Checks for the secondary groups are not implemented yet.
+        _filter filters the query the same way the AccessControl
+        class does inside the readable()/writeable() function. But the
+        filtering is done on the DB side.
 
         """
-        clause = lambda name, value: _entity_descriptor(self._joinpoint_zero(), name)==value
+        if access == 'readable':
+            (usr, grp, all) = ('user_readable', 'group_readable',
+                               'all_readable')
+        elif access == 'writeable':
+            (usr, grp, all) = ('user_writeable', 'group_writeable',
+                               'all_writeable')
+
+        clause = lambda name: _entity_descriptor(self._joinpoint_zero(), name)
+        cu_grps = [current_user.group_id]+[g.id for g in current_user.groups]
         return self.filter( or_(
-            and_(clause('user_readable', True),
-                 clause('user_id', current_user.id)),
-            and_(clause('group_readable',True),
-                 clause('group_id',current_user.primary_id)),
-            and_(clause('all_readable', True))))
+            and_(clause(usr)==True, clause('user_id') == current_user.id),
+            and_((grp) ==  True, clause('group_id').in_(cu_grps)),
+            and_(clause(all)==True)))
 
     def all_readable(self):
-        raise NotImplementedError
+        return self._filter('readable').all()
 
     def all_writeable(self):
-        raise NotImplementedError
+        return self._filter('writeable').all()
 
     def first_readable(self):
-        raise NotImplementedError
+        return self._filter('readable').first()
 
     def first_writeable(self):
-        raise NotImplementedError
+        return self._filter('writeable').first()
 
     def get_readable(self, ident):
         """gets the row if it's readable, returns None otherwise"""

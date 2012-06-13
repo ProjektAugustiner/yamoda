@@ -9,13 +9,11 @@
     </thead>
   <tbody>
   {% for set in sets %}
-    {% if set.readable() %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td>{{ set.name }}</td>
-        <td>{{ set.children|length }}</td>
-        <td>{{ set.datas|length }}</td></tr>
-    {% endif %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ set.name }}</td>
+      <td>{{ set.children|length }}</td>
+      <td>{{ set.datas|length }}</td></tr>
   {% endfor %}
   </tbody>
   </table>

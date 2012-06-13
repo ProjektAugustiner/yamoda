@@ -16,5 +16,5 @@ from yamoda.server.database import Set
 @app.route('/data')
 @login_required
 def data_view(all=False):
-    setlist = Set.query.all()
+    setlist = Set.query.all_readable()
     return render_template('setlist.html', sets=setlist)

@@ -59,7 +59,7 @@ if options.testdata:
             datas.append(Data(entries=[e1, e2]))
         children.append(Set(datas=datas, user=admin, group=admin_group))
     #create admin only visible set
-    admin_set = Set(name="admin", user=admin, 
+    admin_set = Set(name="admin", user=admin,
                     group=admin_group, group_readable=False, all_readable=False)
     children.append(admin_set)
     superset = Set(children=children, user=admin, group=admin_group)
