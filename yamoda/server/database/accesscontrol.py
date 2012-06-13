@@ -82,12 +82,14 @@ class AccessControlledQuery(BaseQuery):
         filtering is done on the DB side.
 
         """
-        if access == 'readable':
+        if access == 'read':
             (usr, grp, all) = ('user_readable', 'group_readable',
                                'all_readable')
-        elif access == 'writeable':
+        elif access == 'write':
             (usr, grp, all) = ('user_writeable', 'group_writeable',
                                'all_writeable')
+        else:
+            raise ValueError
 
         clause = lambda name: _entity_descriptor(self._joinpoint_zero(), name)
         cu_grps = [current_user.group_id]+[g.id for g in current_user.groups]
@@ -97,16 +99,16 @@ class AccessControlledQuery(BaseQuery):
             and_(clause(all)==True)))
 
     def all_readable(self):
-        return self._filter('readable').all()
+        return self._filter('read').all()
 
     def all_writeable(self):
-        return self._filter('writeable').all()
+        return self._filter('write').all()
 
     def first_readable(self):
-        return self._filter('readable').first()
+        return self._filter('read').first()
 
     def first_writeable(self):
-        return self._filter('writeable').first()
+        return self._filter('write').first()
 
     def get_readable(self, ident):
         """gets the row if it's readable, returns None otherwise"""
@@ -192,54 +194,47 @@ class AccessControl(object):
         """Relation with the owning group"""
         return db.relationship('Group')
 
-    def readable(self):
-        """Return the read access of the current user.
+    def access(self, access='read'):
+        """calculates the read/write access of the current user.
 
-        The readable member function detemines the read access of the current
-        user. It is evaluated hirachically, first the *user* permission, then
-        the *group* permission and finally the *all* permission. If it's 
-        called from outside of a request context, it evaluates to True.
+        The access member function determines the read/write access of the 
+        current user. It is evaluated in a hirarchical fashion, first the
+        *user*, followed by the *group* and finally the *all* access. Outside
+        of a request context complete access is granted.
+        
+        Keyword arguments:
+        ------------------
+        :access: Determines if read or write permission is calculated. Valid
+                 values are "read" or "write".
 
         """
-        if _request_ctx_stack.top:
-            get = lambda x: object.__getattribute__(self, x)
-            user = object.__getattribute__(self, 'user')
-            group = object.__getattribute__(self, 'group')
-            if user == current_user and get('user_readable'):
-                return True
-            if ((group == current_user.primary_group or
-                 group in current_user.groups) and
-                 get('group_readable')):
-                return True
-            if get('all_readable'):
-                return True
-            return False
-        return True
+        if access == 'read':
+            (usr, grp, all) = ('user_readable', 'group_readable',
+                               'all_readable')
+        elif access == 'write':
+            (usr, grp, all) = ('user_writeable', 'group_writeable',
+                               'all_writeable')
+        else:
+            raise ValueError
+        if _request_ctx_stack.top is None:
+            return True
+        get = lambda x: object.__getattribute__(self, x)
+        user = object.__getattribute__(self, 'user')
+        group = object.__getattribute__(self, 'group')
+        cu_groups = [current_user.primary_group] + current_user.groups
+
+        if ((get(usr) and user == current_user) or 
+            (get(grp) and group in cu_groups) or get(all)):
+            return True
+        return False
+
+    def readable(self):
+        """Return the read access of the current user."""
+        return self.access('read')
 
     def writeable(self):
-        """Return the write access of the current user.
-
-        The writeable member function detemines the write access of the 
-        current user. It is evaluated hirachically, first the *user* 
-        permission, followed by the *group* permission and finally the *all*
-        permission. If it's called from outside of a request context, it 
-        evaluates to True.
-
-        """
-        if _request_ctx_stack.top:
-            user = object.__getattribute__(self, 'user')
-            group = object.__getattribute__(self, 'group')
-            permission = object.__getattribute__(self, 'permission')
-            if user == current_user and permission.user_writeable:
-                return True
-            if ((group == current_user.primary_group or
-                 group in current_user.groups) and
-                permission.group_writeable):
-                return True
-            if permission.all_writeable:
-                return True
-            return False
-        return True
+        """Return the write access of the current user."""
+        return self.access('write')
 
     def __getattribute__(self,name):
         """Intercepts column read access."""
