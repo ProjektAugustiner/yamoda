@@ -99,29 +99,28 @@ class AccessControlledQuery(BaseQuery):
             and_(clause(all)==True)))
 
     def all_readable(self):
+        """Returns all readable items of this query as a list."""
         return self._filter('read').all()
 
-    def all_readable_or_404(self):
-        return self._filter('read').all_or_404()
-
     def all_writeable(self):
+        """Returns all writeable items of this query as a list."""
         return self._filter('write').all()
 
-    def all_writeable_or_404(self):
-        return self._filter('write').all_or_404()
-
     def first_readable(self):
+        """Returns the first readable row of this query."""
         return self._filter('read').first()
 
     def first_writeable(self):
+        """Returns the first writeable row of this query."""
         return self._filter('write').first()
 
     def get_readable(self, ident):
-        """gets the row if it's readable, returns None otherwise"""
+        """Gets the row if it's found and readable, returns None otherwise."""
         row = self.get(ident)
         return row if row.readable() else None
 
     def get_readable_or_404(self, ident):
+        """Like get_readable, but aborts with 404 if it fails."""
         row = self.get_readable(ident)
         if row is None:
             abort(404)
@@ -129,11 +128,12 @@ class AccessControlledQuery(BaseQuery):
             return row
 
     def get_writeable(self, ident):
-        """gets the row if it's writeable, returns None otherwise"""
+        """Gets the row if it's found and writeable, returns None otherwise."""
         row = self.get(ident)
         return row if row.writeable() else None
 
     def get_writeable_or_404(self, ident):
+        """Like get_writeable, but aborts with 404 if it fails."""
         row = self.get_writeable(ident)
         if row is None:
             abort(404)
