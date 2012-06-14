@@ -15,7 +15,13 @@
   <tbody>
   {% for entry in data.entries %}
       <tr>
-        <td>{{ entry.parameter.name }}</td>
+        <td>
+            <!-- Link to the Parameter description, parameter.brief is used as tooltip -->
+            <a href="{{ url_for('context', ctx_name=entry.parameter.context.name) }}#{{ entry.parameter.name }}" 
+             rel="tooltip" title="{{ entry.parameter.brief }}">
+              {{ entry.parameter.name }}
+            </a>
+        </td>
         <td>{{ entry.value_any }}</td>
         <td>{{ entry.parameter.unit or '' }}</td>
       </tr>
@@ -25,5 +31,6 @@
   <script>
     $(document).ready(function() { $('#datatable').dataTable({
     "bLengthChange": false, "bPaginate": false}); });
+    $(function(){ $('a[rel=tooltip]').tooltip();});
   </script>
 {% endblock %}

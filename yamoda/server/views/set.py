@@ -13,7 +13,7 @@ from yamoda.server import app
 from yamoda.server.database import Set
 
 
-@app.route('/set/<id>')
+@app.route('/set/<int:id>')
 @login_required
 def set(id):
     s = Set.query.get_or_404(id)
