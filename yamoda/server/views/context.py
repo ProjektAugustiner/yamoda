@@ -21,7 +21,7 @@ from yamoda.server.database import Context, User, Group, Set
 
 @app.route('/context', methods=['GET','POST'])
 @login_required
-def contexttable():
+def contextlist():
     """shows every context in the database"""
     if request.method == 'POST':
         name = request.form['ctx_name']
@@ -41,7 +41,7 @@ def contexttable():
             flash('Created new context: {0}'.format(name), 'info')
 
     contextlist = Context.query.all()
-    return render_template('contexttable.html', contextlist=contextlist)
+    return render_template('contextlist.html', contextlist=contextlist)
 
 
 @app.route('/context/<ctx_name>')

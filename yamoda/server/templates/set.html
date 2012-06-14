@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% set title = "Dataset" %}
+{% block body %}
+  <h2>Dataset: {{ set.name }}</h2>
+  {% if set.children %}
+  <p>Subsets:</p>
+  <table id="datatable" class="table table-condensed table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Subsets</th>
+        <th>Datas</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+  <tbody>
+  {% for subset in set.children %}
+    {% if subset.readable() %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><a href="{{ url_for('set', id=subset.id) }}">{{ subset.name }}</a></td>
+        <td>{{ subset.children|length }}</td>
+        <td>{{ subset.datas|length }}</td>
+        <td>{{ subset.created|dtformat }}</td></tr>
+    {% endif %}
+  {% endfor %}
+  </tbody>
+  </table>
+  <script>
+    $(document).ready(function() { $('#datatable').dataTable({
+    "bLengthChange": false, "bPaginate": false}); });
+  </script>
+  {% endif %}
+  {% if set.datas %}
+  <p>Data in this set:</p>
+  <table id="datatable2" class="table table-condensed table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Entries</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+  <tbody>
+  {% for data in set.datas %}
+    {# if data.readable() #}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><a href="{{ url_for('data', id=data.id) }}">{{ data.name }}</a></td>
+        <td>{{ data.entries|length }}</td>
+        <td>{{ data.created|dtformat }}</td></tr>
+    {# endif #}
+  {% endfor %}
+  </tbody>
+  </table>
+  <script>
+    $(document).ready(function() { $('#datatable2').dataTable({
+    "bLengthChange": false, "bPaginate": false}); });
+  </script>
+  {% endif %}
+{% endblock %}

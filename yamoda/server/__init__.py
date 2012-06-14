@@ -25,5 +25,9 @@ login_manager.setup_app(app)
 login_manager.login_view = 'login'
 
 
+def datetimeformat(value, format='%Y-%m-%d %H:%M'):
+    return value.strftime(format)
+app.jinja_env.filters['dtformat'] = datetimeformat
+
 import yamoda.server.views
 import yamoda.server.database

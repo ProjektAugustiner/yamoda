@@ -17,8 +17,17 @@ DescriptionMixin -- Mixin class, which adds a brief and a long description colum
 
 
 """
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.sql.expression import func
 from yamoda.server import db
 from yamoda.server.database.accesscontrol import User, Group, AccessControl
+
+
+class TimeStamp(object):
+    """A simple timestamp mixin"""
+    @declared_attr
+    def created(cls):
+        return db.Column(db.DateTime, default=func.now(),nullable=False)
 
 
 _set_to_data = db.Table('set_to_data', db.Model.metadata,
@@ -31,10 +40,10 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
     db.Column('parent_id', db.Integer, db.ForeignKey('set.id'), primary_key=True))
 
 
-class Set(AccessControl, db.Model):
+class Set(AccessControl, db.Model, TimeStamp):
     """The Set class is used to group Datas and other Sets"""
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60))
+    name = db.Column(db.String(60), nullable=False)
     datas = db.relationship('Data', secondary=_set_to_data, backref='sets')
     children = db.relationship('Set', secondary=_set_to_set,
                                primaryjoin=id==_set_to_set.c.child_id,
@@ -44,16 +53,17 @@ class Set(AccessControl, db.Model):
         return '<DataSet({0})>'.format(self.id)
 
 
-class Data(db.Model):
+class Data(db.Model, TimeStamp):
     """A Data is a collection of Entries"""
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60), nullable=False)
     entries = db.relationship('Entry', backref='data')
 
     def __repr__(self):
         return '<Data({0})>'.format(self.id)
 
 
-class Entry(db.Model):
+class Entry(db.Model, TimeStamp):
     """And Entry is a single bit of information (scalar or array) in a Data"""
     id = db.Column(db.Integer, primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))

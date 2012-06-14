@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% set title = "Contexts" %}
 {% block body %}
   <h2>Data contexts</h2>
   <p class="newbutton"><a class="btn" data-toggle="modal" href="#new_context">New Context</a></p>
@@ -9,7 +10,7 @@
         <th>Brief description</th>
     </tr>
     </thead>
-    <tbody>    
+    <tbody>
       {% for ctx in contextlist %}
         <tr>
           <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
@@ -19,7 +20,7 @@
     </tbody>
   </table>
   <div class="modal hide" id="new_context">
-    <form class="modal-form" action="{{ url_for('contexttable') }}" method="post">
+    <form class="modal-form" action="{{ url_for('contextlist') }}" method="post">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h3>New Context</h3>

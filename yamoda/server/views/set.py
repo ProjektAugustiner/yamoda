@@ -6,15 +6,26 @@
 Data set related views.
 """
 
-from flask import render_template
-from flask.ext.login import login_required
+from flask import render_template, request
+from flask.ext.login import login_required, current_user
 
 from yamoda.server import app
 from yamoda.server.database import Set
 
 
-@app.route('/data')
+@app.route('/set/<id>')
 @login_required
-def data_view(all=False):
-    setlist = Set.query.all_readable()
+def set(id):
+    s = Set.query.get_readable_or_404(id)
+    return render_template('set.html', set=s)
+
+
+@app.route('/sets')
+@app.route('/sets/<which>')
+@login_required
+def setlist(which='mine'):
+    if which == 'all':
+        setlist = Set.query.all_readable()
+    else:
+        setlist = Set.query.filter_by(user=current_user).all_readable()
     return render_template('setlist.html', sets=setlist)

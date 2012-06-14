@@ -101,8 +101,14 @@ class AccessControlledQuery(BaseQuery):
     def all_readable(self):
         return self._filter('read').all()
 
+    def all_readable_or_404(self):
+        return self._filter('read').all_or_404()
+
     def all_writeable(self):
         return self._filter('write').all()
+
+    def all_writeable_or_404(self):
+        return self._filter('write').all_or_404()
 
     def first_readable(self):
         return self._filter('read').first()
@@ -112,14 +118,27 @@ class AccessControlledQuery(BaseQuery):
 
     def get_readable(self, ident):
         """gets the row if it's readable, returns None otherwise"""
-        row = self.query.get(ident)
+        row = self.get(ident)
         return row if row.readable() else None
+
+    def get_readable_or_404(self, ident):
+        row = self.get_readable(ident)
+        if row is None:
+            abort(404)
+        else:
+            return row
 
     def get_writeable(self, ident):
         """gets the row if it's writeable, returns None otherwise"""
-        row = self.query.get(ident)
+        row = self.get(ident)
         return row if row.writeable() else None
 
+    def get_writeable_or_404(self, ident):
+        row = self.get_writeable(ident)
+        if row is None:
+            abort(404)
+        else:
+            return row
 
 class AccessControl(object):
     """Mixin class, adding row level security to the database model.

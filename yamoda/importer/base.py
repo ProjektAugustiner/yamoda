@@ -8,6 +8,7 @@ Base class and utilities for importers.
 
 import os
 from os import path
+from datetime import datetime
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -76,8 +77,13 @@ class ImporterBase(object):
                                   self.__class__.__name__)
 
     def process_entries(self, entries):
-        data = Data()
-        for ent in entries:
+        kwds = {'name': '(unnamed)'}
+        if '__name__' in entries:
+            kwds['name'] = entries.pop('__name__').value
+        if '__created__' in entries:
+            kwds['created'] = entries.pop('__created__').value
+        data = Data(**kwds)
+        for ent in entries.itervalues():
             try:
                 param = Parameter.query.filter_by(name=ent.name,
                                                   context=self.ctx).one()
