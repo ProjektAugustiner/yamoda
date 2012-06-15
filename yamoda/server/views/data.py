@@ -31,13 +31,12 @@ def plot(yid, xid):
 
     ex = Entry.query.get_or_404(xid)
     ey = Entry.query.get_or_404(yid)
-    if not isinstance(ex.value_complex, ndarray) or not \
-        isinstance(ey.value_complex, ndarray) or \
-        len(ex.value_complex) != len(ey.value_complex):
+    if not isinstance(ex.value, ndarray) or not isinstance(ey.value, ndarray) \
+       or len(ex.value) != len(ey.value):
         abort(415)
     fig = plt.figure()
     ax = fig.gca()
-    ax.plot(ex.value_complex, ey.value_complex)
+    ax.plot(ex.value, ey.value)
     ax.set_xlabel('%s (%s)' % (ex.parameter.name, ex.parameter.unit))
     ax.set_ylabel('%s (%s)' % (ey.parameter.name, ey.parameter.unit))
     fp = cStringIO.StringIO()

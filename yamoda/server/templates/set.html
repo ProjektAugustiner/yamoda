@@ -33,7 +33,7 @@
   </script>
   {% endif %}
   {% if set.datas %}
-  <p>Data in this set:</p>
+  <p>Data in this set (<a href="{{ url_for('setimport', id=set.id) }}">import data</a>):</p>
   <table id="datatable2" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>

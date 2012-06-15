@@ -17,6 +17,7 @@ DescriptionMixin -- Mixin class, which adds a brief and a long description colum
 
 
 """
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.expression import func
 from yamoda.server import db
@@ -27,7 +28,7 @@ class TimeStamp(object):
     """A simple timestamp mixin"""
     @declared_attr
     def created(cls):
-        return db.Column(db.DateTime, default=func.now(),nullable=False)
+        return db.Column(db.DateTime, default=func.now(), nullable=False)
 
 
 _set_to_data = db.Table('set_to_data', db.Model.metadata,
@@ -70,7 +71,21 @@ class Entry(db.Model, TimeStamp):
     id = db.Column(db.Integer, primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))
     parameter_id = db.Column(db.Integer, db.ForeignKey('parameter.id'), nullable=False)
-    value = db.Column(db.Float)
+
+    @hybrid_property
+    def value(self):
+        if self.value_float is None:
+            return self.value_complex
+        return self.value_float
+
+    @value.setter
+    def _(self, newvalue):
+        if isinstance(newvalue, float):
+            self.value_float = newvalue
+        else:
+            self.value_complex = newvalue
+
+    value_float = db.Column(db.Float)
     value_complex = db.Column(db.PickleType)
 
     parameter = db.relationship('Parameter')
@@ -81,12 +96,6 @@ class Entry(db.Model, TimeStamp):
                                                  self.value)
         return '<Entry({0},{1},{2!r})>'.format(self.id, self.parameter.name,
                                                self.value_complex)
-
-    @property
-    def value_any(self):
-        if self.value is None:
-            return self.value_complex
-        return self.value
 
 
 class DescriptionMixin(object):

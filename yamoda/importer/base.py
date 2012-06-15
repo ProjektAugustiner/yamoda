@@ -8,7 +8,6 @@ Base class and utilities for importers.
 
 import os
 from os import path
-from datetime import datetime
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -23,11 +22,14 @@ class ReadFailed(Exception):
 class MissingInfo(Exception):
     """Raised when an importer requires more information from the user
     in order to continue.
+
+    *info* is a list of tuples ``(key, type, help)``; *help* will be
+    displayed to the user.
     """
 
-    def __init__(self, parameters):
-        self.parameters = parameters
-        Exception.__init__(self, parameters)
+    def __init__(self, info):
+        self.info = info
+        Exception.__init__(self, info)
 
 
 class ImportEntry(object):
@@ -54,49 +56,59 @@ class ImporterBase(object):
         self.ctx = ctx
         self.baseset = baseset
 
-    def import_items(self, *names):
+    def import_items(self, names, userinfo):
         for name in names:
             # recursively import from subdirectories
             if path.isdir(name):
                 self.import_items([path.join(name, sub)
-                                   for sub in os.listdir(name)])
+                                   for sub in os.listdir(name)], userinfo)
             elif path.isfile(name):
                 # XXX support zipfiles?
-                self.import_file(name)
+                self.import_file(name, userinfo)
             else:
                 raise ReadFailed('could not handle path %r' % name)
 
-    def import_file(self, filename):
+    def import_file(self, filename, userinfo):
         # default implementation: one file is one data
         entries = self.read_file(filename)
-        data = self.process_entries(entries)
+        data = self.process_entries(entries, userinfo)
         self.baseset.datas.append(data)
 
     def read_file(self, filename):
         raise NotImplementedError('%s.read_file must be implemented' %
                                   self.__class__.__name__)
 
-    def process_entries(self, entries):
+    def process_entries(self, entries, userinfo):
         kwds = {'name': '(unnamed)', 'context': self.ctx}
         if '__name__' in entries:
             kwds['name'] = entries.pop('__name__').value
         if '__created__' in entries:
             kwds['created'] = entries.pop('__created__').value
         data = Data(**kwds)
+        missing_params = []
         for ent in entries.itervalues():
             try:
                 param = Parameter.query.filter_by(name=ent.name,
                                                   context=self.ctx).one()
             except NoResultFound:
-                # for testing:
-                param = Parameter(name=ent.name, context=self.ctx, unit=ent.unit)
-                db.session.add(param)
-                db.session.commit()
-                #raise MissingInfo('parameter %s' % ent.name)  # XXX format of errors
-            else:
-                assert param.unit == ent.unit  # XXX
-            if isinstance(ent.value, float):
-                data.entries.append(Entry(parameter=param, value=ent.value))
-            else:
-                data.entries.append(Entry(parameter=param, value_complex=ent.value))
+                if 'par_' + ent.name in userinfo:
+                    kwds = userinfo['par_' + ent.name]
+                    if 'unit' not in kwds:
+                        kwds['unit'] = ent.unit
+                    param = Parameter(name=ent.name, context=self.ctx,
+                                      **kwds)
+                    db.session.add(param)
+                    db.session.flush()
+                else:
+                    missing_params.append(ent.name)
+                    continue
+            if param.unit != ent.unit:
+                # TODO: unit mismatch: as long as we can't convert between
+                # units, lets be on the safe side and error out
+                raise ReadFailed('inconsistent units for param %s: expecting %s'
+                                 ', got %s' % (ent.name, param.unit, ent.unit))
+            data.entries.append(Entry(parameter=param, value=ent.value))
+        if missing_params:
+            raise MissingInfo([('par_' + param, 'new_param', None)
+                               for param in missing_params])
         return data
