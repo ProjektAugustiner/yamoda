@@ -19,11 +19,12 @@ Functions:
 load_user -- User loader callback neccessary for flask-login
 
 """
+
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.util import _entity_descriptor
 from sqlalchemy.sql import and_, or_
-from flask import _request_ctx_stack
+from flask import _request_ctx_stack, abort
 from flask.ext.login import UserMixin, current_user
 from flask.ext.sqlalchemy import BaseQuery
 import bcrypt
@@ -216,7 +217,7 @@ class AccessControl(object):
     def access(self, access='read'):
         """calculates the read/write access of the current user.
 
-        The access member function determines the read/write access of the 
+        The access member function determines the read/write access of the
         current user. It is evaluated in a hirarchical fashion, first the
         *user*, followed by the *group* and finally the *all* access. Outside
         of a request context complete access is granted.
@@ -242,7 +243,7 @@ class AccessControl(object):
         group = object.__getattribute__(self, 'group')
         cu_groups = [current_user.primary_group] + current_user.groups
 
-        if ((get(usr) and user == current_user) or 
+        if ((get(usr) and user == current_user) or
             (get(grp) and group in cu_groups) or get(all)):
             return True
         return False
@@ -259,8 +260,7 @@ class AccessControl(object):
         """Intercepts column read access."""
         get = lambda x: object.__getattribute__(self, x)
         if _request_ctx_stack.top:
-            columns = get('__table__').columns.keys()
-            if name in columns and not get('readable')():
+            if name in get('__table__').columns and not get('readable')():
                 raise PermissionError('read access denied: {0}'.format(name))
 
         return object.__getattribute__(self, name)
@@ -269,8 +269,7 @@ class AccessControl(object):
         """Intercepts column write access."""
         get = lambda x: object.__getattribute__(self, x)
         if _request_ctx_stack.top:
-            columns = get('__table__').columns.keys()
-            if name in columns and not get('writeable')():
+            if name in get('__table__').columns and not get('writeable')():
                 raise PermissionError('write access denied: {0}'.format(name))
         object.__setattr__(self, name, value)
 
