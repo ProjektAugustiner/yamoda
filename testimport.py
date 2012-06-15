@@ -4,8 +4,8 @@
 
 import sys
 
-from yamoda.server import app, db
-from yamoda.server.database import User, Group, Context, Parameter, Set, Data, Entry
+from yamoda.server import db
+from yamoda.server.database import User, Group, Context, Set
 
 from yamoda.importer import load_importer
 
@@ -19,7 +19,7 @@ baseset = Set(name='imported', user=usr, group=grp)
 
 importer = load_importer(impname)(ctx, baseset)
 try:
-    importer.import_items(*filenames)
+    importer.import_items(filenames, {})
     db.session.add(baseset)
     db.session.commit()
 except:
