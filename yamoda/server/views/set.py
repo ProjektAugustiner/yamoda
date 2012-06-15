@@ -20,7 +20,7 @@ from yamoda.importer import list_importers, load_importer
 @app.route('/set/<int:id>')
 @login_required
 def set(id):
-    s = Set.query.get_or_404(id)
+    s = Set.query.get_readable_or_404(id)
     return render_template('set.html', set=s)
 
 
