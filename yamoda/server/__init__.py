@@ -8,6 +8,12 @@ from flask.ext.login import LoginManager
 
 from jinja2 import Markup
 
+try:
+    import matplotlib
+    matplotlib.use('agg')
+except ImportError:
+    pass
+
 # configuration
 SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
 DEBUG = True
