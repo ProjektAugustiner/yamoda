@@ -11,7 +11,7 @@ from yamoda.importer import load_importer
 from yamoda.importer.base import MissingInfo
 
 parser = optparse.OptionParser()
-parser.add_option('-a', dest='autoparams', default=False,
+parser.add_option('-a', action='store_true', dest='autoparams', default=False,
                   help='automatically add missing parameters')
 parser.add_option('-s', type='int', dest='setid',
                   help='data set to import to, default is to create new')
