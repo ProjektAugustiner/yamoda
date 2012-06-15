@@ -23,13 +23,13 @@ class MissingInfo(Exception):
     """Raised when an importer requires more information from the user
     in order to continue.
 
-    *parameters* is a list of tuples ``(paramname, type, help)``; *help* will be
+    *info* is a list of tuples ``(key, type, help)``; *help* will be
     displayed to the user.
     """
 
-    def __init__(self, parameters):
-        self.parameters = parameters
-        Exception.__init__(self, parameters)
+    def __init__(self, info):
+        self.info = info
+        Exception.__init__(self, info)
 
 
 class ImportEntry(object):
