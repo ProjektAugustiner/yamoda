@@ -22,8 +22,8 @@
               {{ entry.parameter.name }}
             </a>
         </td>
-        <td>{{ entry.value_any }}</td>
-        <td>{{ entry.parameter.unit or '' }}</td>
+        <td>{{ entry.value_any|dataformat }}</td>
+        <td>{{ entry.parameter.unit|unitformat }}</td>
       </tr>
   {% endfor %}
   </tbody>

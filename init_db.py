@@ -59,7 +59,7 @@ if options.testdata:
         datas = []
         for j in range(10):
             e1 = Entry(value=random.random()*270, parameter=par_T)
-            e2 = Entry(value=random.random()*50, parameter=par_om)
+            e2 = Entry(value=random.random()*5000000, parameter=par_om)
             datas.append(Data(name='random data', entries=[e1, e2],
                               context=ctx))
         children.append(Set(name='set %d' % i, datas=datas,
