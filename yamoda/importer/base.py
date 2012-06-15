@@ -79,7 +79,7 @@ class ImporterBase(object):
                                   self.__class__.__name__)
 
     def process_entries(self, entries, userinfo):
-        kwds = {'name': '(unnamed)'}
+        kwds = {'name': '(unnamed)', 'context': self.ctx}
         if '__name__' in entries:
             kwds['name'] = entries.pop('__name__').value
         if '__created__' in entries:

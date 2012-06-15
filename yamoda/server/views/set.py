@@ -17,7 +17,7 @@ from yamoda.server.database import Set, Context
 from yamoda.importer import list_importers, load_importer
 
 
-@app.route('/set/<id>')
+@app.route('/set/<int:id>')
 @login_required
 def set(id):
     s = Set.query.get_or_404(id)
@@ -63,9 +63,7 @@ def setimport(id):
 @login_required
 def setlist(which='mine'):
     if which == 'all':
-        setlist = Set.query.all()
+        setlist = Set.query.all_readable()
     else:
-        setlist = Set.query.filter_by(user=current_user)
-    for s in setlist:
-        print s.readable()
+        setlist = Set.query.filter_by(user=current_user).all_readable()
     return render_template('setlist.html', sets=setlist)

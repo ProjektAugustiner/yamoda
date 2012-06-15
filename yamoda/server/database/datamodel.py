@@ -41,7 +41,7 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
     db.Column('parent_id', db.Integer, db.ForeignKey('set.id'), primary_key=True))
 
 
-class Set(db.Model, AccessControl, TimeStamp):
+class Set(AccessControl, TimeStamp, db.Model):
     """The Set class is used to group Datas and other Sets"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
@@ -59,6 +59,8 @@ class Data(db.Model, TimeStamp):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     entries = db.relationship('Entry', backref='data')
+    context_id = db.Column(db.Integer, db.ForeignKey('context.id'), nullable=False)
+    context = db.relationship('Context')
 
     def __repr__(self):
         return '<Data({0})>'.format(self.id)
@@ -94,6 +96,12 @@ class Entry(db.Model, TimeStamp):
                                                  self.value)
         return '<Entry({0},{1},{2!r})>'.format(self.id, self.parameter.name,
                                                self.value_complex)
+
+    @property
+    def value_any(self):
+        if self.value is None:
+            return self.value_complex
+        return self.value
 
 
 class DescriptionMixin(object):

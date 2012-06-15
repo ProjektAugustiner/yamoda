@@ -25,7 +25,7 @@
       {% for param in context.parameters %}
       <tr>
         <td>
-        <a href="#param_{{ param.name }}">{{ param.name }}</a></td>
+        <a href="#{{ param.name }}">{{ param.name }}</a></td>
         <td>{{ param.brief }}</td>
       </tr>
       {% endfor %}
@@ -40,7 +40,7 @@
   {% if context.parameters %}
   <h2>Parameters <small>A detailed description of the parameters</small></h2>
   {% for param in context.parameters %}
-  <h3 id="param_{{ param.name }}">{{ param.name }}</h3>
+  <h3 id="{{ param.name }}">{{ param.name }}</h3>
   <p>{{ param.description }}</p>
   {% endfor %}
   {% endif %}

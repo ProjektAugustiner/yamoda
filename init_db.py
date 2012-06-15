@@ -2,12 +2,11 @@
 """Script to create the database schema and populate with test data."""
 
 import random
-from datetime import datetime
 from optparse import OptionParser
 
 from yamoda.server import db
-from yamoda.server.database import User, Group, Permission, Context, \
-     Parameter, Set, Data, Entry
+from yamoda.server.database import User, Group, Context, Parameter, \
+     Set, Data, Entry
 
 
 parser = OptionParser()
@@ -61,13 +60,13 @@ if options.testdata:
         for j in range(10):
             e1 = Entry(value=random.random()*270, parameter=par_T)
             e2 = Entry(value=random.random()*50, parameter=par_om)
-            datas.append(Data(name='random data', entries=[e1, e2]))
+            datas.append(Data(name='random data', entries=[e1, e2],
+                              context=ctx))
         children.append(Set(name='set %d' % i, datas=datas,
                             user=user, group=user_group))
-    #create admin only visible set
-    perm = Permission(group_readable=False, all_readable=False)
+    # create admin only visible set
     admin_set = Set(name="admin-only", user=admin, group=admin_group,
-                    permission=perm)
+                    group_readable=False, all_readable=False)
     children.append(admin_set)
     superset = Set(name='superset', children=children,
                    user=admin, group=admin_group)

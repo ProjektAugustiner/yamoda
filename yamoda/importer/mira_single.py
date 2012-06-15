@@ -59,8 +59,11 @@ class Importer(ImporterBase):
                 return 0.0  # XXX care for string columns?!
         cvdict = dict((i, convert_value) for i in range(len(colnames))
                       if colnames[i] != ';')
+        colnames = [name for name in colnames if name != ';']
+        colunits = [unit for unit in colunits if unit != ';']
         usecols = cvdict.keys()
-        coldata = numpy.loadtxt(fp, converters=cvdict, usecols=usecols, unpack=True)
+        coldata = numpy.loadtxt(fp, converters=cvdict,
+                                usecols=usecols, unpack=True)
         for (name, unit, data) in zip(colnames, colunits, coldata):
             entries[name] = ImportEntry(name=name, value=data, unit=unit)
         return entries

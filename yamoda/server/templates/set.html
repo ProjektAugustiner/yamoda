@@ -39,6 +39,7 @@
       <tr>
         <th>#</th>
         <th>Name</th>
+        <th>Context</th>
         <th>Entries</th>
         <th>Created</th>
       </tr>
@@ -49,6 +50,7 @@
       <tr>
         <td>{{ loop.index }}</td>
         <td><a href="{{ url_for('data', id=data.id) }}">{{ data.name }}</a></td>
+        <td>{{ data.context.name }}</td>
         <td>{{ data.entries|length }}</td>
         <td>{{ data.created|dtformat }}</td></tr>
     {# endif #}
