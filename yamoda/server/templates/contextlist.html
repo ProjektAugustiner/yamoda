@@ -11,12 +11,12 @@
     </tr>
     </thead>
     <tbody>
-      {% for ctx in contextlist %}
-        <tr>
-          <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
-          <td>{{ ctx.brief }}</td>
-        </tr>
-      {% endfor %}
+      {%- for ctx in contextlist %}
+      <tr>
+        <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
+        <td>{{ ctx.brief }}</td>
+      </tr>
+      {%- endfor %}
     </tbody>
   </table>
   <div class="modal hide" id="new_context">
@@ -31,7 +31,8 @@
         <label>Brief</label>
         <input type="text" class="span12" placeholder="A brief description…" name="ctx_brief">
         <label>Description</label>
-        <textarea class="span12" name="ctx_description" placeholder="A full description…"></textarea>
+        <textarea class="span12" name="ctx_description"
+                  placeholder="A full description…"></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn" data-dismiss="modal">Cancel</button>

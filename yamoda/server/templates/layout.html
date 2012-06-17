@@ -39,14 +39,14 @@
               <li><a href="{{ url_for('contextlist') }}">Contexts</a></li>
             </ul>
             <ul class="nav pull-right">
-              {% if current_user.is_authenticated() %}
+              {%- if current_user.is_authenticated() %}
               <li><a href="{{ url_for('settings') }}">Welcome, {{ current_user.name }}</a></li>
               <li><a href="{{ url_for('logout') }}">Logout</a></li>
-              {% else %}
+              {%- else %}
               <li><a href="#">You are not logged in</a></li>
               <li><a href="{{ url_for('login') }}">Login</a></li>
               <li><a href="{{ url_for('register') }}">Register</a></li>
-              {% endif %}
+              {%- endif %}
             </ul>
           </div>
         </div>
@@ -58,26 +58,16 @@
         <div class="span2">
           <!-- sidebar here -->
         </div>
-		#}
-        <div class="span12">   
-          {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-              {% for category, message in messages %}
-                {% if category == "error" %}
-                  <div class="alert alert-error">
-                {% elif category == "info" %}      
-                  <div class="alert alert-info">
-                {% elif category == "success" %}      
-                  <div class="alert alert-success">
-                {% else %}
-                  <div class="alert">
-                {% endif %}
-                    <a class="close" data-dismiss="alert" href="#">×</a>
-                  {{ message }}
-                  </div>
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
+	#}
+        <div class="span12">
+          {%- with messages = get_flashed_messages(with_categories=true) %}
+          {%- for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              <a class="close" data-dismiss="alert" href="#">×</a>
+              {{ message }}
+            </div>
+          {%- endfor %}
+          {%- endwith %}
           {% block body %}{% endblock %}
         </div>
       </div>

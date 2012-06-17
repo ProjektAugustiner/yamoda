@@ -13,7 +13,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for set in sets %}
+      {%- for set in sets %}
       <tr>
         <td>{{ loop.index }}</td>
         <td><a href="{{ url_for('set', id=set.id) }}">{{ set.name }}</a></td>
@@ -21,7 +21,7 @@
         <td>{{ set.datas|length }}</td>
         <td>{{ set.created|dtformat }}</td>
       </tr>
-      {% endfor %}
+      {%- endfor %}
     </tbody>
   </table>
   <script>

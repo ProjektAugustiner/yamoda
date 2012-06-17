@@ -12,22 +12,22 @@
         <th>Unit</th>
       </tr>
     </thead>
-  <tbody>
-  {% for entry in data.entries %}
+    <tbody>
+      {%- for entry in data.entries %}
       <tr>
         <td>
-            {# Link to the Parameter description, parameter.brief is used as tooltip #}
-            <a href="{{ url_for('context', ctx_name=entry.parameter.context.name)
-                     }}#{{ entry.parameter.name }}"
+          {# Link to the Parameter description, parameter.brief is used as tooltip #}
+          <a href="{{ url_for('context', ctx_name=entry.parameter.context.name)
+                   }}#{{ entry.parameter.name }}"
              rel="tooltip" title="{{ entry.parameter.brief }}">
-              {{ entry.parameter.name }}
-            </a>
+            {{ entry.parameter.name }}
+          </a>
         </td>
         <td>{{ entry.value|dataformat }}</td>
         <td>{{ entry.parameter.unit|unitformat }}</td>
       </tr>
-  {% endfor %}
-  </tbody>
+      {%- endfor %}
+    </tbody>
   </table>
   <script>
     $(document).ready(function() { $('#datatable').dataTable({

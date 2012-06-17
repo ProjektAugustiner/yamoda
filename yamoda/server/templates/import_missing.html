@@ -2,24 +2,24 @@
   <i class="icon-warning-sign"></i>
   <strong>Please supply information about new parameters:</strong>
 </div>
-{% for entry in missing %}
-{% if entry[1] == 'new_param' %}
-{% set p = entry[0][4:] %}
-<div class="control-group">
-  <label class="control-label">{{ p }}:</label>
-  <div class="controls">
-    <input type="hidden" name="ui_par_{{ p }}" value="yes" />
-    &nbsp;Brief: <input type="text" name="ui_brief_{{ p }}" style="width: 150px" />
-    &nbsp;Description: <input type="text" name="ui_descr_{{ p }}" style="width: 300px" />
-    &nbsp;Unit: <input type="text" name="ui_unit_{{ p }}"
-                       value="{{ entry[2] or '' }}" style="width: 100px" />
-    &nbsp;<input type="checkbox" name="ui_vis_{{ p }}" /> Visible by default
+{%- for entry in missing %}
+{%- if entry[1] == 'new_param' %}
+  {%- set p = entry[0][4:] %}
+  <div class="control-group">
+    <label class="control-label">{{ p }}:</label>
+    <div class="controls">
+      <input type="hidden" name="ui_par_{{ p }}" value="yes" />
+      &nbsp;Brief: <input type="text" name="ui_brief_{{ p }}" style="width: 150px" />
+      &nbsp;Description: <input type="text" name="ui_descr_{{ p }}" style="width: 300px" />
+      &nbsp;Unit: <input type="text" name="ui_unit_{{ p }}"
+                         value="{{ entry[2] or '' }}" style="width: 100px" />
+      &nbsp;<input type="checkbox" name="ui_vis_{{ p }}" /> Visible by default
+    </div>
   </div>
-</div>
-{% endif %}
-{% if entry[1] == 'userinfo' %}
-{% for k, v in entry[0] %}
-<input type="hidden" name="{{ k }}" value="{{ v }}" />
-{% endfor %}
-{% endif %}
-{% endfor %}
+{%- endif %}
+{%- if entry[1] == 'userinfo' %}
+  {%- for k, v in entry[0] %}
+  <input type="hidden" name="{{ k }}" value="{{ v }}" />
+  {%- endfor %}
+{%- endif %}
+{%- endfor %}
