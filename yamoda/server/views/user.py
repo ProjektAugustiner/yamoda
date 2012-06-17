@@ -30,7 +30,7 @@ def login():
             return redirect(request.form.get('next') or url_for('index'))
         else:
             flash('Invalid password or username.', 'error')
-    return render_template('login.html', next=request.args.get('next'))
+    return render_template('login.html', next=request.args.get('next', ''))
 
 
 @app.route("/logout")
