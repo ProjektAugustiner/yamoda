@@ -1,17 +1,35 @@
 {% extends "layout.html" %}
 {% set title = "Login" %}
 {% block body %}
-  <h2>Login</h2>
-  <form action="{{ url_for('login') }}" method="post">
-    <dl>
-      <dt>Username:
-      <dd><input type="text" name="username">
-      <dt>Password:
-      <dd><input type="password" name="password">
-      <dd><button type="submit" class="btn btn-primary"><i class="icon-ok-sign icon-white"></i>
-      Login</button>
-          &nbsp;&nbsp;<input type="checkbox" name="remember" value="yes">
-          remember me
-    </dl>
+  <h2>Login to yamoda</h2>
+
+  <form action="{{ url_for('login') }}" method="post" class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="username">Username:</label>
+      <div class="controls">
+        <input type="text" name="username" id="username" />
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="username">Password:</label>
+      <div class="controls">
+        <input type="password" name="password" id="password" />
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox" for="remember"><input type="checkbox"
+        name="remember" id="remember" value="yes" /> remember me</label>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="icon-ok-sign icon-white"></i> Login</button>
+      &nbsp;&nbsp;
+      <a href="{{ url_for('register') }}">Register...</a>
+    </div>
   </form>
+  <script>
+    $(function() { $('#username').focus(); });
+  </script>
 {% endblock %}

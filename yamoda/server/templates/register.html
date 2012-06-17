@@ -3,17 +3,33 @@
 {% block body %}
   <h2>Register</h2>
   {% if error %}<div class="alert alert-error"><strong>Error:</strong> {{ error }}</div>{% endif %}
-  <form action="{{ url_for('register') }}" method="post">
-    <dl>
-      <dt>Username:
-      <dd><input type="text" name="username">
-      <dt>Password:
-      <dd><input type="password" name="password">
-      <dt>Confirm password:
-      <dd><input type="password" name="confirm">
-    </dl>
-    <button type="submit" class="btn btn-primary"><i class="icon-asterisk icon-white"></i>
-        Register</button> &nbsp;
-    <button type="reset" class="btn"><i class="icon-remove"></i> Reset</button>
+  <form action="{{ url_for('register') }}" method="post"
+        class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="username">Username:</label>
+      <div class="controls">
+        <input type="text" name="username" id="username" />
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="username">Password:</label>
+      <div class="controls">
+        <input type="password" name="password" id="password" />
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="username">Confirm password:</label>
+      <div class="controls">
+        <input type="password" name="confirm" id="confirm" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="icon-asterisk icon-white"></i> Register</button> &nbsp;
+      <button type="reset" class="btn"><i class="icon-remove"></i> Reset</button>
+    </div>
   </form>
+  <script>
+    $(function() { $('#username').focus(); });
+  </script>
 {% endblock %}
