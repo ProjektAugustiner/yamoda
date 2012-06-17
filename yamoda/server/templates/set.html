@@ -42,6 +42,9 @@
         <th>Context</th>
         <th>Entries</th>
         <th>Created</th>
+        {% for p in params %}
+        <th>{{ p.name }} ({{ p.unit }})</th>
+        {% endfor %}
       </tr>
     </thead>
   <tbody>
@@ -52,7 +55,11 @@
         <td><a href="{{ url_for('data', id=data.id) }}">{{ data.name }}</a></td>
         <td>{{ data.context.name }}</td>
         <td>{{ data.entries|length }}</td>
-        <td>{{ data.created|dtformat }}</td></tr>
+        <td>{{ data.created|dtformat }}</td>
+        {% for pv in pvalues[loop.index0] %}
+        <td>{{ pv|dataformat }}</td>
+        {% endfor %}
+      </tr>
     {# endif #}
   {% endfor %}
   </tbody>

@@ -13,7 +13,7 @@ from flask import render_template, request, flash
 from flask.ext.login import login_required, current_user
 
 from yamoda.server import app, db
-from yamoda.server.database import Set, Context
+from yamoda.server.database import Set, Context, Entry
 from yamoda.importer import list_importers, load_importer
 
 
@@ -21,7 +21,22 @@ from yamoda.importer import list_importers, load_importer
 @login_required
 def set(id):
     s = Set.query.get_readable_or_404(id)
-    return render_template('set.html', set=s)
+    # determine a context to use for displaying parameters
+    params = None
+    pvalues = None
+    if s.datas:
+        # FIXME: this is quick and dirty, and way too inefficient.  Must be
+        # rewritten using fewer queries.
+        ctx = s.datas[0].context
+        params = [p for p in ctx.parameters if p.visible]
+        pvalues = []
+        for d in s.datas:
+            pvalues.append([])
+            for p in params:
+                pvalue = Entry.query.filter_by(data=d, parameter=p).first()
+                pvalues[-1].append(pvalue.value if pvalue else None)
+    return render_template('set.html', set=s,
+                           params=params, pvalues=pvalues)
 
 
 @app.route('/set/<id>/import', methods=['GET', 'POST'])
