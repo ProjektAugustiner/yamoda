@@ -3,9 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>yamoda &mdash; {{ title }}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-responsive.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='yamoda.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='bootstrap-responsive.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='yamoda.css') }}">
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.dataTables.js') }}"></script>
@@ -15,6 +18,7 @@
         padding-bottom: 40px;
       }
     </style>
+    {% block extrahead %}{% endblock %}
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -48,7 +52,7 @@
         </div>
       </div>
     </div>
-    <div class="container-fluid">
+    <div class="container">
       <div class="row-fluid">
         {#
         <div class="span2">
