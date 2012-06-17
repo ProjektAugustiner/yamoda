@@ -27,10 +27,10 @@ def login():
         if (user is not None) and user.valid_password(password):
             login_user(user, remember=remember)
             flash('Logged in successfully.')
-            return redirect(request.args.get("next") or url_for("index"))
+            return redirect(request.form.get('next') or url_for('index'))
         else:
-            flash('Invalid password or username.','error')
-    return render_template('login.html')
+            flash('Invalid password or username.', 'error')
+    return render_template('login.html', next=request.args.get('next'))
 
 
 @app.route("/logout")

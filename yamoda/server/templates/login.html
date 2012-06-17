@@ -4,6 +4,7 @@
   <h2>Login to yamoda</h2>
 
   <form action="{{ url_for('login') }}" method="post" class="form-horizontal">
+    <input type="hidden" name="next" value="{{ next }}" />
     <div class="control-group">
       <label class="control-label" for="username">Username:</label>
       <div class="controls">
