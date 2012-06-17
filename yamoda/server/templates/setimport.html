@@ -35,9 +35,9 @@
     <div class="control-group">
       <label class="control-label">File(s):</label>
       <div class="controls">
-        <input type="file" name="file0" id="file0" style="display: block" />
-        <input type="file" name="file1" id="file1" style="display: block"/>
-        <input type="file" name="file2" id="file2" style="display: block"/>
+        <input type="file" name="file00" id="file00" style="display: block" />
+        <input type="file" name="file01" id="file01" style="display: block"/>
+        <input type="file" name="file02" id="file02" style="display: block"/>
         <button class="btn" onclick="addfile(); return false;"
                 style="margin-top: 5px">
         <i class="icon-plus-sign"></i> More</button>
@@ -54,11 +54,14 @@
   <script>
     var nfiles = 2;
     function addfile() {
-      var oldid = '#file' + nfiles;
+      var newid, oldid;
+      if (nfiles.toString().length == 1) oldid = '#file0' + nfiles;
+      else oldid = '#file' + nfiles;
       nfiles += 1;
-      var newname = 'file' + nfiles;
+      if (nfiles.toString().length == 1) newid = 'file0' + nfiles;
+      else newid = 'file' + nfiles;
       $('<input type="file" style="display: block">').
-        attr('name', newname).attr('id', newname).insertAfter(oldid);
+        attr('name', newid).attr('id', newid).insertAfter(oldid);
     }
     function submitok(data, status, xhr) {
       if (data['result'] == 'success') {

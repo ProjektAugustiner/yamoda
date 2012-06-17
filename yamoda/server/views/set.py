@@ -48,7 +48,7 @@ def setimport_do(id):
     try:
         s = Set.query.get(id)
         ctx = Context.query.get(request.form['context'])
-        for fstorage in request.files.itervalues():
+        for ffield, fstorage in sorted(request.files.iteritems()):
             name = fstorage.filename
             if not name:
                 continue
