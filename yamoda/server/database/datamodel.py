@@ -15,11 +15,12 @@ Context   -- The Context class is used to group several parameters
 Parameter -- Describes a Entry instance
 DescriptionMixin -- Mixin class, which adds a brief and a long description column
 
-
 """
+
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.expression import func
+
 from yamoda.server import db
 from yamoda.server.database.accesscontrol import User, Group, AccessControl
 
