@@ -1,30 +1,55 @@
 {% extends "layout.html" %}
 {% set title = "Import" %}
+{% block extrahead %}
+  <script src="{{ url_for('static', filename='jquery.form.js') }}"></script>
+{% endblock %}
 {% block body %}
   <h2>Import Data</h2>
-  {% if error %}<div class="alert alert-error"><strong>Error:</strong> {{ error }}</div>{% endif %}
+  <div style="display: none" id="error" class="alert alert-error">
+    <strong>Error:</strong> <span id="errortext"></span></div>
+  <div style="display: none" id="success" class="alert alert-success">
+    <span id="successtext"></span></div>
   <p>Import data into set <a href="{{ url_for('set', id=set.id) }}">{{ set.name }}</a>:</p>
-  <form action="{{ url_for('setimport', id=set.id) }}" method="post" enctype="multipart/form-data">
-    <dl>
-      <dt>Importer:
-      <dd><select name="importer">
-          {% for key, info in importers %}<option value="{{ key }}">{{ info[0] }}</option>{% endfor %}
-          </select>
-      <dt>Context:
-      <dd><select name="context">
-          {% for ctx in contexts %}<option value="{{ ctx.id }}">{{ ctx.name }}</option>{% endfor %}
-          </select>
-      <dt>File(s):
-      <dd>
-        <input type="file" name="file0" id="file0" style="display: block">
-        <input type="file" name="file1" id="file1" style="display: block">
-        <input type="file" name="file2" id="file2" style="display: block">
-        <button class="btn" onclick="addfile(); return false;">
-          <i class="icon-plus-sign"></i> More</button>
-      <dt>
-      <dd><button type="submit" class="btn btn-primary"><i class="icon-upload icon-white"></i>
-      Import</button>
-    </dl>
+  <form id="impform" action="{{ url_for('setimport_do', id=set.id) }}" method="post"
+        enctype="multipart/form-data" class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="importer">Importer:</label>
+      <div class="controls">
+        <select name="importer">
+          {%- for key, info in importers %}
+          <option value="{{ key }}">{{ info[0] }}</option>
+          {%- endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="context">Context:</label>
+      <div class="controls">
+        <select name="context">
+          {%- for ctx in contexts %}
+          <option value="{{ ctx.id }}">{{ ctx.name }}</option>
+          {%- endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">File(s):</label>
+      <div class="controls">
+        <input type="file" name="file0" id="file0" style="display: block" />
+        <input type="file" name="file1" id="file1" style="display: block"/>
+        <input type="file" name="file2" id="file2" style="display: block"/>
+        <button class="btn" onclick="addfile(); return false;"
+                style="margin-top: 5px">
+        <i class="icon-plus-sign"></i> More</button>
+      </div>
+    </div>
+    <div style="display: none" id="missing" class="well"></div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+      <i class="icon-upload icon-white"></i> Import</button>
+      <button type="reset" class="btn">
+        <i class="icon-remove"></i> Reset</button>
+    </div>
   </form>
   <script>
     var nfiles = 2;
@@ -35,5 +60,30 @@
       $('<input type="file" style="display: block">').
         attr('name', newname).attr('id', newname).insertAfter(oldid);
     }
+    function submitok(data, status, xhr) {
+      if (data['result'] == 'success') {
+        $('#successtext').text('The import was successful.  New datas: ' + data['data']);
+        $('#success').show();
+        $('#impform').resetForm();
+        $('#missing').html('').hide();
+      } else if (data['result'] == 'missing') {
+        $('#missing').html(data['data']).show();
+      } else {
+        submiterr(xhr, status, data['data']);
+      }
+    }
+    function submiterr(xhr, status, error) {
+      $('#errortext').text(error);
+      $('#error').show();
+    }
+    $(function() { $('#impform').submit(function() {
+      $('#success').hide();
+      $('#error').hide();
+      $('#impform').ajaxSubmit({
+        'success': submitok,
+        'error': submiterr
+      });
+      return false;
+    }); });
   </script>
 {% endblock %}
