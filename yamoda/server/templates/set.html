@@ -43,7 +43,7 @@
         <th>Entries</th>
         <th>Created</th>
         {% for p in params %}
-        <th>{{ p.name }} ({{ p.unit }})</th>
+        <th rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
         {% endfor %}
       </tr>
     </thead>

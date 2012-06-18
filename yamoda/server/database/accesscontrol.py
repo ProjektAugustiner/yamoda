@@ -22,6 +22,7 @@ load_user -- User loader callback neccessary for flask-login
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import  validates
 from sqlalchemy.orm.util import _entity_descriptor
 from sqlalchemy.sql import and_, or_
 from flask import _request_ctx_stack, abort
@@ -93,7 +94,7 @@ class AccessControlledQuery(BaseQuery):
             raise ValueError
 
         clause = lambda name: _entity_descriptor(self._joinpoint_zero(), name)
-        cu_grps = [current_user.group_id]+[g.id for g in current_user.groups]
+        cu_grps = [g.id for g in current_user.groups]
         return self.filter(or_(
             and_(clause(usr) == True, clause('user_id') == current_user.id),
             and_(clause(grp) == True, clause('group_id').in_(cu_grps)),
@@ -241,7 +242,7 @@ class AccessControl(object):
         get = lambda x: object.__getattribute__(self, x)
         user = object.__getattribute__(self, 'user')
         group = object.__getattribute__(self, 'group')
-        cu_groups = [current_user.primary_group] + current_user.groups
+        cu_groups = current_user.groups
 
         if ((get(usr) and user == current_user) or
             (get(grp) and group in cu_groups) or get(all)):
@@ -321,6 +322,17 @@ class User(db.Model, UserMixin):
         """Compares the bcrypt hash of password with the stored hash."""
         return self._hashed_pw == bcrypt.hashpw(password, self._hashed_pw)
 
+    @validates('primary_group')
+    def _add_pg(self, key, target):
+        self.groups.add(target)
+        return target
+
+    @validates('groups', include_removes=True)
+    def _modify_groups(self, key, target, is_remove):
+        if is_remove and target is self.primary_group:
+            del self.primary_group
+        return target
+
     def __repr__(self):
         return '<User({0},{1})>'.format(self.id, self.name)
 
@@ -330,7 +342,7 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     users = db.relationship('User', secondary=_usergroup_table,
-                            backref='groups')
+                            backref=db.backref('groups', collection_class=set))
 
     def __repr__(self):
         return '<Group({0},{1})>'.format(self.id, self.name)
