@@ -93,11 +93,11 @@ class AccessControlledQuery(BaseQuery):
             raise ValueError
 
         clause = lambda name: _entity_descriptor(self._joinpoint_zero(), name)
-        cu_grps = [current_user.group_id]+[g.id for g in current_user.groups]
+        cu_grps = [g.id for g in current_user.groups]
         return self.filter( or_(
-            and_(clause(usr)==True, clause('user_id') == current_user.id),
-            and_((grp) ==  True, clause('group_id').in_(cu_grps)),
-            and_(clause(all)==True)))
+            and_(clause(usr) == True, clause('user_id') == current_user.id),
+            and_(clause(grp) == True, clause('group_id').in_(cu_grps)),
+            and_(clause(all) == True)))
 
     def all_readable(self):
         """Returns all readable items of this query as a list."""
