@@ -171,7 +171,7 @@ class AccessControl(object):
         inheritance pattern to call the next initializer.
 
         """
-        self.permission = kw.pop('permission',0b011111)
+        self.permission = kw.pop('permission', 0b011111)
         super(AccessControl, self).__init__(*args, **kw)
 
     @declared_attr
@@ -237,7 +237,7 @@ class AccessControl(object):
                                'all_writeable')
         else:
             raise ValueError
-        if _request_ctx_stack.top is None:
+        if _request_ctx_stack.top is None or 'permission' not in self.__dict__:
             return True
         get = lambda x: object.__getattribute__(self, x)
         user = object.__getattribute__(self, 'user')
@@ -257,7 +257,7 @@ class AccessControl(object):
         """Return the write access of the current user."""
         return self.access('write')
 
-    def __getattribute__(self,name):
+    def __getattribute__(self, name):
         """Intercepts column read access."""
         get = lambda x: object.__getattribute__(self, x)
         if _request_ctx_stack.top:
