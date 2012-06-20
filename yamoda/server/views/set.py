@@ -10,7 +10,8 @@ import os
 import json
 import tempfile
 
-from flask import render_template, make_response, request, flash
+from flask import render_template, make_response, request, flash, \
+     redirect, url_for
 from flask.ext.login import login_required, current_user
 
 from yamoda.server import app, db
@@ -92,6 +93,17 @@ def setimport_do(id):
     resp = make_response(json.dumps({'result': res, 'data': data}))
     resp.headers['Content-Type'] = 'application/json'
     return resp
+
+
+@app.route('/set/create', methods=['POST'])
+@login_required
+def setcreate():
+    name = request.form['name']
+    s = Set(name=name, user=current_user, group=current_user.primary_group)
+    db.session.add(s)
+    db.session.commit()
+    flash('New dataset successfully created.', 'success')
+    return redirect(url_for('set', id=s.id))
 
 
 @app.route('/set/<id>/import')

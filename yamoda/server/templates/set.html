@@ -5,10 +5,11 @@
   <h2>Dataset: {{ set.name }}</h2>
   {%- if set.children %}
   <p>Subsets:</p>
-  {{ setlist(set.children) }}
+  {{ setlist(set.children, set) }}
   {%- endif %}
   {%- if set.datas %}
-  <p>Data in this set (<a href="{{ url_for('setimport', id=set.id) }}">import data</a>):</p>
+  <p>Data in this set:</p>
+  <p><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></p>
   <table id="datatable2" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
@@ -41,5 +42,8 @@
     $(document).ready(function() { $('#datatable2').dataTable({
     "bLengthChange": false, "bPaginate": false}); });
   </script>
+  {%- else %}
+  <p>There is no data in this set.</p>
+  <p><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></p>
   {%- endif %}
 {% endblock %}
