@@ -1,36 +1,11 @@
 {% extends "layout.html" %}
+{% from "setlist.html" import setlist with context %}
 {% set title = "Dataset" %}
 {% block body %}
   <h2>Dataset: {{ set.name }}</h2>
   {%- if set.children %}
   <p>Subsets:</p>
-  <table id="datatable" class="table table-condensed table-bordered table-striped">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Subsets</th>
-        <th>Datas</th>
-        <th>Created</th>
-      </tr>
-    </thead>
-  <tbody>
-  {%- for subset in set.children %}
-    {%- if subset.readable() %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td><a href="{{ url_for('set', id=subset.id) }}">{{ subset.name }}</a></td>
-        <td>{{ subset.children|length }}</td>
-        <td>{{ subset.datas|length }}</td>
-        <td>{{ subset.created|dtformat }}</td></tr>
-    {%- endif %}
-  {%- endfor %}
-  </tbody>
-  </table>
-  <script>
-    $(document).ready(function() { $('#datatable').dataTable({
-    "bLengthChange": false, "bPaginate": false}); });
-  </script>
+  {{ setlist(set.children) }}
   {%- endif %}
   {%- if set.datas %}
   <p>Data in this set (<a href="{{ url_for('setimport', id=set.id) }}">import data</a>):</p>
