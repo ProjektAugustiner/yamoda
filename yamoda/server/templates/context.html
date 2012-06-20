@@ -34,14 +34,14 @@
   {%- endif %}
   {%- if context.description %}
     <h2 id="context_description">Description</h2>
-    <p>{{ context.description }}</p>
+    <p>{{ context.description|markdown }}</p>
   {%- endif %}
 
   {%- if context.parameters %}
     <h2>Parameters <small>A detailed description of the parameters</small></h2>
     {%- for param in context.parameters %}
     <h3 id="{{ param.name }}">{{ param.name }}</h3>
-    <p>{{ param.description }}</p>
+    <p>{{ param.description|markdown }}</p>
     {%- endfor %}
   {%- endif %}
 {% endblock %}

@@ -8,6 +8,8 @@ from flask.ext.login import LoginManager
 
 from jinja2 import Markup
 
+import markdown2
+
 try:
     import matplotlib
     matplotlib.use('agg')
@@ -48,9 +50,13 @@ def unitformat(value):
     if value is None:
         return ''
     return value
+md = markdown2.Markdown(safe_mode='escape')
+def markdown(value):
+    return Markup(md.convert(value))
 app.jinja_env.filters['dtformat'] = datetimeformat
 app.jinja_env.filters['dataformat'] = dataformat
 app.jinja_env.filters['unitformat'] = unitformat
+app.jinja_env.filters['markdown'] = markdown
 
 import yamoda.server.views
 import yamoda.server.database
