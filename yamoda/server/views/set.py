@@ -7,11 +7,9 @@ Data set related views.
 """
 
 import os
-import json
 import tempfile
 
-from flask import render_template, make_response, request, flash, \
-     redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, jsonify
 from flask.ext.login import login_required, current_user
 
 from yamoda.server import app, db
@@ -95,9 +93,7 @@ def setimport_do(id):
     except Exception, err:
         res = 'error'
         data = str(err)
-    resp = make_response(json.dumps({'result': res, 'data': data}))
-    resp.headers['Content-Type'] = 'application/json'
-    return resp
+    return jsonify(result=res, data=data)
 
 
 @app.route('/set/create', methods=['POST'])

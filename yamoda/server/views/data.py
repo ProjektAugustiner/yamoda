@@ -35,8 +35,8 @@ def datadelete():
             db.session.delete(d)
         db.session.commit()
     except Exception, err:
-        return jsonify(result='fail', error=str(err))
-    return jsonify(result='success')
+        return jsonify(result='error', data=str(err))
+    return jsonify(result='success', data=None)
 
 
 @app.route('/entry/plot/<xid>/<yid>')
