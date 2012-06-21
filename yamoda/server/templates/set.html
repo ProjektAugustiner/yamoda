@@ -43,7 +43,7 @@
   </table>
   <div id="actionbutton" style="float: right">
     <div class="btn-group">
-      <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+      <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
         With selected
         <span class="caret"></span>
       </button>
@@ -51,6 +51,7 @@
         <li><a href="#" onclick="deletedatas()">Delete</a></li>
       </ul>
     </div>
+    <div class="alert alert-error hide" id="actionerror"></div>
   </div>
   <script>
     $(document).ready(function() {
@@ -68,11 +69,15 @@
     function deletedatas() {
       var ids = $.map($('.datacheck:checked'), function(el) { return el.id.substr(6); });
       if (!ids) return;
+      $("#actionbutton button").button("loading");
       $.ajax({url: "{{ url_for('datadelete') }}",
               type: "POST",
               data: {"ids": ids},
-              success: function() { window.location.reload(); }
+              success: function(data, st, xhr) { window.location.reload(); },
+              error: function(xhr, st, err) { $("#actionbutton button").button("reset");
+                                              $("#actionerror").text(err).show(); }
               });
+      return false;
     }
   </script>
   {%- else %}
