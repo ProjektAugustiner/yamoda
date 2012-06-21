@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% set title = "Datasets" %}
 {% macro setlist(sets, parent=None) %}
-  <a class="btn" data-toggle="modal" href="#new_set">Create {% if parent %}sub{% endif %}set</a>
+  <div class="newbutton"><a class="btn" data-toggle="modal"
+                            href="#new_set">Create {% if parent %}sub{% endif %}set</a></div>
   <table id="settable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
@@ -26,7 +27,10 @@
   </table>
   <script>
     $(document).ready(function() {
-      $('#settable').dataTable({bLengthChange: false, bPaginate: false});
+      $('#settable').dataTable({
+        bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip'});
+      // move button into the <div> of dataTable
+      $(".datatoolbar").append($(".newbutton").remove());
     });
   </script>
   <div class="modal hide" id="new_set">

@@ -6,11 +6,12 @@
   {%- if set.children %}
   <p>Subsets:</p>
   {{ setlist(set.children, set) }}
+  <hr />
   {%- endif %}
   {%- if set.datas %}
   <p>Data in this set:</p>
-  <p><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></p>
-  <table id="datatable2" class="table table-condensed table-bordered table-striped">
+  <div class="newbutton"><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></div>
+  <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
         <th>#</th>
@@ -39,8 +40,11 @@
     </tbody>
   </table>
   <script>
-    $(document).ready(function() { $('#datatable2').dataTable({
-    "bLengthChange": false, "bPaginate": false}); });
+    $(document).ready(function() {
+      $('#datatable').dataTable({
+        bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip'});
+      $(".datatoolbar").append($(".newbutton").remove());
+    });
   </script>
   {%- else %}
   <p>There is no data in this set.</p>

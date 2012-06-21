@@ -47,8 +47,7 @@
       $('#contexttable').dataTable({
         bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip'});
       // move button into the <div> of dataTable
-      $("div.datatoolbar").html($(".newbutton").html());
-      $(".newbutton").remove();
+      $(".datatoolbar").append($(".newbutton").remove());
     });
   </script>
 {% endblock %}
