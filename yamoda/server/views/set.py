@@ -7,10 +7,9 @@ Data set related views.
 """
 
 import os
-import json
 import tempfile
 
-from flask import render_template, make_response, request, flash
+from flask import render_template, request, flash, redirect, url_for, jsonify
 from flask.ext.login import login_required, current_user
 
 from yamoda.server import app, db
@@ -48,15 +47,16 @@ def setimport_do(id):
     try:
         s = Set.query.get(id)
         ctx = Context.query.get(request.form['context'])
-        for ffield, fstorage in sorted(request.files.iteritems()):
-            name = fstorage.filename
-            if not name:
-                continue
-            fd, fname = tempfile.mkstemp()
-            fd = os.fdopen(fd, 'w')
-            fstorage.save(fd, 1024*1024)
-            fd.close()
-            to_import.append(fname)
+        for ffield in sorted(request.files):
+            for fstorage in request.files.getlist(ffield):
+                name = fstorage.filename
+                if not name:
+                    continue
+                fd, fname = tempfile.mkstemp()
+                fd = os.fdopen(fd, 'w')
+                fstorage.save(fd, 1024*1024)
+                fd.close()
+                to_import.append(fname)
         for key in request.form:
             if not key.startswith('ui_par_'):
                 continue
@@ -85,13 +85,26 @@ def setimport_do(id):
             raise
         else:
             res = 'success'
-            data = ', '.join(d.name for d in imported)
+            if len(imported) <= 10:
+                data = 'New datas created: ' + \
+                    ', '.join(d.name for d in imported) + '.'
+            else:
+                data = '%d new datas created.' % len(imported)
     except Exception, err:
         res = 'error'
         data = str(err)
-    resp = make_response(json.dumps({'result': res, 'data': data}))
-    resp.headers['Content-Type'] = 'application/json'
-    return resp
+    return jsonify(result=res, data=data)
+
+
+@app.route('/set/create', methods=['POST'])
+@login_required
+def setcreate():
+    name = request.form['name']
+    s = Set(name=name, user=current_user, group=current_user.primary_group)
+    db.session.add(s)
+    db.session.commit()
+    flash('New dataset successfully created.', 'success')
+    return redirect(url_for('set', id=s.id))
 
 
 @app.route('/set/<id>/import')

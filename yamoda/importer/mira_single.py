@@ -7,6 +7,7 @@ Importer for MIRA single counter data.
 """
 
 import time
+from os import path
 from datetime import datetime
 
 import numpy
@@ -49,7 +50,8 @@ class Importer(ImporterBase):
                     key = key[:-6]
                 entries[key] = ImportEntry(name=key, value=val, unit=unit)
         if 'filename' in entries:
-            entries['__name__'] = entries['filename']
+            basename = path.splitext(entries['filename'].value)[0]
+            entries['__name__'] = ImportEntry(name='name', value=basename)
         colnames = fp.readline()[1:].split()
         colunits = fp.readline()[1:].split()
         def convert_value(s):

@@ -35,37 +35,25 @@
     <div class="control-group">
       <label class="control-label">File(s):</label>
       <div class="controls">
-        <input type="file" name="file00" id="file00" style="display: block" />
-        <input type="file" name="file01" id="file01" style="display: block"/>
-        <input type="file" name="file02" id="file02" style="display: block"/>
-        <button class="btn" onclick="addfile(); return false;"
-                style="margin-top: 5px">
-        <i class="icon-plus-sign"></i> More</button>
+        <input type="file" name="file00" id="file00" style="display: block" multiple="" />
+        <input type="file" name="file01" id="file01" style="display: block" multiple="" />
+        <input type="file" name="file02" id="file02" style="display: block" multiple="" />
+        <p class="help-block">Multiple files can be selected in each field.</p>
       </div>
     </div>
     <div style="display: none" id="missing" class="well"></div>
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
+      <button type="submit" class="btn btn-primary" id="submit" data-loading-text="Importing...">
       <i class="icon-upload icon-white"></i> Import</button>
       <button type="reset" class="btn">
         <i class="icon-remove"></i> Reset</button>
     </div>
   </form>
   <script>
-    var nfiles = 2;
-    function addfile() {
-      var newid, oldid;
-      if (nfiles.toString().length == 1) oldid = '#file0' + nfiles;
-      else oldid = '#file' + nfiles;
-      nfiles += 1;
-      if (nfiles.toString().length == 1) newid = 'file0' + nfiles;
-      else newid = 'file' + nfiles;
-      $('<input type="file" style="display: block">').
-        attr('name', newid).attr('id', newid).insertAfter(oldid);
-    }
     function submitok(data, status, xhr) {
+      $('#submit').button('reset');
       if (data['result'] == 'success') {
-        $('#successtext').text('The import was successful.  New datas: ' + data['data']);
+        $('#successtext').text('The import was successful. ' + data['data']);
         $('#success').show();
         $('#impform').resetForm();
         $('#missing').html('').hide();
@@ -76,12 +64,14 @@
       }
     }
     function submiterr(xhr, status, error) {
+      $('#submit').button('reset');
       $('#errortext').text(error);
       $('#error').show();
     }
     $(function() { $('#impform').submit(function() {
       $('#success').hide();
       $('#error').hide();
+      $('#submit').button('loading');
       $('#impform').ajaxSubmit({
         'success': submitok,
         'error': submiterr

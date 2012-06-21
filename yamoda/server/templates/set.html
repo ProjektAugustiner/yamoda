@@ -1,40 +1,17 @@
 {% extends "layout.html" %}
+{% from "setlist.html" import setlist with context %}
 {% set title = "Dataset" %}
 {% block body %}
   <h2>Dataset: {{ set.name }}</h2>
   {%- if set.children %}
   <p>Subsets:</p>
-  <table id="datatable" class="table table-condensed table-bordered table-striped">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Subsets</th>
-        <th>Datas</th>
-        <th>Created</th>
-      </tr>
-    </thead>
-  <tbody>
-  {%- for subset in set.children %}
-    {%- if subset.readable() %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td><a href="{{ url_for('set', id=subset.id) }}">{{ subset.name }}</a></td>
-        <td>{{ subset.children|length }}</td>
-        <td>{{ subset.datas|length }}</td>
-        <td>{{ subset.created|dtformat }}</td></tr>
-    {%- endif %}
-  {%- endfor %}
-  </tbody>
-  </table>
-  <script>
-    $(document).ready(function() { $('#datatable').dataTable({
-    "bLengthChange": false, "bPaginate": false}); });
-  </script>
+  {{ setlist(set.children, set) }}
+  <hr />
   {%- endif %}
   {%- if set.datas %}
-  <p>Data in this set (<a href="{{ url_for('setimport', id=set.id) }}">import data</a>):</p>
-  <table id="datatable2" class="table table-condensed table-bordered table-striped">
+  <p>Data in this set:</p>
+  <div id="newbutton"><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></div>
+  <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
         <th>#</th>
@@ -45,6 +22,7 @@
         {% for p in params %}
         <th rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
         {% endfor %}
+        <th><input type="checkbox" onchange="toggleall(this)" /></th>
       </tr>
     </thead>
     <tbody>
@@ -58,13 +36,52 @@
         {% for pv in pvalues[loop.index0] %}
         <td>{{ pv|dataformat }}</td>
         {% endfor %}
+        <td><input type="checkbox" class="datacheck" id="check_{{ data.id }}" value="yes" /></td>
       </tr>
     {%- endfor %}
     </tbody>
   </table>
+  <div id="actionbutton" style="float: right">
+    <div class="btn-group">
+      <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
+        With selected
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#" onclick="deletedatas()">Delete</a></li>
+      </ul>
+    </div>
+    <div class="alert alert-error hide" id="actionerror"></div>
+  </div>
   <script>
-    $(document).ready(function() { $('#datatable2').dataTable({
-    "bLengthChange": false, "bPaginate": false}); });
+    $(document).ready(function() {
+      $('#datatable').dataTable({
+        bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip<"databottombar">'});
+      $(".datatoolbar").append($("#newbutton").remove());
+      $(".databottombar").append($("#actionbutton").remove());
+    });
+    function toggleall(check) {
+      if (check.checked)
+        $('.datacheck').attr('checked', 'checked');
+      else
+        $('.datacheck').removeAttr('checked');
+    }
+    function deletedatas() {
+      var ids = $.map($('.datacheck:checked'), function(el) { return el.id.substr(6); });
+      if (!ids) return;
+      $("#actionbutton button").button("loading");
+      $.ajax({url: "{{ url_for('datadelete') }}",
+              type: "POST",
+              data: {"ids": ids},
+              success: function(data, st, xhr) { window.location.reload(); },
+              error: function(xhr, st, err) { $("#actionbutton button").button("reset");
+                                              $("#actionerror").text(err).show(); }
+              });
+      return false;
+    }
   </script>
+  {%- else %}
+  <p>There is no data in this set.</p>
+  <p><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></p>
   {%- endif %}
 {% endblock %}

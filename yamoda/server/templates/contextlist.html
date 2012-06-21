@@ -2,7 +2,7 @@
 {% set title = "Contexts" %}
 {% block body %}
   <h2>Data contexts</h2>
-  <p class="newbutton"><a class="btn" data-toggle="modal" href="#new_context">New Context</a></p>
+  <div class="newbutton"><a class="btn" data-toggle="modal" href="#new_context">New Context</a></div>
   <table id="contexttable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
@@ -32,7 +32,7 @@
         <input type="text" class="span12" placeholder="A brief description…" name="ctx_brief">
         <label>Description</label>
         <textarea class="span12" name="ctx_description"
-                  placeholder="A full description…"></textarea>
+                  placeholder="A full description (in Markdown syntax)…"></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn" data-dismiss="modal">Cancel</button>
@@ -45,10 +45,9 @@
   <script>
     $(document).ready(function() {
       $('#contexttable').dataTable({
-        "bLengthChange": false, "bPaginate": false, "sDom": 'f<"datatoolbar">rtip'});
-    // move button into the <div> of dataTable
-    $("div.datatoolbar").html($("p.newbutton").html());
-    $("p.newbutton").remove();
+        bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip'});
+      // move button into the <div> of dataTable
+      $(".datatoolbar").append($(".newbutton").remove());
     });
   </script>
 {% endblock %}

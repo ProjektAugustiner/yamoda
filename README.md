@@ -9,6 +9,7 @@ Dependencies
 * Flask-Login
 * Flask-SQLAlchemy
 * py-bcrypt
+* python-markdown2
 * numpy
 
 Licensing
