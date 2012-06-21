@@ -10,10 +10,10 @@ import cStringIO
 
 from numpy import ndarray
 
-from flask import render_template, make_response, abort
+from flask import render_template, make_response, request, abort, jsonify
 from flask.ext.login import login_required
 
-from yamoda.server import app
+from yamoda.server import app, db
 from yamoda.server.database import Data, Entry
 
 
@@ -22,6 +22,21 @@ from yamoda.server.database import Data, Entry
 def data(id):
     d = Data.query.get_or_404(id)
     return render_template('data.html', data=d)
+
+
+@app.route('/data/delete', methods=['POST'])
+@login_required
+def datadelete():
+    try:
+        ids = map(int, request.form.getlist('ids[]'))
+        for id in ids:
+            d = Data.query.get(id)
+            #if d.writeable():  # XXX Data is not AccessControl'd
+            db.session.delete(d)
+        db.session.commit()
+    except Exception, err:
+        return jsonify(result='fail', error=str(err))
+    return jsonify(result='success')
 
 
 @app.route('/entry/plot/<xid>/<yid>')

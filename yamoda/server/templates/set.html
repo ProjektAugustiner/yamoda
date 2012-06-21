@@ -10,7 +10,7 @@
   {%- endif %}
   {%- if set.datas %}
   <p>Data in this set:</p>
-  <div class="newbutton"><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></div>
+  <div id="newbutton"><a class="btn" href="{{ url_for('setimport', id=set.id) }}">Import data</a></div>
   <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
@@ -22,6 +22,7 @@
         {% for p in params %}
         <th rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
         {% endfor %}
+        <th><input type="checkbox" onchange="toggleall(this)" /></th>
       </tr>
     </thead>
     <tbody>
@@ -35,16 +36,44 @@
         {% for pv in pvalues[loop.index0] %}
         <td>{{ pv|dataformat }}</td>
         {% endfor %}
+        <td><input type="checkbox" class="datacheck" id="check_{{ data.id }}" value="yes" /></td>
       </tr>
     {%- endfor %}
     </tbody>
   </table>
+  <div id="actionbutton" style="float: right">
+    <div class="btn-group">
+      <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+        With selected
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#" onclick="deletedatas()">Delete</a></li>
+      </ul>
+    </div>
+  </div>
   <script>
     $(document).ready(function() {
       $('#datatable').dataTable({
-        bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip'});
-      $(".datatoolbar").append($(".newbutton").remove());
+        bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip<"databottombar">'});
+      $(".datatoolbar").append($("#newbutton").remove());
+      $(".databottombar").append($("#actionbutton").remove());
     });
+    function toggleall(check) {
+      if (check.checked)
+        $('.datacheck').attr('checked', 'checked');
+      else
+        $('.datacheck').removeAttr('checked');
+    }
+    function deletedatas() {
+      var ids = $.map($('.datacheck:checked'), function(el) { return el.id.substr(6); });
+      if (!ids) return;
+      $.ajax({url: "{{ url_for('datadelete') }}",
+              type: "POST",
+              data: {"ids": ids},
+              success: function() { window.location.reload(); }
+              });
+    }
   </script>
   {%- else %}
   <p>There is no data in this set.</p>
