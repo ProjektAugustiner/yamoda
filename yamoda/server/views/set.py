@@ -87,7 +87,11 @@ def setimport_do(id):
             raise
         else:
             res = 'success'
-            data = ', '.join(d.name for d in imported)
+            if len(imported) <= 10:
+                data = 'New datas created: ' + \
+                    ', '.join(d.name for d in imported) + '.'
+            else:
+                data = '%d new datas created.' % len(imported)
     except Exception, err:
         res = 'error'
         data = str(err)

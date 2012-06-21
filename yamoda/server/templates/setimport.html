@@ -53,7 +53,7 @@
     function submitok(data, status, xhr) {
       $('#submit').button('reset');
       if (data['result'] == 'success') {
-        $('#successtext').text('The import was successful.  New datas: ' + data['data']);
+        $('#successtext').text('The import was successful. ' + data['data']);
         $('#success').show();
         $('#impform').resetForm();
         $('#missing').html('').hide();
