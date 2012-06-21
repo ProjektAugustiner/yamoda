@@ -13,6 +13,7 @@ import sys
 
 importers = {
     'mira_single': ('MIRA single counter data',),
+    'vsm':('VSM magnetisation data',),
 }
 
 def list_importers():

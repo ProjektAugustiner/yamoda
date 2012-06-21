@@ -8,6 +8,12 @@ Functions:
  vsm_context -- Creates a default VSM context.
 """
 from yamoda.server.database import Context
+from yamoda.importer.base import ImporterBase, ReadFailed, ImportEntry
+
+import numpy as np
+from datetime import datetime
+from itertools import izip
+from os import path
 
 
 def vsm_context():
@@ -76,14 +82,56 @@ def vsm_context():
     return vsm
 
 
-class VSMImporter(ImporterBase):
-    """Importer for VSM datafiles."""
+class Importer(ImporterBase):
+    """Importer for VSM datafiles.
+
+    VSM files follow the following syntax:
+
+        COMMENTS
+        DATETIME
+
+        COLNAMES
+        COLUNITS
+
+        PRECISSION
+        DATA
+
+    `COMMENTS` start with a `;`, multiple `COMMENTS` per line are possible.
+    The `DATETIME` follows the Syntax `day month date hh:mm:ss yyyy` e.g.
+    `Wed May 23 16:11:30 2012`.
+    
+    """
     def read_file(self, filename):
-        entries = {}
-        fp = open(filename, 'rb')      
-        #for line in iter(fp.readline, ''):
-            #parse header
-            #parse data
+        """Parses a VSM file."""
+        def assert_blank(line):
+            """Tiny helper funtion checking if the line is blanck."""
+            if line.strip():
+                raise ReadFailed('invalid VSM file:{0}, line:{1}:'.format(filename, len(line)))
+        name = path.splitext(path.basename(filename))[0]
+        entries = {'__name__':ImportEntry(name=filename, value=name),}
+
+        with open(filename, 'rb') as f:
+            for line in iter(f.readline, ''):
+                if line.startswith(';'):
+                    # TODO parse comments
+                    continue
+                else:
+                    t = datetime.strptime(line.strip(), "%a %b %d %H:%M:%S %Y")
+                    entries['time'] = ImportEntry(name='time', value=t)
+                    break
+
+            assert_blank(f.readline())
+            cols = [x.strip() for x in f.readline().split(',')]
+            units = [x.strip() for x in f.readline().split(',')]
+            assert_blank(f.readline())
+
+            precission = f.readline()
+            M = np.loadtxt(f)
+            assert(len(cols) == len(units) == M.shape[1])
+
+            for (row, col, unit) in izip(M.T, cols, units):
+                entries[col] = ImportEntry(name=col, unit=unit, value=row)
+
         return entries
     
 
