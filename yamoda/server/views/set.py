@@ -49,15 +49,16 @@ def setimport_do(id):
     try:
         s = Set.query.get(id)
         ctx = Context.query.get(request.form['context'])
-        for ffield, fstorage in sorted(request.files.iteritems()):
-            name = fstorage.filename
-            if not name:
-                continue
-            fd, fname = tempfile.mkstemp()
-            fd = os.fdopen(fd, 'w')
-            fstorage.save(fd, 1024*1024)
-            fd.close()
-            to_import.append(fname)
+        for ffield in sorted(request.files):
+            for fstorage in request.files.getlist(ffield):
+                name = fstorage.filename
+                if not name:
+                    continue
+                fd, fname = tempfile.mkstemp()
+                fd = os.fdopen(fd, 'w')
+                fstorage.save(fd, 1024*1024)
+                fd.close()
+                to_import.append(fname)
         for key in request.form:
             if not key.startswith('ui_par_'):
                 continue
