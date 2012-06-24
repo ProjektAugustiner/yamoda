@@ -46,7 +46,6 @@ def setimport_do(id):
     to_import = []
     try:
         s = Set.query.get(id)
-        ctx = Context.query.get(request.form['context'])
         for ffield in sorted(request.files):
             for fstorage in request.files.getlist(ffield):
                 name = fstorage.filename
@@ -68,7 +67,7 @@ def setimport_do(id):
             d['unit'] = request.form['ui_unit_' + pname] or None
         if not to_import:
             raise ValueError('Nothing to import.')
-        importer = load_importer(request.form['importer'])(ctx, s)
+        importer = load_importer(request.form['importer'])(target=s)
         try:
             imported = importer.import_items(to_import, userinfo)
             db.session.commit()

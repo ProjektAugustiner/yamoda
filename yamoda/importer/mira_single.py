@@ -14,9 +14,12 @@ import numpy
 
 from yamoda.importer.base import ImporterBase, ReadFailed, \
      ImportEntry
-
+from yamoda.server.database import Context, Parameter
+    
 
 class Importer(ImporterBase):
+    def __init__(self, target):
+        super(Importer, self).__init__('Mira singlecounter', target)
 
     def read_file(self, filename):
         entries = {}
@@ -69,3 +72,11 @@ class Importer(ImporterBase):
         for (name, unit, data) in zip(colnames, colunits, coldata):
             entries[name] = ImportEntry(name=name, value=data, unit=unit)
         return entries
+
+    @classmethod
+    def default_context(cls):
+        """Creates a `Mira singlecounter` context object."""
+        # TODO Implement complete context initialisation.
+        mira_brief = 'Mira singlecounter.'
+        mira_single = Context(name='Mira singlecounter', brief=mira_brief)
+        return mira_single

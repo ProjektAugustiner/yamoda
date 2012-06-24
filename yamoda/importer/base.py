@@ -12,7 +12,7 @@ from os import path
 from sqlalchemy.orm.exc import NoResultFound
 
 from yamoda.server import db
-from yamoda.server.database import Parameter, Data, Entry
+from yamoda.server.database import Context, Parameter, Data, Entry
 
 
 class ReadFailed(Exception):
@@ -49,13 +49,40 @@ class ImportEntry(object):
 class ImporterBase(object):
     """Base class for data importers.
 
-    Subclasses need to implement the read_file() method.
+    .. note::
+       
+       Subclasses need to implement the following methods:
+
+        * read_file()
+        * default_context()
+
     """
 
-    def __init__(self, ctx, baseset):
-        self.ctx = ctx
-        self.baseset = baseset
+    def __init__(self, ctx, target):
+        """Constructor.
 
+        Args:
+            ctx (str, Context):  A Context object or the name of the Context in
+                                 the db.
+        
+            target (Set):  The target set, where the data should be imported.
+
+        """
+        if isinstance(ctx, basestring):
+            ctx = Context.query.filter_by(name=ctx).first()
+            if ctx is None:
+                ctx = self.default_context()
+                db.session.add(ctx)
+                db.session.commit()
+        
+        self.ctx = ctx
+        self.target = target
+
+    @classmethod
+    def default_context(cls):
+        raise NotImplementedError('{0}.default_context must be implemented'.format(
+                                  cls.__name__))
+        
     def import_items(self, names, userinfo):
         imported = []
         for name in names:
@@ -74,7 +101,7 @@ class ImporterBase(object):
         # default implementation: one file is one data
         entries = self.read_file(filename)
         data = self.process_entries(entries, userinfo)
-        self.baseset.datas.append(data)
+        self.target.datas.append(data)
         return [data]
 
     def read_file(self, filename):
