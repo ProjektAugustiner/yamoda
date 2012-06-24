@@ -23,16 +23,6 @@
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" for="context">Context:</label>
-      <div class="controls">
-        <select name="context">
-          {%- for ctx in contexts %}
-          <option value="{{ ctx.id }}">{{ ctx.name }}</option>
-          {%- endfor %}
-        </select>
-      </div>
-    </div>
-    <div class="control-group">
       <label class="control-label">File(s):</label>
       <div class="controls">
         <input type="file" name="file00" id="file00" style="display: block" multiple="" />
