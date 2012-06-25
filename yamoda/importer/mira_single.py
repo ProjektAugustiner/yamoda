@@ -12,8 +12,7 @@ from datetime import datetime
 
 import numpy
 
-from yamoda.importer.base import ImporterBase, ReadFailed, \
-     ImportEntry
+from yamoda.importer.base import ImporterBase, ReadFailed, ImportEntry
 from yamoda.server.database import Context, Parameter
     
 
