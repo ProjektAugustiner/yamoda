@@ -34,6 +34,9 @@
         </a></td>
         {% else %}
         {{ param.name }}
+        {% if param.unit %}
+          ({{ param.unit }})
+        {% endif %}
         {% endif %}
         <td>{{ param.brief }}</td>
       </tr>
