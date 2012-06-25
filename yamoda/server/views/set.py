@@ -51,6 +51,7 @@ def setimport_do(id):
                 name = fstorage.filename
                 if not name:
                     continue
+                # XXX tempfile is not deleted anywere
                 fd, fname = tempfile.mkstemp()
                 fd = os.fdopen(fd, 'w')
                 fstorage.save(fd, 1024*1024)

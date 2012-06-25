@@ -82,7 +82,6 @@ class ImporterBase(object):
         Args:
             ctx (str, Context):  A Context object or the name of the Context in
                                  the db.
-        
             target (Set):  The target set, where the data should be imported.
 
         """
@@ -124,8 +123,8 @@ class ImporterBase(object):
         return [data]
 
     def read_file(self, filename):
-        raise NotImplementedError('%s.read_file must be implemented' %
-                                  self.__class__.__name__)
+        raise NotImplementedError('{0}.read_file must be implemented'.format(
+                                  self.__class__.__name__))
 
     def process_entries(self, entries, userinfo):
         kwds = {'name': '(unnamed)', 'context': self.ctx}
