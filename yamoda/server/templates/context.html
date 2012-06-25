@@ -26,7 +26,12 @@
       <tr>
         <td>
         {% if param.description %}
-        <a href="#{{ param.name }}">{{ param.name }}</a></td>
+        <a href="#{{ param.name }}">
+          {{ param.name }}
+        {% if param.unit %}
+          ({{ param.unit }})
+        {% endif %}
+        </a></td>
         {% else %}
         {{ param.name }}
         {% endif %}
@@ -45,7 +50,12 @@
     <h2>Parameters <small>A detailed description of the parameters</small></h2>
     {%- for param in context.parameters %}
     {% if param.description %}
-    <h3 id="{{ param.name }}">{{ param.name }}</h3>
+    <h3 id="{{ param.name }}">
+      {{ param.name }}
+    {% if param.unit %}
+      <small>({{ param.unit }})</small>
+    {% endif %}
+    </h3>
     <p>{{ param.description|markdown }}</p>
     {% endif %}
     {%- endfor %}
