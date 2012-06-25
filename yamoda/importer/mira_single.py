@@ -12,7 +12,7 @@ from datetime import datetime
 
 import numpy
 
-from yamoda.importer.base import ImporterBase, ReadFailed, ImportEntry
+from yamoda.importer.base import ImporterBase, ParsingError, ImportEntry
 from yamoda.server.database import Context, Parameter
     
 
@@ -25,8 +25,8 @@ class Importer(ImporterBase):
         fp = open(filename, 'rb')
         dtline = fp.readline()
         if not dtline.startswith('### NICOS data file'):
-            raise ReadFailed('%r does not appear to be a NICOS data file' %
-                               filename)
+            raise ParsingError(
+                '{0!r} does not appear to be a NICOS data file'.format(filename))
         ctime = time.mktime(time.strptime(
             dtline[len('### NICOS data file, created at '):].strip(),
             '%Y-%m-%d %H:%M:%S'))

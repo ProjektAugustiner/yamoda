@@ -15,7 +15,7 @@ from flask.ext.login import login_required, current_user
 from yamoda.server import app, db
 from yamoda.server.database import Set, Context, Entry
 from yamoda.importer import list_importers, load_importer
-from yamoda.importer.base import MissingInfo
+from yamoda.importer.base import MissingInfo, ImporterError
 
 
 @app.route('/set/<int:id>')
@@ -71,7 +71,7 @@ def setimport_do(id):
         try:
             imported = importer.import_items(to_import, userinfo)
             db.session.commit()
-        except MissingInfo, err:
+        except MissingInfo as err:
             db.session.rollback()
             missing = sorted(err.info)
             missing.append((
@@ -79,7 +79,7 @@ def setimport_do(id):
                 'userinfo'))
             data = render_template('import_missing.html', missing=missing)
             res = 'missing'
-        except Exception, err:
+        except ImporterError as err:
             db.session.rollback()
             raise
         else:
@@ -89,7 +89,7 @@ def setimport_do(id):
                     ', '.join(d.name for d in imported) + '.'
             else:
                 data = '%d new datas created.' % len(imported)
-    except Exception, err:
+    except ImporterError as err:
         res = 'error'
         data = str(err)
     return jsonify(result=res, data=data)
