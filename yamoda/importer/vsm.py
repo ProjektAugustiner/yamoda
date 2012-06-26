@@ -34,14 +34,14 @@ class Importer(ImporterBase):
     `COMMENTS` start with a `;`, multiple `COMMENTS` per line are possible.
     The `DATETIME` follows the Syntax `day month date hh:mm:ss yyyy` e.g.
     `Wed May 23 16:11:30 2012`.
-    
+
     """
     def __init__(self, target):
         super(Importer, self).__init__('VSM', target)
 
-    def read_file(self, filename):
+    def read_file(self, filename, original):
         """Parses a VSM file.
-        
+
         Args:
           filename (str):  Path to the file, which should get parsed.
 
@@ -50,14 +50,14 @@ class Importer(ImporterBase):
 
         Raises:
           ParsingError
-        
+
         """
         def assert_blank(line):
-            """Tiny helper funtion checking if the line is blanck."""
+            """Tiny helper funtion checking if the line is blank."""
             if line.strip():
                 raise ParsingError('Line is not blank.')
-        name = path.splitext(path.basename(filename))[0]
-        entries = {'__name__':ImportEntry(name=filename, value=name),}
+        name = path.splitext(original)[0]
+        entries = {'__name__': ImportEntry(name='name', value=name),}
 
         with open(filename, 'rb') as f:
             for line in iter(f.readline, ''):
@@ -86,7 +86,7 @@ class Importer(ImporterBase):
             for (row, col, unit) in izip(M.T, cols, units):
                 entries[col] = ImportEntry(name=col, unit=unit, value=row)
         return entries
-    
+
     @classmethod
     def default_context(cls):
         """Creates and returns a default VSM context.

@@ -43,7 +43,8 @@ def set(id):
 @app.route('/set/<int:id>/import/do', methods=['POST'])
 def setimport_do(id):
     userinfo = {}
-    to_import = []
+    filenames = []
+    orig_names = []
     try:
         s = Set.query.get(id)
         for ffield in sorted(request.files):
@@ -56,7 +57,8 @@ def setimport_do(id):
                 fd = os.fdopen(fd, 'w')
                 fstorage.save(fd, 1024*1024)
                 fd.close()
-                to_import.append(fname)
+                filenames.append(fname)
+                orig_names.append(name)
         for key in request.form:
             if not key.startswith('ui_par_'):
                 continue
@@ -66,18 +68,18 @@ def setimport_do(id):
             d['description'] = request.form['ui_descr_' + pname]
             d['visible'] = bool(request.form.get('ui_vis_' + pname))
             d['unit'] = request.form['ui_unit_' + pname] or None
-        if not to_import:
+        if not filenames:
             raise ValueError('Nothing to import.')
         importer = load_importer(request.form['importer'])(target=s)
         try:
-            imported = importer.import_items(to_import, userinfo)
+            imported = importer.import_items(filenames, orig_names, userinfo)
             db.session.commit()
         except MissingInfo as err:
             db.session.rollback()
             missing = sorted(err.info)
-            missing.append((
-                [(k, v) for (k, v) in request.form.iteritems() if k.startswith('ui_')],
-                'userinfo'))
+            existing_userinfo = [(k, v) for (k, v) in request.form.iteritems()
+                                 if k.startswith('ui_')]
+            missing.append((existing_userinfo, 'userinfo'))
             data = render_template('import_missing.html', missing=missing)
             res = 'missing'
         except ImporterError as err:

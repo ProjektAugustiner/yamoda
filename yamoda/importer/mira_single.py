@@ -20,7 +20,7 @@ class Importer(ImporterBase):
     def __init__(self, target):
         super(Importer, self).__init__('Mira singlecounter', target)
 
-    def read_file(self, filename):
+    def read_file(self, filename, original):
         entries = {}
         fp = open(filename, 'rb')
         dtline = fp.readline()

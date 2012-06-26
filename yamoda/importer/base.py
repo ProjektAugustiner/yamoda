@@ -98,28 +98,36 @@ class ImporterBase(object):
         raise NotImplementedError('{0}.default_context must be implemented'.format(
                                   cls.__name__))
 
-    def import_items(self, names, userinfo):
+    def import_items(self, names, orig_names, userinfo):
+        """Import file(s).
+
+        :param names:  A list of file or directory names.
+        :param orig_names:  A list of corresponding original file names.
+        :param userinfo:  A dictionary with user-supplied info.
+        :returns:  A list of newly-created Data instances.
+        """
         imported = []
-        for name in names:
+        for name, orig in map(None, names, orig_names):
             # recursively import from subdirectories
             if path.isdir(name):
                 items = [path.join(name, sub) for sub in os.listdir(name)]
-                imported.extend(self.import_items(items, userinfo))
+                imported.extend(self.import_items(items, items, userinfo))
             elif path.isfile(name):
                 # XXX support zipfiles?
-                imported.extend(self.import_file(name, userinfo))
+                imported.extend(self.import_file(name, orig, userinfo))
             else:
                 raise InvalidPathError(name)
         return imported
 
-    def import_file(self, filename, userinfo):
+    def import_file(self, filename, original, userinfo):
+        """Import a single file."""
         # default implementation: one file is one data
-        entries = self.read_file(filename)
+        entries = self.read_file(filename, original)
         data = self.process_entries(entries, userinfo)
         self.target.datas.append(data)
         return [data]
 
-    def read_file(self, filename):
+    def read_file(self, filename, original):
         raise NotImplementedError('{0}.read_file must be implemented'.format(
                                   self.__class__.__name__))
 
