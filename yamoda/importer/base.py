@@ -148,7 +148,7 @@ class ImporterBase(object):
                 try:
                     ent.value = self._convert_unit(ent.value, ent.unit,
                                                    param.unit)
-                except ValueError:
+                except (ValueError, TypeError):
                     raise UnitMismatchError(ent.name, param.unit, ent.unit)
             data.entries.append(Entry(parameter=param, value=ent.value))
         if missing_params:
@@ -180,7 +180,7 @@ class ImporterBase(object):
             db.session.flush()
         return param
 
-    def _convert_unit(value, from_unit, to_unit):
+    def _convert_unit(self, value, from_unit, to_unit):
         """Performs a unit conversion of value.
 
         :param value:  The value to convert.
