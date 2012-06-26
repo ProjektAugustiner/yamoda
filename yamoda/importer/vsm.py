@@ -13,7 +13,7 @@ from os import path
 
 import numpy as np
 
-from yamoda.importer.base import ImporterBase, ReadFailed, ImportEntry
+from yamoda.importer.base import ImporterBase, ImportEntry, ParsingError
 from yamoda.server.database import Context, Parameter
 
 
@@ -40,11 +40,22 @@ class Importer(ImporterBase):
         super(Importer, self).__init__('VSM', target)
 
     def read_file(self, filename):
-        """Parses a VSM file."""
+        """Parses a VSM file.
+        
+        Args:
+          filename (str):  Path to the file, which should get parsed.
+
+        Returns:
+          dict.  A dictionairy holding the parsed ImportEntries.
+
+        Raises:
+          ParsingError
+        
+        """
         def assert_blank(line):
             """Tiny helper funtion checking if the line is blanck."""
             if line.strip():
-                raise ReadFailed('Line is not blank.')
+                raise ParsingError('Line is not blank.')
         name = path.splitext(path.basename(filename))[0]
         entries = {'__name__':ImportEntry(name=filename, value=name),}
 
@@ -58,7 +69,7 @@ class Importer(ImporterBase):
                         t = datetime.strptime(line.strip(),
                                               "%a %b %d %H:%M:%S %Y")
                     except ValueError:
-                        raise ReadFailed('Invalid Date.')
+                        raise ParsingError('Invalid Date.')
                     entries['Date'] = ImportEntry(name='Date', value=t)
                     break
 
@@ -70,38 +81,47 @@ class Importer(ImporterBase):
             precission = f.readline()
             M = np.loadtxt(f)
             if not(len(cols) == len(units) == M.shape[1]):
-                raise ReadFailed('Column mismatch.')
+                raise ParsingError('Column mismatch.')
 
             for (row, col, unit) in izip(M.T, cols, units):
                 entries[col] = ImportEntry(name=col, unit=unit, value=row)
-
         return entries
     
     @classmethod
     def default_context(cls):
-        """Creates a default VSM context."""
+        """Creates and returns a default VSM context.
+
+        Returns:
+          Context.  The default context for the VSM Importer.
+
+        """
         T1_brief = 'Temperature of the capacitance thermometer.'
         T1_desc = """\
-The *T1* variable represents the temperature of the capacitance thermometer.It's
-advantage is the low magnetic field dependance. It is perfectly suited for
+The *T1* variable represents the temperature of the capacitance thermometer.
+It's advantage is the low magnetic field dependance. It is perfectly suited for
 magnetic field sweeps. It reacts slowly to large temperature changes, the
-resistive thermometer *T1* and *T2* are the better alternative for temperature sweeps.
+resistive thermometer *T1* and *T2* are the better alternative for temperature
+sweeps.
 """
-        T1 = Parameter(name='T1', brief=T1_brief, description=T1_desc, unit='K')
+        T1 = Parameter(name='T1', brief=T1_brief, description=T1_desc,
+                       unit='K')
         T2_brief = 'Temperature of the resistive thermometer.'
         T2_desc = """\
-The *T2* variable represents the temperature of the resistive thermometer. It is
-mounted adjacent to the *T1* thermometer. It's strength is the short reaction time
-to temperature changes. It is the first choice for Temperature Sweeps.
+The *T2* variable represents the temperature of the resistive thermometer. It
+is mounted adjacent to the *T1* thermometer. It's strength is the short
+reaction time to temperature changes. It is the first choice for Temperature
+Sweeps.
 """
-        T2 = Parameter(name='T2', brief=T2_brief, description=T2_desc, unit='K')
+        T2 = Parameter(name='T2', brief=T2_brief, description=T2_desc,
+                       unit='K')
         T3_brief = 'Temperature of the resistive sample thermometer'
         T3_desc = """\
 The *T3* variable represents the temperature of the resistive sample
 thermometer. It is mounted close to the sample holder, between the inner pickup
 coils, to achieve a more acurate sample Temperature.
 """
-        T3 = Parameter(name='T3', brief=T3_brief, description=T3_desc, unit='K')
+        T3 = Parameter(name='T3', brief=T3_brief, description=T3_desc,
+                       unit='K')
         Tsample_brief = 'Tsample is the sample temperature (default: *T3*)'
         Tsample = Parameter(name='Tsample', brief=Tsample_brief, unit='K')
         inv_Tsample = Parameter(name='1/Tsample', unit='1/K',
@@ -119,10 +139,11 @@ minimize the difference between *Tset* and *Tcontrol* (**Default**:*T2*).
         Tcontrol = Parameter(name='Tcontrol', brief=Tcontrol_brief,
                              description=Tcontrol_desc, unit='K')
         X_desc = """\
-*X* is the in phase magnetic induction signal. A SR830 Lock-In amplifier is used
-to measure the magnetic induction signal. The in-phase component represents the
-sample signal. With a reference measurement, typically a high purity Ni sample
-of known magnetic moment, the magnetic moment of the sample can be calculated.
+*X* is the in phase magnetic induction signal. A SR830 Lock-In amplifier is
+used to measure the magnetic induction signal. The in-phase component
+represents the sample signal. With a reference measurement, typically a high
+purity Ni sample of known magnetic moment, the magnetic moment of the sample
+can be calculated.
 """
         X = Parameter(name='X', brief='In-phase magnetic induction signal.',
                        description=X_desc, unit='V')
@@ -151,15 +172,16 @@ Magnetic moment of the reference sample (**Default**: 0.519emu @ 0.6T).
         m_ref = Parameter(name='m_ref', brief=m_ref_brief,
                           description=m_ref_desc, unit='emu')
         U_ref_desc = """\
-*U_ref* is the voltage of the reference sample measured at the correct z-position.
+*U_ref* is the voltage of the reference sample measured at the correct
+z-position.
         """
         U_ref = Parameter(name='U_ref', brief='Reference Voltage.',
                           description=U_ref_desc, unit='V')
         Date = Parameter(name='Date', brief='Date of the measurement')
         vsm_brief = "The VSM is the Oxford Vibrating Sample Magnetometer"
         vsm_desc = """\
-The VSM is the Oxford Vibrating Sample Magnetometer. It is capable of delivering
-magnetic fields up to 9T in a temperature range of 1.7K-300K.
+The VSM is the Oxford Vibrating Sample Magnetometer. It is capable of
+delivering magnetic fields up to 9T in a temperature range of 1.7K-300K.
 
 ### Components:
 

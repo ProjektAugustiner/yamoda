@@ -16,21 +16,39 @@ from yamoda.server import db
 from yamoda.server.database import Context, Parameter, Data, Entry
 
 
-class ReadFailed(Exception):
-    """Raised when an importer cannot import one or more files."""
+class ImporterError(Exception):
+    """Base Exception of the Importer module."""
 
 
-class MissingInfo(Exception):
+class ParsingError(ImporterError):
+    """Raised when the parsing of a file fails."""
+
+
+class InvalidPathError(ImporterError):
+    def __init__(self, path):
+        super(InvalidPathError, self).__init__(
+            'Could not handle path {0}'.format(path))
+
+
+class UnitMismatchError(ImporterError):
+    """Raised in case of a unit mismatch."""
+    def __init__(self, entry, expected_unit, received_unit):
+        super(UnitMismatch, self).__init__(
+            'In entry {0}: expected unit {1} got {2}'.format(entry, 
+            expected_unit, received_unit))
+
+
+class MissingInfo(ImporterError):
     """Raised when an importer requires more information from the user
     in order to continue.
 
     *info* is a list of tuples ``(key, type, ...)``, where the rest of the
     entries depends on the type.
-    """
 
+    """
     def __init__(self, info):
         self.info = info
-        Exception.__init__(self, info)
+        super(MissingInfo, self).__init__(info)
 
 
 class ImportEntry(object):
@@ -65,13 +83,13 @@ class ImporterBase(object):
         Args:
             ctx (str, Context):  A Context object or the name of the Context in
                                  the db.
-        
             target (Set):  The target set, where the data should be imported.
 
         """
         if isinstance(ctx, basestring):
             ctx = Context.query.filter_by(name=ctx).first()
             if ctx is None:
+                # XXX possible race condition?
                 ctx = self.default_context()
                 db.session.add(ctx)
                 db.session.commit()
@@ -95,7 +113,7 @@ class ImporterBase(object):
                 # XXX support zipfiles?
                 imported.extend(self.import_file(name, userinfo))
             else:
-                raise ReadFailed('could not handle path %r' % name)
+                raise InvalidPathError(name)
         return imported
 
     def import_file(self, filename, userinfo):
@@ -106,8 +124,8 @@ class ImporterBase(object):
         return [data]
 
     def read_file(self, filename):
-        raise NotImplementedError('%s.read_file must be implemented' %
-                                  self.__class__.__name__)
+        raise NotImplementedError('{0}.read_file must be implemented'.format(
+                                  self.__class__.__name__))
 
     def process_entries(self, entries, userinfo):
         kwds = {'name': '(unnamed)', 'context': self.ctx}
@@ -127,8 +145,7 @@ class ImporterBase(object):
                     ent.value = self._convert_unit(ent.value, ent.unit,
                                                    param.unit)
                 except ValueError:
-                    raise ReadFailed('inconsistent units for entry {0}'.format(
-                                     ent.name))
+                    raise UnitMismatchError(ent.name, param.unit, ent.unit)
             data.entries.append(Entry(parameter=param, value=ent.value))
         if missing_params:
             raise MissingInfo([('par_' + param, 'new_param', unit)
