@@ -17,7 +17,7 @@ from yamoda.server import app, db
 from yamoda.server.database import Data, Entry
 
 
-@app.route('/data/<id>')
+@app.route('/data/<int:id>')
 @login_required
 def data(id):
     d = Data.query.get_or_404(id)
@@ -39,7 +39,7 @@ def datadelete():
     return jsonify(result='success', data=None)
 
 
-@app.route('/entry/plot/<xid>/<yid>')
+@app.route('/entry/plot/<int:xid>/<int:yid>')
 @login_required
 def plot(yid, xid):
     import matplotlib.pyplot as plt

@@ -40,7 +40,7 @@ def set(id):
                            params=params, pvalues=pvalues)
 
 
-@app.route('/set/<id>/import/do', methods=['POST'])
+@app.route('/set/<int:id>/import/do', methods=['POST'])
 def setimport_do(id):
     userinfo = {}
     to_import = []
@@ -107,7 +107,7 @@ def setcreate():
     return redirect(url_for('set', id=s.id))
 
 
-@app.route('/set/<id>/import')
+@app.route('/set/<int:id>/import')
 @login_required
 def setimport(id):
     s = Set.query.get_or_404(id)
