@@ -11,6 +11,7 @@ Dependencies
 * py-bcrypt
 * python-markdown2
 * numpy
+* quantities (version >= 0.10.0)
 
 Licensing
 ---------

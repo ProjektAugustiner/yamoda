@@ -10,6 +10,7 @@ import os
 from os import path
 
 from sqlalchemy.orm.exc import NoResultFound
+import quantities as pq
 
 from yamoda.server import db
 from yamoda.server.database import Context, Parameter, Data, Entry
@@ -117,28 +118,65 @@ class ImporterBase(object):
         data = Data(**kwds)
         missing_params = []
         for ent in entries.itervalues():
-            try:
-                param = Parameter.query.filter_by(name=ent.name,
-                                                  context=self.ctx).one()
-            except NoResultFound:
-                if 'par_' + ent.name in userinfo:
-                    kwds = userinfo['par_' + ent.name]
-                    if 'unit' not in kwds:
-                        kwds['unit'] = ent.unit
-                    param = Parameter(name=ent.name, context=self.ctx,
-                                      **kwds)
-                    db.session.add(param)
-                    db.session.flush()
-                else:
-                    missing_params.append((ent.name, ent.unit))
-                    continue
+            param = self._get_param(entry=ent, userinfo=userinfo)
+            if param is None:
+                missing_params.append((ent.name, ent.unit))
+                continue
             if param.unit != ent.unit:
-                # TODO: unit mismatch: as long as we can't convert between
-                # units, lets be on the safe side and error out
-                raise ReadFailed('inconsistent units for param %s: expecting %s'
-                                 ', got %s' % (ent.name, param.unit, ent.unit))
+                try:
+                    ent.value = self._convert_unit(ent.value, ent.unit,
+                                                   param.unit)
+                except ValueError:
+                    raise ReadFailed('inconsistent units for entry {0}'.format(
+                                     ent.name))
             data.entries.append(Entry(parameter=param, value=ent.value))
         if missing_params:
             raise MissingInfo([('par_' + param, 'new_param', unit)
                                for (param, unit) in missing_params])
         return data
+           
+    def _get_param(self, entry, userinfo):
+        """Tries to get the param from the db or to create it otherwise.
+
+        Args:
+          entry (ImportEntry):  The import entry, whose corresponding parameter
+                                should be returned.
+          userinfo (dict):  A dictionairy containing all neccessary keywords
+                            for parameter creation
+
+        Returns:
+          Parameter, None.  The requested parameter or None in case of failure.
+        
+        """
+        name = entry.name
+        try:
+            param = Parameter.query.filter_by(name=name,
+                                              context=self.ctx).one()
+        except NoResultFound:
+            if not ('par_' + name) in userinfo:
+                return None
+            kw = userinfo['par_' + name]
+            unit = kw.pop('unit', entry.unit)
+            # XXX possible race condition?
+            param = Parameter(name=name, context=self.ctx, unit=unit, **kw)
+            db.session.add(param)
+            db.session.flush()
+        return param
+            
+    def _convert_unit(value, from_unit, to_unit):
+        """Performs a unit conversion of value.
+
+        Args:
+          value:  The value to convert.
+          from_unit (str):  The unit string of the value.
+          to_unit (str):  The string representation of the target unit.
+
+        Returns:
+          type(value).  The converted value.
+
+        Raises:
+          ValueError
+
+        """
+        pq.Quantity(value, from_unit)
+        return x.rescale(to_unit).item()
