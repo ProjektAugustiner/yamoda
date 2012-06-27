@@ -33,8 +33,8 @@ class InvalidPathError(ImporterError):
 class UnitMismatchError(ImporterError):
     """Raised in case of a unit mismatch."""
     def __init__(self, entry, expected_unit, received_unit):
-        super(UnitMismatch, self).__init__(
-            'In entry {0}: expected unit {1} got {2}'.format(entry, 
+        super(UnitMismatchError, self).__init__(
+            'In entry {0}: expected unit {1} got {2}'.format(entry,
             expected_unit, received_unit))
 
 
@@ -69,22 +69,18 @@ class ImporterBase(object):
     """Base class for data importers.
 
     .. note::
-       
+
        Subclasses need to implement the following methods:
 
-        * read_file()
-        * default_context()
-
+       * read_file()
+       * default_context()
     """
 
     def __init__(self, ctx, target):
         """Constructor.
 
-        Args:
-            ctx (str, Context):  A Context object or the name of the Context in
-                                 the db.
-            target (Set):  The target set, where the data should be imported.
-
+        :param ctx:  A Context object or the name of the Context in the db.
+        :param target:  The target set, where the data should be imported.
         """
         if isinstance(ctx, basestring):
             ctx = Context.query.filter_by(name=ctx).first()
@@ -93,7 +89,7 @@ class ImporterBase(object):
                 ctx = self.default_context()
                 db.session.add(ctx)
                 db.session.commit()
-        
+
         self.ctx = ctx
         self.target = target
 
@@ -101,29 +97,37 @@ class ImporterBase(object):
     def default_context(cls):
         raise NotImplementedError('{0}.default_context must be implemented'.format(
                                   cls.__name__))
-        
-    def import_items(self, names, userinfo):
+
+    def import_items(self, names, orig_names, userinfo):
+        """Import file(s).
+
+        :param names:  A list of file or directory names.
+        :param orig_names:  A list of corresponding original file names.
+        :param userinfo:  A dictionary with user-supplied info.
+        :returns:  A list of newly-created Data instances.
+        """
         imported = []
-        for name in names:
+        for name, orig in map(None, names, orig_names):
             # recursively import from subdirectories
             if path.isdir(name):
                 items = [path.join(name, sub) for sub in os.listdir(name)]
-                imported.extend(self.import_items(items, userinfo))
+                imported.extend(self.import_items(items, items, userinfo))
             elif path.isfile(name):
                 # XXX support zipfiles?
-                imported.extend(self.import_file(name, userinfo))
+                imported.extend(self.import_file(name, orig, userinfo))
             else:
                 raise InvalidPathError(name)
         return imported
 
-    def import_file(self, filename, userinfo):
+    def import_file(self, filename, original, userinfo):
+        """Import a single file."""
         # default implementation: one file is one data
-        entries = self.read_file(filename)
+        entries = self.read_file(filename, original)
         data = self.process_entries(entries, userinfo)
         self.target.datas.append(data)
         return [data]
 
-    def read_file(self, filename):
+    def read_file(self, filename, original):
         raise NotImplementedError('{0}.read_file must be implemented'.format(
                                   self.__class__.__name__))
 
@@ -144,26 +148,22 @@ class ImporterBase(object):
                 try:
                     ent.value = self._convert_unit(ent.value, ent.unit,
                                                    param.unit)
-                except ValueError:
+                except (ValueError, TypeError):
                     raise UnitMismatchError(ent.name, param.unit, ent.unit)
             data.entries.append(Entry(parameter=param, value=ent.value))
         if missing_params:
             raise MissingInfo([('par_' + param, 'new_param', unit)
                                for (param, unit) in missing_params])
         return data
-           
+
     def _get_param(self, entry, userinfo):
         """Tries to get the param from the db or to create it otherwise.
 
-        Args:
-          entry (ImportEntry):  The import entry, whose corresponding parameter
-                                should be returned.
-          userinfo (dict):  A dictionairy containing all neccessary keywords
-                            for parameter creation
-
-        Returns:
-          Parameter, None.  The requested parameter or None in case of failure.
-        
+        :param entry:  The import entry whose corresponding parameter
+           should be returned.
+        :param userinfo:  A dictionary containing all neccessary keywords
+           for parameter creation.
+        :returns:  The requested Parameter or None in case of failure.
         """
         name = entry.name
         try:
@@ -179,21 +179,15 @@ class ImporterBase(object):
             db.session.add(param)
             db.session.flush()
         return param
-            
-    def _convert_unit(value, from_unit, to_unit):
+
+    def _convert_unit(self, value, from_unit, to_unit):
         """Performs a unit conversion of value.
 
-        Args:
-          value:  The value to convert.
-          from_unit (str):  The unit string of the value.
-          to_unit (str):  The string representation of the target unit.
-
-        Returns:
-          type(value).  The converted value.
-
-        Raises:
-          ValueError
-
+        :param value:  The value to convert.
+        :param from_unit:  The unit string of the value.
+        :param to_unit:  The string representation of the target unit.
+        :returns:  The converted value.
+        :raises ValueError: In case of a unit conversion failure.
         """
-        pq.Quantity(value, from_unit)
+        x = pq.Quantity(value, from_unit)
         return x.rescale(to_unit).item()
