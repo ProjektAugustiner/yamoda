@@ -185,13 +185,42 @@ class Importer(ImporterBase):
         vsm_brief = "The VSM is the Oxford Vibrating Sample Magnetometer"
         vsm_desc = d("""\
         The VSM is the Oxford Vibrating Sample Magnetometer. It is capable of
-        delivering magnetic fields up to 9T in a temperature range of 1.7K-300K.
-
-        ### Components:
-
-        * VCU
-        * ITC503
+        delivering magnetic fields up to 9T in a temperature range of
+        1.7K-300K.
+        
+        The main components are:
         * SR830
+        * VCU
+        * SMC
+        * ITC503
+        * ILM
+        * IPS
+
+        ### SR830
+        The Stanford Research lock-in amplifier measures the magnetic induction
+        signal.
+
+        ### VCU
+        The vibrator control unit controls the moessbauer-type vibrator. It is
+        modified to use the SR830 reference signal instead of the original
+        lock-in amplifier reference. The deviation of the real oscillation from
+        the supplied reference signal is measured with a induction technique. A
+        internal PI control loop is used to minimize this error.
+
+        ### SMC
+        The stepper motor control unit controls the the z psition of the
+        sample. The available range is 30mm.
+
+        ### ITC503
+        The intelligent temperature control uses three thermometers, a needle
+        valve and a heater to control the sample temperature.
+
+        ### ILM
+        The intelligent level meter controls the nitrogen and helium levels.
+        The maximum magnetic field depends on the current He-level.
+
+        ### IPS
+        The inteligent power supply controls the magnet. 
         """)
         vsm = Context(name='VSM', brief=vsm_brief, description=vsm_desc )
         vsm.parameters.extend([X, Y, T1, T2, T3, Tsample, Tset, Tcontrol,
