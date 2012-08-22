@@ -17,7 +17,9 @@ except ImportError:
     pass
 
 # configuration
-SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
+#SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
+SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://yamoda:bla@/yamoda'
+#SQLALCHEMY_DATABASE_URI = 'mysql://yamoda:bla@localhost/yamoda'
 DEBUG = True
 SECRET_KEY = 'development key'
 
