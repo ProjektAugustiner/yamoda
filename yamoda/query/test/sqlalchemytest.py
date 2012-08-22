@@ -6,17 +6,18 @@ Created on 21.08.2012
 '''
 from __future__ import division, absolute_import, print_function
 from yamoda.query.alchemy import convert_dict_query
-from testqueries import testquery_datas, testquery_sets
+import yamoda.query.test.testqueries as tq
 import logging as logg
-logg.basicConfig(level=logg.DEBUG)
+logg.basicConfig(level=logg.WARN)
 
 print("testquery for datas")
 print("-" * 100)
-res_datas = convert_dict_query(testquery_datas)
+res_datas = convert_dict_query(tq.testquery_datas)
 print(res_datas)
 print("\n")
 
 print("testquery for sets")
 print("-" * 100)
-res_sets = convert_dict_query(testquery_sets)
+res_sets = convert_dict_query(tq.testquery_sets)
 print(res_sets)
+

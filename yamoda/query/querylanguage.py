@@ -11,7 +11,7 @@ class SortParameter(object):
         self.param_name = param_name
         self.sort_direction = sort_direction
         
-class Range(object):
+class Interval(object):
     def __init__(self, start, end):
         self.start = start
         self.end = end

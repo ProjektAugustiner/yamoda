@@ -13,15 +13,16 @@ testquery_datas = {
              "context_name" : "TestContext",
              "find" : "datas",
              "param_filters" : {
-                 "T" : Range(0, 400),
+                 "T" : Interval(200, 400),
                  "omega": GreaterThan(1e6)
                  },
-             "limit" : 10
+             "sort" : [SortParameter("T", "asc")],
+             "limit" : 50
              }
 
 testquery_sets = {
              "find" : "sets",
-             "creation_date": TimeInterval(*parse_daterange("13 August 2012 to 11 September 2012")) ,
+             "creation_date": TimeInterval(*parse_daterange("11 August 2012 to 11 September 2012")) ,
              "user_name" : "user",
              "limit" : 10
              }

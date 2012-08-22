@@ -23,10 +23,10 @@ def usecase4(context_name=None, **params_start_end_values):
         query = Data.query.filter_by(context_id = context_sq)
 
     for param_name, (start_value, end_value) in params_start_end_values.iteritems():
-        param_sq = db.session.query(Parameter.id).filter_by(name = param_name).subquery()
+        param_sq = db.session.query(Parameter.id).filter_by(name = param_name).filter_by(context_id = context_sq).subquery()
         e_alias = aliased(Entry)
         query = query.join(e_alias, Data.entries).filter(e_alias.parameter_id == param_sq) 
-        query = query.filter(e_alias.value_float > start_value).filter(e_alias.value_float < end_value)
+        query = query.filter(e_alias.value_float.between(start_value, end_value))
 
     return query
 
@@ -44,11 +44,7 @@ def a_usecase4(context_name=None, **params_start_end_values):
             Entry.data_id == Data.id, 
             Entry.parameter_id == param_sq)
 
-        entry_value_in_range_stmt = and_(
-            Entry.value_float > start_value,
-            Entry.value_float < end_value)
-
-        entry_stmt = exists().where(and_(entry_for_data_and_param_stmt, entry_value_in_range_stmt))
+        entry_stmt = exists().where(and_(entry_for_data_and_param_stmt, Entry.value.between(start_value, end_value)))
         query = query.filter(entry_stmt)
 
     return query
