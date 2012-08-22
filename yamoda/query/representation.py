@@ -10,21 +10,35 @@ Intermediate representation of AugQL queries.
 '''
 
 from __future__ import division, absolute_import
+import types
 
 
+def add_tup_method(cls):
+    def tup(args):
+        print(args)
+        return cls(*args)
+    cls.tup = staticmethod(tup)
+    return cls
+
+
+@add_tup_method
 class SortParameter(object):
     def __init__(self, param_name, sort_direction):
         self.param_name = param_name
-        self.sort_direction = sort_direction
+        self.sort_direction = sort_direction if sort_direction else "asc"
+
+    def __repr__(self):
+        return "SortParameter({}, {})".format(self.param_name, self.sort_direction)
 
 
+@add_tup_method
 class Interval(object):
     def __init__(self, start, end):
         self.start = start
         self.end = end
 
     def __repr__(self):
-        return "Range({}, {})".format(self.start, self.end)
+        return "Interval({}, {})".format(self.start, self.end)
 
 
 class LessThan(object):
@@ -43,12 +57,49 @@ class GreaterThan(object):
         return "GreaterThan({})".format(self.value)
 
 
+class Context(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return "Context({})".format(self.value)
+
+
+class Limit(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return "Limit({})".format(self.value)
+
+
+class Find(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return "Find({})".format(self.value)
+
+
+class User(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return "User({})".format(self.value)
+
+
+@add_tup_method
 class ParamFilter(object):
     def __init__(self, param_name, param_values):
         self.param_name = param_name
         self.param_values = param_values
 
+    def __repr__(self):
+        return "ParamFilter({}, {})".format(self.param_name, self.param_values)
 
+
+@add_tup_method
 class TimeInterval(object):
     def __init__(self, start_datetime, end_datetime):
         self.start = start_datetime

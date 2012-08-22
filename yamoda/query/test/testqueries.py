@@ -7,7 +7,7 @@ Created on 21.08.2012
 from __future__ import division, absolute_import, print_function
 import daterangeparser
 parse_daterange = daterangeparser.parse
-from yamoda.query.querylanguage import *
+from yamoda.query.representation import *
 
 testquery_datas = {
              "context_name": "TestContext",
@@ -26,3 +26,22 @@ testquery_sets = {
              "user_name": "user",
              "limit": 10
              }
+
+teststr_sets = """
+find: sets
+user: tstenzel
+created: 11 August 2012 to 15 August 2012
+"""
+
+teststr_datas = """
+find: datas
+context: TestContext
+T: 0 to 400 or 500 to 600
+omega: > 1e6
+sort: T omega.desc
+limit: 10
+"""
+
+teststr_comma_separated = """
+context.name: TestContext, T: 0 to 400, omega: > 100
+"""

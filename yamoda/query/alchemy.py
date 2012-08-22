@@ -12,11 +12,11 @@ from __future__ import division, absolute_import
 import logging as logg
 from sqlalchemy.sql import exists, and_, between, select
 from sqlalchemy.orm import aliased
-from .querylanguage import *
+from .representation import *
 from yamoda.server.database import *
 
 
-def convert_dict_query(query_dict):
+def convert_dict_query_to_sqla(query_dict):
     """Convert AugQL query representation to an SQLAlchemy query.
     This method selects the right conversion method according to the find attribute.
     Supports querying for datas (default) and sets at the moment.
