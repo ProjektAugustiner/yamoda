@@ -19,7 +19,7 @@ from yamoda.server import app, db
 from yamoda.server.database import Context, User, Group, Set
 
 
-@app.route('/context', methods=['GET','POST'])
+@app.route('/context', methods=['GET', 'POST'])
 @login_required
 def contextlist():
     """shows every context in the database"""
@@ -36,7 +36,7 @@ def contextlist():
             db.session.commit()
         except (ValueError, IntegrityError):
             db.session.rollback()
-            flash('Invalid Input','error')
+            flash('Invalid Input', 'error')
         else:
             flash('Created new context: {0}'.format(name), 'info')
 

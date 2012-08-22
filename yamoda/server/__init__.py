@@ -39,6 +39,8 @@ login_manager.login_view = 'login'
 
 def datetimeformat(value, format='%Y-%m-%d %H:%M'):
     return value.strftime(format)
+
+
 def dataformat(value):
     if value is None:
         return ''
@@ -48,11 +50,15 @@ def dataformat(value):
             fmt = Markup(fmt.replace('e', ' &times; 10<sup>') + '</sup>')
         return fmt
     return str(value)
+
+
 def unitformat(value):
     if value is None:
         return ''
     return value
 md = markdown2.Markdown(safe_mode='escape')
+
+
 def markdown(value):
     return Markup(md.convert(value))
 app.jinja_env.filters['dtformat'] = datetimeformat

@@ -20,4 +20,3 @@ print("testquery for sets")
 print("-" * 100)
 res_sets = convert_dict_query(tq.testquery_sets)
 print(res_sets)
-

@@ -15,7 +15,7 @@ from yamoda.server import app, db
 from yamoda.server.database import User, Group
 
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     """handles the user login"""
     if request.method == 'POST':

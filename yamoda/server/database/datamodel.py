@@ -33,12 +33,12 @@ class TimeStamp(object):
 
 
 _set_to_data = db.Table('set_to_data', db.Model.metadata,
-    db.Column('set_id',  db.Integer, db.ForeignKey('set.id')),
+    db.Column('set_id', db.Integer, db.ForeignKey('set.id')),
     db.Column('data_id', db.Integer, db.ForeignKey('data.id')))
 
 
 _set_to_set = db.Table('set_to_set', db.Model.metadata,
-    db.Column('child_id' , db.Integer, db.ForeignKey('set.id'), primary_key=True),
+    db.Column('child_id', db.Integer, db.ForeignKey('set.id'), primary_key=True),
     db.Column('parent_id', db.Integer, db.ForeignKey('set.id'), primary_key=True))
 
 
@@ -48,8 +48,8 @@ class Set(AccessControl, TimeStamp, db.Model):
     name = db.Column(db.String(60), nullable=False)
     datas = db.relationship('Data', secondary=_set_to_data, backref='sets')
     children = db.relationship('Set', secondary=_set_to_set,
-                               primaryjoin=id==_set_to_set.c.child_id,
-                               secondaryjoin=id==_set_to_set.c.parent_id)
+                               primaryjoin=id == _set_to_set.c.child_id,
+                               secondaryjoin=id == _set_to_set.c.parent_id)
 
     def __repr__(self):
         return '<DataSet({0})>'.format(self.id)

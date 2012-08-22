@@ -41,6 +41,7 @@ class PermissionError(Exception):
     def __str__(self):
         return repr(self.value)
 
+
 def _bit_property(bit, name='permission'):
     """creates hybrid property to set and get a *name* col."""
     #: Helper fn to bypass Accesscontrol.__getattribute__
@@ -59,11 +60,11 @@ def _bit_property(bit, name='permission'):
 
     def _set(self, value):
         """Sets the *bit* bit dependant on value."""
-        if value: #set bit
+        if value:  # set bit
             set_attr(self, attr(self) | (1 << bit))
-        else: #clear bit
+        else:  # clear bit
             set_attr(self, attr(self) & (~(1 << bit)))
-    return hybrid_property( _get, _set, expr=_exp)
+    return hybrid_property(_get, _set, expr=_exp)
 
 
 class AccessControlledQuery(BaseQuery):
@@ -141,6 +142,7 @@ class AccessControlledQuery(BaseQuery):
             abort(404)
         else:
             return row
+
 
 class AccessControl(object):
     """Mixin class, adding row level security to the database model.
@@ -295,7 +297,7 @@ class AccessControl(object):
 
 #: Helper table, neccessary for User-Group relationship.
 _usergroup_table = db.Table('usergroup_table', db.metadata,
-    db.Column('user_id',  db.Integer, db.ForeignKey('user.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('group_id', db.Integer, db.ForeignKey('group.id')))
 
 
