@@ -2,17 +2,27 @@
 """Script to create the database schema and populate with test data."""
 
 import random
+import logging as logg
+logg.basicConfig(level=logg.INFO)
+#logg.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 from optparse import OptionParser
 
-from yamoda.server import db
+from yamoda.server import db, app
 from yamoda.server.database import User, Group, Context, Parameter, \
      Set, Data, Entry
+from dbsettings import DATABASE_URIS
 
 
 parser = OptionParser()
 parser.add_option('--testdata', dest='testdata', default=True,
                   help='create some test data')
+parser.add_option('--database', dest='database', default="sqlite",
+                  help='Select Database backend (sqlite | mysql | postgres)')
 (options, args) = parser.parse_args()
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URIS[options.database]
+
+logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])
 
 print 'creating schema...'
 db.drop_all()

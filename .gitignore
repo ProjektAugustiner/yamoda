@@ -4,5 +4,5 @@ localsettings.py
 .project
 .pydevproject
 .settings
-.swp
+*.swp
 

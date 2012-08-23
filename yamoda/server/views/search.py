@@ -37,7 +37,7 @@ def do_search():
         datas = query.all()
         logg.info("query returned %s datas", len(datas))
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
-        logg.info("result datas and entries %s", formatted_data)
+        logg.info("result datas and entries \n%s", formatted_data)
         return "query returned {} datas".format(len(datas))
 #        return render_template('searchresult_data.html', datas=datas)
 
@@ -51,6 +51,7 @@ def search():
 @app.route('/searchtest')
 @login_required
 def searchtest():
+    """ just run some test query"""
     import yamoda.query.test.testqueries as tq
 
     query_dict = parse_query_string(tq.teststr_sets)
