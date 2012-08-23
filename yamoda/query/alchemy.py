@@ -35,7 +35,7 @@ def convert_dict_query_to_sqla(query_dict):
         raise NotImplementedError(str(what_to_find) + " queries are not supported!")
 
 
-def _make_entry_query(context_sq, param_name, param_value):
+def _make_entry_query(context_sq, param_name, param_exprs):
     """unused atm"""
 
     entry_query = db.session.query(Parameter.name, Entry.value)
@@ -45,28 +45,28 @@ def _make_entry_query(context_sq, param_name, param_value):
     if context_sq is not None:
         entry_query = entry_query.filter(Parameter.context_id == context_sq)
 
-    if isinstance(param_value, Interval):
-        r = param_value
+    if isinstance(param_exprs, Interval):
+        r = param_exprs
         # do values in the range `start` to `end` exist?
         entry_query = entry_query.filter(Entry.value.between(r.start, r.end))
 
-    elif isinstance(param_value, GreaterThan):
-        gt = param_value
+    elif isinstance(param_exprs, GreaterThan):
+        gt = param_exprs
         entry_query = entry_query.filter(Entry.value > gt.value)
 
-    elif isinstance(param_value, LessThan):
-        lt = param_value
+    elif isinstance(param_exprs, LessThan):
+        lt = param_exprs
         entry_query = entry_query.filter(Entry.value < lt.value)
 
     else:
-        raise Exception("invalid param_value for param {}: param_value {}".format(param_name, param_value))
+        raise Exception("invalid param_exprs for param {}: param_exprs {}".format(param_name, param_exprs))
 
     logg.debug("entry_query is %s", entry_query)
 
     return entry_query
 
 
-def _make_entry_cond(param_name, param_value):
+def _make_entry_cond(param_name, param_exprs):
     """Create condition for entries for the _convert_dict_query_datas method.
     Only entries which belong to a certain Data and Parameter will be selected.
     Supports restricting selected entries by value (>, < or interval)
@@ -78,21 +78,24 @@ def _make_entry_cond(param_name, param_value):
                 Entry.data_id == Data.id,
                 Entry.parameter_id == Parameter.id)
 
-    if isinstance(param_value, Interval):
-        r = param_value
-        # do values in the range `start` to `end` exist?
-        cond = and_(cond, Entry.value.between(r.start, r.end))
+    # multiple exprs are joined by OR
+    or_cond = or_()
 
-    elif isinstance(param_value, GreaterThan):
-        gt = param_value
-        cond = and_(cond, Entry.value > gt.value)
+    for expr in param_exprs:
+        if isinstance(expr, Interval):
+            # do values in the range `start` to `end` exist?
+            or_cond = or_(or_cond, Entry.value.between(expr.start, expr.end))
 
-    elif isinstance(param_value, LessThan):
-        lt = param_value
-        cond = and_(cond, Entry.value < lt.value)
+        elif isinstance(expr, GreaterThan):
+            or_cond = or_(or_cond, Entry.value > expr.value)
 
-    else:
-        raise Exception("invalid param_value for param {}: param_value {}".format(param_name, param_value))
+        elif isinstance(expr, LessThan):
+            or_cond = or_(or_cond, Entry.value < expr.value)
+
+        else:
+            raise Exception("invalid param_exprs for param {}: param_exprs {}".format(param_name, param_exprs))
+
+    cond = and_(cond, or_cond)
 
     logg.debug("entry_cond is %s", cond)
 
@@ -122,7 +125,7 @@ def _convert_dict_query_datas(query_dict):
     param_filters = query_dict.get("param_filters", {})
     for param_name, param_exprs in param_filters.iteritems():
         # TODO: support "or"
-        entry_cond = _make_entry_cond(param_name, param_exprs[0])
+        entry_cond = _make_entry_cond(param_name, param_exprs)
         query = query.filter(Data.entries.any(entry_cond))
 
     # apply sorting
