@@ -13,6 +13,7 @@ Dependencies
 * numpy
 * quantities (version >= 0.10.0)
 * Parcon
+* DateRangeParser
 
 Licensing
 ---------
