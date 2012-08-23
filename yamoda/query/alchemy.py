@@ -25,14 +25,14 @@ def convert_dict_query_to_sqla(query_dict):
     :returns (what_to_find, query)
 
     """
-    what_to_find = query_dict.get("find", "datas")
+    what_to_find = query_dict.get("find", "sets")
 
     if what_to_find == "datas":
         return ("datas", _convert_dict_query_datas(query_dict))
     elif what_to_find == "sets":
         return ("sets", _convert_dict_query_sets(query_dict))
     else:
-        raise NotImplementedError()
+        raise NotImplementedError(str(what_to_find) + " queries are not supported!")
 
 
 def _make_entry_query(context_sq, param_name, param_value):
