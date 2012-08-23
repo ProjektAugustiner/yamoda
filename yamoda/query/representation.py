@@ -15,7 +15,6 @@ import types
 
 def add_tup_method(cls):
     def tup(args):
-        print(args)
         return cls(*args)
     cls.tup = staticmethod(tup)
     return cls
@@ -91,12 +90,12 @@ class User(object):
 
 @add_tup_method
 class ParamFilter(object):
-    def __init__(self, param_name, param_values):
+    def __init__(self, param_name, param_exprs):
         self.param_name = param_name
-        self.param_values = param_values
+        self.param_exprs = param_exprs
 
     def __repr__(self):
-        return "ParamFilter({}, {})".format(self.param_name, self.param_values)
+        return "ParamFilter({}, {})".format(self.param_name, self.param_exprs)
 
 
 @add_tup_method

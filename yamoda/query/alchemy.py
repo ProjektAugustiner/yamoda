@@ -19,15 +19,18 @@ from yamoda.server.database import *
 def convert_dict_query_to_sqla(query_dict):
     """Convert AugQL query representation to an SQLAlchemy query.
     This method selects the right conversion method according to the find attribute.
-    Supports querying for datas (default) and sets at the moment.
+    Supports querying for `datas` (default) and `sets` at the moment.
+    Returns what is queried for as first value
     :param query_dict: dict representation of an AugQL query
+    :returns (what_to_find, query)
+
     """
     what_to_find = query_dict.get("find", "datas")
 
     if what_to_find == "datas":
-        return _convert_dict_query_datas(query_dict)
+        return ("datas", _convert_dict_query_datas(query_dict))
     elif what_to_find == "sets":
-        return _convert_dict_query_sets(query_dict)
+        return ("sets", _convert_dict_query_sets(query_dict))
     else:
         raise NotImplementedError()
 
@@ -117,8 +120,9 @@ def _convert_dict_query_datas(query_dict):
     # apply entry filters
     # TODO: test performance of any() and remove it if neccessary
     param_filters = query_dict.get("param_filters", {})
-    for param_name, param_value in param_filters.iteritems():
-        entry_cond = _make_entry_cond(param_name, param_value)
+    for param_name, param_exprs in param_filters.iteritems():
+        # TODO: support "or"
+        entry_cond = _make_entry_cond(param_name, param_exprs[0])
         query = query.filter(Data.entries.any(entry_cond))
 
     # apply sorting
@@ -126,7 +130,7 @@ def _convert_dict_query_datas(query_dict):
     for sort_param in sort:
         e_alias = aliased(Entry)
         p_alias = aliased(Parameter)
-        query = query.join(e_alias, Data.entries).join(p_alias).filter(and_(p_alias.name == Parameter.name,
+        query = query.join(e_alias, Data.entries).join(p_alias).filter(and_(p_alias.name == sort_param.param_name,
                                                                             p_alias.context_id == Data.context_id))
         sort_col = e_alias.value_float if sort_param.sort_direction == "asc" else e_alias.value_float.desc()
         query = query.order_by(sort_col)
@@ -152,7 +156,7 @@ def _convert_dict_query_sets(query_dict):
         query = query.filter_by(user_id=user_sq)
 
     # filter sets by creation date
-    time_interval = query_dict.get("creation_date")
+    time_interval = query_dict.get("created")
     if time_interval is not None:
         query = query.filter(Set.created.between(time_interval.start, time_interval.end))
 

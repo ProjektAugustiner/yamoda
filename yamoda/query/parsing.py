@@ -23,22 +23,31 @@ def parse_query_string(query_string):
     """ Parse AugQL query string to intermediate representation.
     :param query_string: AugQL string, clauses separated by comma or newline.
     """
-    query_dict = {}
+    query_dict = dict(param_filters={})
     query_str = _replace_newline_with_comma(query_string)
     logg.debug("parsing: '%s'", query_str)
     parsed = query.parse_string(query_str)
     logg.debug("parsing result: %s", parsed)
 
+    def check_duplicate(tag):
+        """duplicate clauses not allowed"""
+        if tag in query_dict:
+            raise Exception("duplicate clause for '{}'!".format(tag))
+
     # walk result and populate query_dict
     for tag, content in parsed:
         logg.debug("adding tag %s, content %s", tag, content)
-        # duplicate clauses not allowed
-        if tag in query_dict:
-                raise Exception("duplicate clause, '{} already given!'".format(tag))
         # XXX: this is a bit stupid, change that...
         if tag in ("context_name", "find", "limit", "user_name"):
+            check_duplicate(tag)
             query_dict[tag] = content.value
-        else:
+        elif tag in ("created", "sort"):
+            check_duplicate(tag)
             query_dict[tag] = content
+        elif tag == "param_filter":
+            param_name = content.param_name
+            if param_name in query_dict["param_filters"]:
+                raise Exception("duplicate param filter clause for '{}'!".format(param_name))
+            query_dict["param_filters"][param_name] = content.param_exprs
 
     return query_dict

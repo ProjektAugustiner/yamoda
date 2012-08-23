@@ -29,8 +29,8 @@ testquery_sets = {
 
 teststr_sets = """
 find: sets
-user: tstenzel
-created: 11 August 2012 to 15 August 2012
+user: admin
+created: 11 August 2011 to 15 August 2012
 """
 
 teststr_datas = """

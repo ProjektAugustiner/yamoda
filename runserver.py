@@ -7,6 +7,11 @@ server.
 
 """
 
+import logging
+logging.basicConfig(level=logging.INFO)
+# INFO shows SQL statements, DEBUG even shows raw result sets
+#logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+
 from optparse import OptionParser
 
 from yamoda.server import app

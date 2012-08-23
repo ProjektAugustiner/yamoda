@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% set title = "Search" %}
+{% block body %}
+  <h2>Search for sets or datas</h2>
+
+  <form action="{{ url_for('search') }}" method="post" class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="query">Enter Query:</label>
+      <div class="controls">
+          <textarea name="query" rows="12" cols="80"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="icon-ok-sign icon-white"></i>Submit</button>
+      &nbsp;&nbsp;
+    </div>
+  </form>
+{% endblock %}

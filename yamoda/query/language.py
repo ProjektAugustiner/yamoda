@@ -39,12 +39,12 @@ def _concat_list(args):
 context_name = Word(string.letters + string.digits + "_")
 data_name = context_name
 param_name = context_name
-user_name = context_name
+user_name = context_name(description="user name")
 
 ### number literals
 
 #  a floating point number like in Python
-float_lit = Regex(r"[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?")
+float_lit = Regex(r"[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?")(name="float lit regex")
 
 ### misc
 
@@ -73,7 +73,7 @@ context_spec = ((L("context.name") | "context") + ":" + context_name)[Context]
 find_spec = (L("find") + ":" + (SL("sets") | SL("datas")))[Find]
 
 # tag filter spec with parameter name so we can insert it correctly in the query dict later
-filter_spec = (param_name + ":" + filter_expr)[lambda t: Pair(t[0], ParamFilter(*t))]
+filter_spec = (param_name + ":" + filter_expr)[ParamFilter.tup]
 
 user_spec = (L("user") + ":" + user_name)[User]
 
@@ -87,7 +87,7 @@ query_clause = (context_spec["context_name"]
                 | user_spec["user_name"]
                 | find_spec["find"]
                 | limit_spec["limit"]
-                | filter_spec
+                | filter_spec["param_filter"]
                 | sort_spec["sort"]
                 | creation_time_spec["created"])
 

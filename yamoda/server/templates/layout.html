@@ -39,6 +39,7 @@
                 </ul>
               </li>
               <li><a href="{{ url_for('contextlist') }}">Contexts</a></li>
+              <li><a href="{{ url_for('search') }}">Search</a></li>
             </ul>
             <ul class="nav pull-right">
               {%- if current_user.is_authenticated() %}
