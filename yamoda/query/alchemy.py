@@ -10,10 +10,10 @@ Conversion of queries (in intermediate representation) to SQLAlchemy.
 '''
 from __future__ import division, absolute_import
 import logging as logg
-from sqlalchemy.sql import exists, and_, between, select
+from sqlalchemy.sql import and_, or_
 from sqlalchemy.orm import aliased
-from .representation import *
-from yamoda.server.database import *
+from .representation import Interval, LessThan, GreaterThan
+from yamoda.server.database import Set, Entry, Parameter, Data, Context, User, db
 
 
 def convert_dict_query_to_sqla(query_dict):

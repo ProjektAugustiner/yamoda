@@ -8,11 +8,11 @@ Created on 22.08.2012
 
 The AugQL query language written as parcon parsers.
 '''
-
 from __future__ import absolute_import
 import string
 from parcon import *
-from .representation import *
+from .representation import GreaterThan, LessThan, SortParameter, Interval, \
+    ContextRepr, Find, ParamFilter, UserRepr, TimeInterval, Limit
 import daterangeparser
 
 # just to save some keystrokes ;-)
@@ -70,14 +70,14 @@ sort_spec = L("sort") + ":" + OneOrMore(sort_param)
 
 limit_spec = (L("limit") + ":" + int_lit)[Limit]
 
-context_spec = ((L("context.name") | "context") + ":" + context_name)[Context]
+context_spec = ((L("context.name") | "context") + ":" + context_name)[ContextRepr]
 
 find_spec = (L("find") + ":" + (SL("sets") | SL("datas")))[Find]
 
 # tag filter spec with parameter name so we can insert it correctly in the query dict later
 filter_spec = (param_name + ":" + filter_expr)[ParamFilter.tup]
 
-user_spec = (L("user") + ":" + user_name)[User]
+user_spec = (L("user") + ":" + user_name)[UserRepr]
 
 # Date range like: '12 August 2012 to 12 December 2012'
 # XXX: we could allow more date range formats because daterangeparser understands many other formats

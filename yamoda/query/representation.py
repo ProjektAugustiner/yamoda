@@ -10,7 +10,6 @@ Intermediate representation of AugQL queries.
 '''
 
 from __future__ import division, absolute_import
-import types
 
 
 def add_tup_method(cls):
@@ -56,7 +55,7 @@ class GreaterThan(object):
         return "GreaterThan({})".format(self.value)
 
 
-class Context(object):
+class ContextRepr(object):
     def __init__(self, value):
         self.value = value
 
@@ -80,7 +79,7 @@ class Find(object):
         return "Find({})".format(self.value)
 
 
-class User(object):
+class UserRepr(object):
     def __init__(self, value):
         self.value = value
 

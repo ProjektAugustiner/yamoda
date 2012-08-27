@@ -86,19 +86,11 @@
   </div>
 </div>
 <script type="text/javascript">
-var make_popup_content = function(row) {
-  console.log(this);
-  var text = $("#query_" + row).text().replace(/,/g, "<br>");
-  return text;
-};
-
 var query_links = $(".query_popover");
 query_links.each(function(index, link) {
     var text = link.text.replace(/,/g, "<br>");
     $("#query_" + index).popover({content: text, title: "Click to insert #" + (index + 1),html: true, trigger: "hover"});
   })
-
-query_links.popover(content=make_popup_content);
 
 
 var insert_query = function(row) {

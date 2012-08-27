@@ -8,7 +8,7 @@ server.
 """
 
 import logging as logg
-logg.basicConfig(level=logg.INFO)
+logg.basicConfig(level=logg.DEBUG)
 # INFO shows SQL statements, DEBUG even shows raw result sets
 #logg.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 

@@ -14,7 +14,8 @@ from .language import query
 
 
 def replace_newline_with_comma(query_str):
-    """Replaces each newline (\n oder \r\n) with a comma and strips extraneous commas and blank lines"""
+    """Replaces each newline (\n oder \r\n) with a comma
+    and strips extraneous commas and blank lines."""
     splitted = query_str.replace("\r", "").split("\n")
     lines = [line.strip(",") for line in splitted if line]
     return ",".join(lines)
