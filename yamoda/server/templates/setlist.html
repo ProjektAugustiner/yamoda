@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 {% set title = "Datasets" %}
-{% macro setlist(sets, parent=None) %}
-  <div class="newbutton"><a class="btn" data-toggle="modal"
-                            href="#new_set">Create {% if parent %}sub{% endif %}set</a></div>
+{% macro settable(sets) %}
   <table id="settable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
@@ -33,6 +31,11 @@
       $(".datatoolbar").append($(".newbutton").remove());
     });
   </script>
+{% endmacro %}
+{% macro setlist(sets, parent=None) %}
+  <div class="newbutton"><a class="btn" data-toggle="modal"
+                            href="#new_set">Create {% if parent %}sub{% endif %}set</a></div>
+  {{ settable(sets) }}
   <div class="modal hide" id="new_set">
     <form class="modal-form" action="{{ url_for('setcreate') }}" method="post">
       <div class="modal-header">

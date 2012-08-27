@@ -130,3 +130,14 @@ class Parameter(db.Model, DescriptionMixin):
 
     def __repr__(self):
         return '<Parameter({0})>'.format(self.name)
+
+
+class HistoricQuery(db.Model, TimeStamp):
+    """An AugQL query which was run on the server earlier.
+    Used to display a search history to the user"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60), default="unnamed")
+    query_string = db.Column(db.String)
+
+    def __repr__(self):
+        return '<HistoricQuery({0})>'.format(self.name)

@@ -13,9 +13,10 @@ import logging as logg
 from .language import query
 
 
-def _replace_newline_with_comma(query_str):
-    """Replaces each newline with a comma and strips extraneous commas and blank lines"""
-    lines = [line.strip(",") for line in query_str.split("\n") if line]
+def replace_newline_with_comma(query_str):
+    """Replaces each newline (\n oder \r\n) with a comma and strips extraneous commas and blank lines"""
+    splitted = query_str.replace("\r", "").split("\n")
+    lines = [line.strip(",") for line in splitted if line]
     return ",".join(lines)
 
 
@@ -24,9 +25,8 @@ def parse_query_string(query_string):
     :param query_string: AugQL string, clauses separated by comma or newline.
     """
     query_dict = dict(param_filters={})
-    query_str = _replace_newline_with_comma(query_string)
-    logg.debug("parsing: '%s'", query_str)
-    parsed = query.parse_string(query_str)
+    logg.debug("parsing: '%s'", query_string)
+    parsed = query.parse_string(query_string)
     logg.debug("parsing result: %s", parsed)
 
     def check_duplicate(tag):

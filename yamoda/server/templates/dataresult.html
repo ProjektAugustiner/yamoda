@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% from "datalist.html" import datalist with context %}
+{% set title = "Results For Data Query" %}
+{% block body %}
+<h2>Data results for query</h2>
+<p>{{ query }}</p>
+{{ datalist(datas, params) }}
+{% endblock %}

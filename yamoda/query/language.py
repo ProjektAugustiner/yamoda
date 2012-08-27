@@ -38,7 +38,7 @@ def _concat_list(args):
 ### names
 context_name = Word(string.letters + string.digits + "_")
 data_name = context_name
-param_name = context_name
+param_name = context_name(desc="param_name")
 user_name = context_name(description="user name")
 
 ### number literals
@@ -52,11 +52,13 @@ int_lit = Word(string.digits)
 
 interval = (float_lit + "to" + float_lit)[Interval.tup]
 
-sort_dir = (L(".") + SL("asc")) | (L(".") + SL("desc")) | SL("")
+dot = L(".")(name="dot")
 
-sort_param = (param_name + sort_dir)[SortParameter.tup]
+sort_dir = ((dot + SL("asc")(name="asc")) | (dot + SL("desc")(name="desc")) | SL("")(name="empty"))(name="sort_dir")
 
-comparison = ((SL("<") | SL(">")) + float_lit)[_make_comparison]
+sort_param = (param_name + sort_dir)[SortParameter.tup](name="sort_param")
+
+comparison = ((SL("<")(name="<") | SL(">")(name=">")) + float_lit)[_make_comparison](name="comparison")
 
 param_exprs = interval | comparison
 

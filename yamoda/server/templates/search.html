@@ -1,19 +1,93 @@
 {% extends "layout.html" %}
 {% set title = "Search" %}
 {% block body %}
-  <h2>Search for sets or datas</h2>
-
-  <form action="{{ url_for('search') }}" method="post" class="form-horizontal">
-    <div class="control-group">
-      <label class="control-label" for="query">Enter Query:</label>
-      <div class="controls">
-          <textarea name="query" rows="12" cols="80"></textarea>
+<script src="{{ url_for('static', filename='bootstrap-popover.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap-tooltip.js') }}"></script>
+<div class="row-fluid">
+  <div class="spam12">
+    <h2>Search for sets or datas</h2>
+    <form action="{{ url_for('search') }}" method="post" class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="query">Enter Query:</label>
+        <div class="controls">
+            <textarea name="query" id="query_input" rows="12"></textarea>
+        </div>
       </div>
-    </div>
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-        <i class="icon-ok-sign icon-white"></i>Submit</button>
-      &nbsp;&nbsp;
-    </div>
-  </form>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-success">
+          <i class="icon-ok-sign icon-white"></i>Submit</button>
+        <button type="reset" class="btn btn-warning">
+          <i class="icon-trash icon-white"></i>Reset</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row-fluid">
+  <div class="spam12">
+    <h2>Query History</h2>
+    <table id="querytable" class="table table-condensed table-bordered table-striped, table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Created</th>
+          <th>Name</th>
+          <th>Insert Query</th>
+          <th>Run</th>
+          <th><input type="checkbox" onchange="toggleall(this)" /></th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for query in query_history %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ query.created|dtformat }}</td>
+          <td>{{ query.name }}</td>
+          <td>
+            <a href="#" id="query_{{ loop.index0 }}"
+              class="query_popover" onclick="insert_query('{{ loop.index0 }}')">{{- query.query_string -}}
+            </a>
+          </td>
+          <td><a href="#" class="insert_query" onclick="run_query('{{ loop.index0 }}');">Run Query</a></td>
+          <td><input type="checkbox" class="querycheck" id="check_{{ loop.index0 }}" value="yes" /></td>
+        </tr>
+        {%- endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<script type="text/javascript">
+  var make_popup_content = function(row) {
+    console.log(this);
+    var text = $("#query_" + row).text().replace(/,/g, "<br>");
+    return text;
+  };
+
+  var query_links = $(".query_popover");
+  query_links.each(function(index, link) {
+      var text = link.text.replace(/,/g, "<br>");
+      $("#query_" + index).popover({content: text, title: "Click to insert #" + (index + 1),html: true, trigger: "hover"});
+    })
+
+  query_links.popover(content=make_popup_content);
+
+
+  var insert_query = function(row) {
+    var newtext = $("#query_" + row).text().replace(/,/g, "\n");
+    $("#query_input").val(newtext);
+  };
+
+  var run_query = function() {
+    var query = $("#query_" + row).text();
+    $.POST
+  }
+
+  var toggleall = function(check) {
+    if (check.checked)
+      $('.querycheck').attr('checked', 'checked');
+    else
+      $('.querycheck').removeAttr('checked');
+  }
+</script>
 {% endblock %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

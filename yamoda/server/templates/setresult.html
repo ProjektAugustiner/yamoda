@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% from "setlist.html" import settable with context %}
+{% set title = "Results For Set Query" %}
+{% block body %}
+<h2>Set results for query</h2>
+<p>{{ query }}</p>
+{{ settable(sets) }}
+{% endblock %}
