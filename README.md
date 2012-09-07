@@ -14,6 +14,7 @@ Dependencies
 * quantities (version >= 0.10.0)
 * Parcon
 * DateRangeParser
+* nose (only for unit tests)
 
 Licensing
 ---------

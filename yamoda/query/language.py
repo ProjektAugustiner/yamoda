@@ -44,11 +44,11 @@ user_name = context_name(description="user name")
 ### number literals
 
 #  a floating point number like in Python
-float_lit = Regex(r"[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?")(name="float lit regex")
+float_lit = Regex(r"[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?")[float](name="float lit regex")
 
 ### misc
 
-int_lit = Word(string.digits)
+int_lit = Word(string.digits)[int]
 
 interval = (float_lit + "to" + float_lit)[Interval.tup]
 

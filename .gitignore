@@ -5,4 +5,5 @@ localsettings.py
 .pydevproject
 .settings
 *.swp
+*.swo
 

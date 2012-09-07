@@ -13,7 +13,8 @@ from flask import render_template, request
 from flask.ext.login import login_required
 
 from yamoda.server import app, db
-from yamoda.query import convert_dict_query_to_sqla, parse_query_string, replace_newline_with_comma
+from yamoda.query.alchemy import convert_dict_query_to_sqla
+from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
 from yamoda.server.database import HistoricQuery
 
 

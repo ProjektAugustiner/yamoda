@@ -83,6 +83,8 @@ class Entry(db.Model, TimeStamp):
     def _(self, newvalue):
         if isinstance(newvalue, float):
             self.value_float = newvalue
+        elif isinstance(newvalue, int):
+            self.value_float = float(newvalue)
         else:
             self.value_complex = newvalue
 

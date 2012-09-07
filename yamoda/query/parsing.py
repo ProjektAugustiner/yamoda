@@ -25,7 +25,7 @@ def parse_query_string(query_string):
     """ Parse AugQL query string to intermediate representation.
     :param query_string: AugQL string, clauses separated by comma or newline.
     """
-    query_dict = dict(param_filters={})
+    query_dict = dict()
     logg.debug("parsing: '%s'", query_string)
     parsed = query.parse_string(query_string)
     logg.debug("parsing result: %s", parsed)
@@ -46,9 +46,10 @@ def parse_query_string(query_string):
             check_duplicate(tag)
             query_dict[tag] = content
         elif tag == "param_filter":
+            param_filters = query_dict.setdefault("param_filters", {})
             param_name = content.param_name
-            if param_name in query_dict["param_filters"]:
+            if param_name in param_filters:
                 raise Exception("duplicate param filter clause for '{}'!".format(param_name))
-            query_dict["param_filters"][param_name] = content.param_exprs
+            param_filters[param_name] = content.param_exprs
 
     return query_dict

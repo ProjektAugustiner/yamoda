@@ -8,7 +8,6 @@ Created on 19.08.2012
 
 Intermediate representation of AugQL queries.
 '''
-
 from __future__ import division, absolute_import
 
 
@@ -28,6 +27,9 @@ class SortParameter(object):
     def __repr__(self):
         return "SortParameter({}, {})".format(self.param_name, self.sort_direction)
 
+    def __eq__(self, other):
+        return self.param_name == other.param_name and self.sort_direction == other.sort_direction
+
 
 @add_tup_method
 class Interval(object):
@@ -38,53 +40,8 @@ class Interval(object):
     def __repr__(self):
         return "Interval({}, {})".format(self.start, self.end)
 
-
-class LessThan(object):
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return "LessThan({})".format(self.value)
-
-
-class GreaterThan(object):
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return "GreaterThan({})".format(self.value)
-
-
-class ContextRepr(object):
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return "Context({})".format(self.value)
-
-
-class Limit(object):
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return "Limit({})".format(self.value)
-
-
-class Find(object):
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return "Find({})".format(self.value)
-
-
-class UserRepr(object):
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return "User({})".format(self.value)
+    def __eq__(self, other):
+        return self.start == other.start and self.end == other.end
 
 
 @add_tup_method
@@ -96,6 +53,9 @@ class ParamFilter(object):
     def __repr__(self):
         return "ParamFilter({}, {})".format(self.param_name, self.param_exprs)
 
+    def __eq__(self, other):
+        return self.param_name == other.param_name and self.param_exprs == other.param_exprs
+
 
 @add_tup_method
 class TimeInterval(object):
@@ -105,3 +65,41 @@ class TimeInterval(object):
 
     def __repr__(self):
         return "TimeInterval({}, {})".format(self.start, self.end)
+
+    def __eq__(self, other):
+        return self.start == other.start and self.end == other.end
+
+
+class SimpleValue(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        return self.value == other.value
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, self.value)
+
+
+class LessThan(SimpleValue):
+    pass
+
+
+class GreaterThan(SimpleValue):
+    pass
+
+
+class ContextRepr(SimpleValue):
+    pass
+
+
+class Limit(SimpleValue):
+    pass
+
+
+class Find(SimpleValue):
+    pass
+
+
+class UserRepr(SimpleValue):
+    pass
