@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "queryhistory.html" import queryhistory_table with context %}
 {% set title = "Search" %}
 {% block body %}
 <script src="{{ url_for('static', filename='bootstrap-popover.js') }}"></script>
@@ -24,9 +25,9 @@
         <a href="#" id="save-query" class="btn" onclick="">
           <i class="icon-briefcase"></i>Save Query</a>
         <a href="#" id="show-help" class="btn" onclick="$('#help-box').show(); $(this).hide(); $('#hide-help').show()">
-          <i class="icon-hand-right"></i>Show Help</a>
+          <i class="icon-arrow-right"></i>Show Help</a>
         <a href="#" style="display: none;" id="hide-help" class="btn" onclick="$('#help-box').hide(); $(this).hide(); $('#show-help').show()">
-          <i class="icon-hand-right"></i>Hide Help</a>
+          <i class="icon-arrow-left"></i>Hide Help</a>
       </div>
     </form>
   </div>
@@ -47,61 +48,31 @@
     </div>
   </div>
 </div>
+<hr />
 <div class="row-fluid">
-  <div class="span12">
-    <a href="#" id="query_history_btn" class="btn btn-large" onclick="">
-      <i class="icon-list"></i>Query History</a>
-    <a href="#" id="query_history_btn" class="btn btn-large disabled" onclick="">
-      <i class="icon-list-alt"></i>Query Results</a>
-    <table id="querytable" class="table table-condensed table-bordered table-striped, table-hover">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Created</th>
-          <th>Name</th>
-          <th>Insert Query</th>
-          <th>Run</th>
-          <th><input type="checkbox" id="checkbox_all" onchange="yamoda.search.toggle_all_checkboxes(this, $('.querycheck'));" /></th>
-        </tr>
-      </thead>
-      <tbody>
-        {%- for query in query_history %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ query.created|dtformat }}</td>
-          <td>{{ query.name }}</td>
-          <td>
-            <a href="#" id="query_{{ loop.index0 }}"
-              class="query_popover" onclick="yamoda.search.insert_query('{{ loop.index0 }}')">{{- query.query_string -}}
-            </a>
-          </td>
-          <td><a href="#" class="insert_query" onclick="yamoda.search.run_query('{{ loop.index0 }}');">Run Query</a></td>
-          <td><input type="checkbox" class="querycheck" id="check_{{ query.id }}" value="yes" /></td>
-        </tr>
-        {%- endfor %}
-      </tbody>
-    </table>
-    <!-- adapted from datalist.html -->
-    <div id="actionbutton" style="float: right">
-      <div class="btn-group">
-        <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
-          With selected
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#" onclick="yamoda.search.del_queries()">Delete</a></li>
-        </ul>
-      </div>
-      <div class="alert alert-error hide" id="actionerror"></div>
-    </div>
+  <div class="span3">
+    <h2 id="bottom-headline">Query History</h2>
   </div>
+  <div class="span9">
+    <a href="#" id="query_history_btn" class="btn btn-large" onclick="yamoda.search.change_to_query_history()">
+      <i class="icon-list"></i>Show Query History</a>
+    <a href="#" id="query_results_btn" class="btn btn-large" onclick="yamoda.search.change_to_query_results()">
+      <i class="icon-list-alt"></i>Show Query Results</a>
+  </div>
+</div>
+<hr />
+<div class="row-fluid">
+    <div id="bottom-content" class="span12">
+      {{ queryhistory_table(query_history) }}
+    </div>
 </div>
 <script type="text/javascript" src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/queryhistory.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
 <script type="text/javascript">
-yamoda.search.del_queries_url = "{{ url_for('delete_queries') }}";
-yamoda.logg.info("del_queries_url", yamoda.search.del_queries_url);
+yamoda.queryhistory.del_queries_url = "{{ url_for('delete_queries') }}";
+yamoda.logg.info("del_queries_url", yamoda.queryhistory.del_queries_url);
 yamoda.search.thisorthat();
 </script>
 {% endblock %}

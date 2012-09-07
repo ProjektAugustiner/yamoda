@@ -6,4 +6,5 @@ localsettings.py
 .settings
 *.swp
 *.swo
+*.swn
 

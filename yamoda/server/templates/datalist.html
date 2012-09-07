@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "queryhistory.html" import queryhistory with context %}
 {% set title = "Datas" %}
 {% macro datalist(datas, params) %}
   <table id="datatable" class="table table-condensed table-bordered table-striped">
@@ -68,3 +69,5 @@
     }
   </script>
 {% endmacro %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}
