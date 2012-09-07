@@ -1,0 +1,1 @@
+/home/tobixx0/coding/web/js/log4javascript-1.4.2/log4javascript.js
