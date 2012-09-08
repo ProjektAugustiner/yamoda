@@ -14,7 +14,16 @@
             <textarea name="query" id="query_input" class="field span12" rows="8"></textarea>
         </div>
         <label class="checkbox">Save query on run
-          <input type="checkbox" name="save_query"></input>
+          <input type="checkbox" id="save_query_checkbox" name="save_query"></input>
+        </label>
+        <input type="text" id="query_name_input" name="name"><span class="help-inline">Name of query</span>
+        <label class="radio inline">
+          <input type="radio" name="show_results" value="newpage" checked />
+          Show query results on new page
+        </label>
+        <label class="radio inline">
+          <input type="radio" name="show_results" value="below"/>
+          Show query results below
         </label>
       </div>
       <div class="form-actions">
@@ -54,9 +63,9 @@
     <h2 id="bottom-headline">Query History</h2>
   </div>
   <div class="span9">
-    <a href="#" id="query_history_btn" class="btn btn-large" onclick="yamoda.search.change_to_query_history()">
+    <a href="#" id="query_history_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_history()">
       <i class="icon-list"></i>Change To History</a>
-    <a href="#" id="query_results_btn" class="btn btn-large" onclick="yamoda.search.change_to_query_results()">
+    <a href="#" id="query_results_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_results()">
       <i class="icon-list-alt"></i>Change To Results</a>
   </div>
 </div>
@@ -72,8 +81,8 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
 <script type="text/javascript">
 yamoda.queryhistory.del_queries_url = "{{ url_for('delete_queries') }}";
+yamoda.search.search_url = "{{ url_for('search') }}";
 yamoda.logg.info("del_queries_url", yamoda.queryhistory.del_queries_url);
-yamoda.search.thisorthat();
 </script>
 {% endblock %}
 

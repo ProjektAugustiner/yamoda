@@ -11,7 +11,7 @@
     logg.debug("activating dataTable for queryhistory_table");
     oTable = $("#queryhistory_table").dataTable({
       bStateSave: true,
-      sDom: "zflrtpi",
+      sDom: "zrltpi",
       oLanguage: {
         sSearch: "Search all columns"
       }
@@ -55,15 +55,17 @@
   });
 
   that = yamoda.queryhistory = {
-    insert_query: function(row, target$) {
-      var newtext;
-      newtext = $("#query_" + row).text().replace(/,/g, "\n");
-      target$.val(newtext);
+    insert_query: function(row) {
+      var query_name, query_string;
+      query_string = $("#query_" + row).text().replace(/,/g, "\n");
+      query_name = $("#query_name_" + row).text();
+      $("#query_input").val(query_string);
+      $("#query_name_input").val(query_name);
     },
-    run_query: function(row, target$, form$) {
+    run_query: function(row) {
       logg.debug("called run_query");
-      that.insert_query(row, target$);
-      form$.trigger("submit");
+      that.insert_query(row);
+      $("#query_form").trigger("submit");
     },
     toggle_all_checkboxes: function(master_checkbox, slave_checkboxes$) {
       logg.debug("called toggle_all_checkboxes");

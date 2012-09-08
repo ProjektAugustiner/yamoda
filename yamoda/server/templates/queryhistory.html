@@ -3,7 +3,7 @@
 {% macro queryhistory_table(query_history) %}
 <script src="{{ url_for('static', filename='bootstrap-popover.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap-tooltip.js') }}"></script>
-<table id="queryhistory_table" class="table table-condensed table-bordered table-striped, table-hover">
+<table id="queryhistory_table" class="table table-condensed table-bordered table-striped table-hover">
   <thead>
     <style type="text/css">
       th.header { border-right:3px solid #aaaaaa; border-bottom:1px solid #aaaaaa; }
@@ -20,7 +20,7 @@
       <th class="header">Created</th>
       <th class="header">Name</th>
       <th class="header">Query String</th>
-      <th class="header">Insert</th>
+      <th class="header">Edit</th>
       <th class="header">Run</th>
       <th><input type="checkbox" id="checkbox_all" onchange="yamoda.queryhistory.toggle_all_checkboxes(this, $('.querycheck'));" /></th>
     </tr>
@@ -30,13 +30,13 @@
     <tr>
       <td>{{ loop.index }}</td>
       <td>{{ query.created|dtformat }}</td>
-      <td>{{ query.name }}</td>
+      <td id="query_name_{{ loop.index0 }}">{{ query.name }}</td>
       <td>
         <a href="#" id="query_{{ loop.index0 }}" class="query_popover">{{- query.query_string -}}
         </a>
       </td>
-      <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}', $('#query_input'));">Insert</a></td>
-      <td><a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}', $('#query_input'), $('#query_form'));">Run</a></td>
+      <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Edit</a></td>
+      <td><a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}');">Run</a></td>
       <td><input type="checkbox" class="querycheck" id="check_{{ query.id }}" value="yes" /></td>
     </tr>
     {%- endfor %}
@@ -47,23 +47,24 @@
       <th class="footer"><input type="text" name="search_created" class="search_init" value="Search in creation dates" /></th>
       <th class="footer"><input type="text" name="search_name" class="search_init" value="Search in names" /></th>
       <th class="footer"><input type="text" name="search_query" class="search_init" value="Search in query strings" /></th>
-      <th class="footer" colspan="3"></th>
+      <th class="footer" colspan="3">
+        <!-- adapted from datalist.html -->
+        <div id="actionbutton" style="float: right">
+          <div class="btn-group">
+            <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
+              With selected
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#" onclick="yamoda.queryhistory.del_queries()">Delete</a></li>
+            </ul>
+          </div>
+          <div class="alert alert-error hide" id="actionerror"></div>
+        </div>
+      </th>
     </tr>
   </tfoot>
 </table>
-<!-- adapted from datalist.html -->
-<div id="actionbutton" style="float: right">
-  <div class="btn-group">
-    <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
-      With selected
-      <span class="caret"></span>
-    </button>
-query_history    <ul class="dropdown-menu">
-      <li><a href="#" onclick="yamoda.queryhistory.del_queries()">Delete</a></li>
-    </ul>
-  </div>
-  <div class="alert alert-error hide" id="actionerror"></div>
-</div>
 <script type="text/javascript" src="{{ url_for('static', filename='ColResize.js') }}"></script>
 {% endmacro %}
 

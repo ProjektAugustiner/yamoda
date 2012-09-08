@@ -6,7 +6,7 @@ $(document).ready(() ->
     logg.debug("activating dataTable for queryhistory_table")
     oTable = $("#queryhistory_table").dataTable(
         bStateSave: true
-        sDom: "zflrtpi"
+        sDom: "zrltpi"
         oLanguage:
             sSearch: "Search all columns"
     )
@@ -51,15 +51,17 @@ query_links.each((index, link) ->
 )
 
 that = yamoda.queryhistory = {
-  insert_query: (row, target$) ->
-    newtext = $("#query_" + row).text().replace(/,/g, "\n")
-    target$.val(newtext)
+  insert_query: (row) ->
+    query_string = $("#query_" + row).text().replace(/,/g, "\n")
+    query_name = $("#query_name_" + row).text()
+    $("#query_input").val(query_string)
+    $("#query_name_input").val(query_name)
     return
 
-  run_query: (row, target$, form$) ->
+  run_query: (row) ->
     logg.debug("called run_query")
-    that.insert_query(row, target$)
-    form$.trigger("submit")
+    that.insert_query(row)
+    $("#query_form").trigger("submit")
     return
 
   toggle_all_checkboxes: (master_checkbox, slave_checkboxes$) ->

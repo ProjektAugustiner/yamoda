@@ -15,6 +15,7 @@ searchtest   -- test searching
 
 import logging as logg
 import pprint
+import time
 
 from flask import render_template, request
 from flask.ext.login import login_required
@@ -28,12 +29,13 @@ from yamoda.server.database import HistoricQuery
 @app.route('/search', methods=["POST"])
 @login_required
 def do_search():
+    time.sleep(2)
     """Parse and execute query from client.
     Queries are saved if the user requests that.
     If successful, this view renders a data or set list with the results.
     Parse errors are sent to client in a special error template.
     """
-    logg.debug("request was %s, form %s", request, request.form)
+    logg.debug("request was %s, form %s, form keys %s", request, request.form, request.form.keys())
     # query strings from the client can use newline as separator
     query_string = replace_newline_with_comma(request.form["query"])
     logg.debug("got query string %s", query_string)
@@ -52,8 +54,9 @@ def do_search():
     logg.debug("result type %s, query %s", result_type, query)
     if "save_query" in request.form:
         # save query for later use (search history)
-        logg.info("saving query to DB")
-        hist_query = HistoricQuery(query_string=query_string)
+        query_name = request.form["name"]
+        logg.info("saving query to DB, name is %s", query_name)
+        hist_query = HistoricQuery(query_string=query_string, name=query_name)
         db.session.add(hist_query)
         db.session.commit()
 
