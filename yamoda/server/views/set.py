@@ -12,7 +12,7 @@ import tempfile
 from flask import render_template, request, flash, redirect, url_for, jsonify
 from flask.ext.login import login_required, current_user
 
-from yamoda.server import app, db
+from yamoda.server import app, db, view_helpers
 from yamoda.server.database import Set, Context, Entry
 from yamoda.importer import list_importers, load_importer
 from yamoda.importer.base import MissingInfo, ImporterError
@@ -23,19 +23,14 @@ from yamoda.importer.base import MissingInfo, ImporterError
 def set(id):
     s = Set.query.get_readable_or_404(id)
     # determine a context to use for displaying parameters
-    params = None
-    pvalues = None
     if s.datas:
-        # FIXME: this is quick and dirty, and way too inefficient.  Must be
-        # rewritten using fewer queries.
         ctx = s.datas[0].context
         params = [p for p in ctx.parameters if p.visible]
+        pvalues = view_helpers.get_pvalues(s.datas, params)
+    else:
+        params = []
         pvalues = []
-        for d in s.datas:
-            pvalues.append([])
-            for p in params:
-                pvalue = Entry.query.filter_by(data=d, parameter=p).first()
-                pvalues[-1].append(pvalue.value if pvalue else None)
+
     return render_template('set.html', set=s,
                            params=params, pvalues=pvalues)
 
@@ -103,6 +98,11 @@ def setimport_do(id):
 def setcreate():
     name = request.form['name']
     s = Set(name=name, user=current_user, group=current_user.primary_group)
+    parent_set_id = request.form.get("parent_set")
+    if parent_set_id is not None:
+        parent_set = Set.query.get(parent_set_id)
+        parent_set.set.children.append(s)
+
     db.session.add(s)
     db.session.commit()
     flash('New dataset successfully created.', 'success')

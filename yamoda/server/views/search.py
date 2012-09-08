@@ -4,6 +4,13 @@
 '''
 Created on 23.08.2012
 @author: dpausp (Tobias Stenzel)
+
+Functions:
+----------
+do_search    -- POST queries and display results
+delete_queries    -- POST delete queries from history
+search   -- display search page
+searchtest   -- test searching
 '''
 
 import logging as logg
@@ -12,7 +19,7 @@ import pprint
 from flask import render_template, request
 from flask.ext.login import login_required
 
-from yamoda.server import app, db
+from yamoda.server import app, db, view_helpers
 from yamoda.query.alchemy import convert_dict_query_to_sqla
 from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
 from yamoda.server.database import HistoricQuery
@@ -56,13 +63,18 @@ def do_search():
         logg.debug("result sets %s", sets)
         return render_template('setresult.html', sets=sets,
                                query=query_string.replace(",", ", "))
+
     elif result_type == "datas":
         # XXX: no accesscontrol for datas
         datas = query.all()
+        all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
+        common_param_set = set.intersection(*all_param_sets)
+        pvalues = view_helpers.get_pvalues(datas, common_param_set)
+        logg.info("intersected params %s", common_param_set)
         logg.info("query returned %s datas", len(datas))
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
-        return render_template("dataresult.html", datas=datas, params=[],
+        return render_template("dataresult.html", datas=datas, params=common_param_set, pvalues=pvalues,
                                query=query_string.replace(",", ", "))
 
 
@@ -97,11 +109,12 @@ def searchtest():
     """ just run some test query"""
     import yamoda.query.test.testqueries as tq
 
-    query_dict = parse_query_string(tq.teststr_sets)
+    query_string = tq.testquery_sets.string
+    query_dict = parse_query_string(query_string)
     result_type, query = convert_dict_query_to_sqla(query_dict)
     result = query.all_readable()
 
     if result_type == "sets":
         return render_template('setresult.html', sets=result)
     else:
-        return render_template('dataresult.html', datas=result, params=[], query=tq.testquery_sets)
+        return render_template('dataresult.html', datas=result, params=[], pvalues=[], query=query_string)

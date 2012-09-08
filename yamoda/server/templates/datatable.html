@@ -1,7 +1,4 @@
-{% extends "layout.html" %}
-{% from "queryhistory.html" import queryhistory with context %}
-{% set title = "Datas" %}
-{% macro datalist(datas, params) %}
+{% macro datatable(datas, params, pvalues) %}
   <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
@@ -21,9 +18,12 @@
       <tr>
         <td>{{ loop.index }}</td>
         <td><a href="{{ url_for('data', id=data.id) }}">{{ data.name }}</a></td>
-        <td>{{ data.context.name }}</td>
+        <td><a href="{{ url_for('context', ctx_name=data.context.name) }}">{{ data.context.name }}</a></td>
         <td>{{ data.entries|length }}</td>
         <td>{{ data.created|dtformat }}</td>
+        {% for pv in pvalues[loop.index0] %}
+        <td>{{ pv|dataformat }}</td>
+        {% endfor %}
         <td><input type="checkbox" class="datacheck" id="check_{{ data.id }}" value="yes" /></td>
       </tr>
     {%- endfor %}
@@ -69,5 +69,12 @@
     }
   </script>
 {% endmacro %}
+
+{% extends "layout.html" %}
+{% set title = "Datas" %}
+
+{%block body %}
+{{ datatable(datas, params, pvalues) }}
+{%endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

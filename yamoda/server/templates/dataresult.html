@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
-{% from "datalist.html" import datalist with context %}
+{% from "datatable.html" import datatable with context %}
 {% set title = "Results For Data Query" %}
 {% block body %}
 <h2>Data results for query</h2>
 <p>{{ query }}</p>
-{{ datalist(datas, params) }}
+{{ datatable(datas, params, pvalues) }}
 {% endblock %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

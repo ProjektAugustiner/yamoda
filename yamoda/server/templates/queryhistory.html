@@ -8,6 +8,12 @@
     <style type="text/css">
       th.header { border-right:3px solid #aaaaaa; border-bottom:1px solid #aaaaaa; }
       th.footer { border-width:1px; }
+      .paginate_disabled_previous, .paginate_enabled_previous, .paginate_disabled_next, .paginate_enabled_next {
+        color: #111111 !important;
+        cursor: pointer;
+        float: left;
+        height: 19px;
+      }
     </style>
     <tr>
       <th class="header">#</th>
@@ -52,7 +58,7 @@
       With selected
       <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu">
+query_history    <ul class="dropdown-menu">
       <li><a href="#" onclick="yamoda.queryhistory.del_queries()">Delete</a></li>
     </ul>
   </div>
@@ -60,5 +66,7 @@
 </div>
 <script type="text/javascript" src="{{ url_for('static', filename='ColResize.js') }}"></script>
 {% endmacro %}
+
+{{ queryhistory_table(query_history) }}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}
