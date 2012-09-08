@@ -1,8 +1,8 @@
-{% extends "layout.html" %}
-{% set title = "Query History" %}
 {% macro queryhistory_table(query_history) %}
 <script src="{{ url_for('static', filename='bootstrap-popover.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap-tooltip.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.dataTables.js') }}"></script>
+<script src="{{ url_for('static', filename='ColResize.js') }}"></script>
 <table id="queryhistory_table" class="table table-condensed table-bordered table-striped table-hover">
   <thead>
     <style type="text/css">
@@ -20,7 +20,7 @@
       <th class="header">Created</th>
       <th class="header">Name</th>
       <th class="header">Query String</th>
-      <th class="header">Edit</th>
+      <th class="header">Insert</th>
       <th class="header">Run</th>
       <th><input type="checkbox" id="checkbox_all" onchange="yamoda.queryhistory.toggle_all_checkboxes(this, $('.querycheck'));" /></th>
     </tr>
@@ -35,7 +35,7 @@
         <a href="#" id="query_{{ loop.index0 }}" class="query_popover">{{- query.query_string -}}
         </a>
       </td>
-      <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Edit</a></td>
+      <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Insert</a></td>
       <td><a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}');">Run</a></td>
       <td><input type="checkbox" class="querycheck" id="check_{{ query.id }}" value="yes" /></td>
     </tr>
@@ -65,7 +65,6 @@
     </tr>
   </tfoot>
 </table>
-<script type="text/javascript" src="{{ url_for('static', filename='ColResize.js') }}"></script>
 {% endmacro %}
 
 {{ queryhistory_table(query_history) }}

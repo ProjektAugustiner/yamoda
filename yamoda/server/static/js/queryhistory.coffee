@@ -1,42 +1,48 @@
 logg = yamoda.get_logger("yamoda.queryhistory")
 
 asInitVals = []
+initialized = false
+
+setup_datatable = () ->
+  if initialized or $("#queryhistory_table").dataTable()
+      logg.info("table already initialized, doing nothing", "initialized var is", initialized)
+      return
+  logg.debug("activating dataTable for queryhistory_table")
+  oTable = $("#queryhistory_table").dataTable(
+      bStateSave: true
+      sDom: "zrltpi"
+      oLanguage:
+          sSearch: "Search all columns"
+  )
+  $("tfoot input").keyup((i) ->
+      logg.debug("input keyup")
+      oTable.fnFilter(this.value, $("tfoot input").index(this))
+      return
+  )
+  $("tfoot input").each((i) ->
+      asInitVals[i] = this.value
+      return
+  )
+  $("tfoot input").focus((i) ->
+      logg.debug("input focus")
+      if this.className == "search_init"
+          this.className = ""
+          this.value = ""
+      return
+  )
+  $("tfoot input").blur((i) ->
+      logg.debug("input blur")
+      if this.value == ""
+          this.className = "search_init"
+          this.value = asInitVals[$("tfoot input").index(this)]
+      return
+  )
+  initialized = true
 
 $(document).ready(() ->
-    logg.debug("activating dataTable for queryhistory_table")
-    oTable = $("#queryhistory_table").dataTable(
-        bStateSave: true
-        sDom: "zrltpi"
-        oLanguage:
-            sSearch: "Search all columns"
-    )
-    $("tfoot input").keyup((i) ->
-        logg.debug("input keyup")
-        oTable.fnFilter(this.value, $("tfoot input").index(this))
-        return
-    )
-    $("tfoot input").each((i) ->
-        asInitVals[i] = this.value
-        return
-    )
-    $("tfoot input").focus((i) ->
-        logg.debug("input focus")
-        if this.className == "search_init"
-            this.className = ""
-            this.value = ""
-        return
-    )
-    logg.info("before keyup")
-    $("tfoot input").blur((i) ->
-        logg.debug("input blur")
-        if this.value == ""
-            this.className = "search_init"
-            this.value = asInitVals[$("tfoot input").index(this)]
-        return
-    )
-    return
+  logg.info("document.ready here")
+  setup_datatable()
 )
-
 
 query_links = $(".query_popover")
 query_links.each((index, link) ->
@@ -61,7 +67,8 @@ that = yamoda.queryhistory = {
   run_query: (row) ->
     logg.debug("called run_query")
     that.insert_query(row)
-    $("#query_form").trigger("submit")
+    $("#save_query_checkbox").removeAttr("checked")
+    yamoda.search.send_query_request()
     return
 
   toggle_all_checkboxes: (master_checkbox, slave_checkboxes$) ->
@@ -96,6 +103,10 @@ that = yamoda.queryhistory = {
         $("actionerror").text(err).show()
     )
     return
+
+  initialize_if_needed: () ->
+    logg.info("called initialize_if_needed")
+    setup_datatable()
 }
 
 yamoda.logg.info("yamoda.queryhistory loaded")

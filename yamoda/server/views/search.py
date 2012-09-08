@@ -18,18 +18,41 @@ import pprint
 import time
 
 from flask import render_template, request
+from flask.helpers import flash
 from flask.ext.login import login_required
+from parcon import ParseException
 
 from yamoda.server import app, db, view_helpers
 from yamoda.query.alchemy import convert_dict_query_to_sqla
 from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
 from yamoda.server.database import HistoricQuery
 
+### helpers ###
+
+
+def _save_query(query_string, query_name):
+    """Save query to DB for later use (search history)
+    :return: Flash message and category for user response
+    """
+    logg.info("saving query '%s' to DB, name is %s", query_string, query_name)
+    # don't save query if we have an identical query in the DB
+    duplicate = HistoricQuery.query.filter_by(name=query_name).filter_by(query_string=query_string).all()
+    logg.info("found duplicate in DB: %s", duplicate)
+    if not duplicate:
+        hist_query = HistoricQuery(query_string=query_string, name=query_name)
+        db.session.add(hist_query)
+        db.session.commit()
+        return ("Query saved.", "info")
+    else:
+        return ("Query was not saved (duplicate).", "warn")
+
+### view functions ###
+
 
 @app.route('/search', methods=["POST"])
 @login_required
 def do_search():
-    time.sleep(2)
+#    time.sleep(0.8)
     """Parse and execute query from client.
     Queries are saved if the user requests that.
     If successful, this view renders a data or set list with the results.
@@ -53,12 +76,9 @@ def do_search():
     result_type, query = convert_dict_query_to_sqla(query_dict)
     logg.debug("result type %s, query %s", result_type, query)
     if "save_query" in request.form:
-        # save query for later use (search history)
         query_name = request.form["name"]
-        logg.info("saving query to DB, name is %s", query_name)
-        hist_query = HistoricQuery(query_string=query_string, name=query_name)
-        db.session.add(hist_query)
-        db.session.commit()
+        flash_msg, flash_cat = _save_query(query_string, query_name)
+        flash(flash_msg, flash_cat)
 
     if result_type == "sets":
         sets = query.all_readable()
@@ -79,6 +99,27 @@ def do_search():
         logg.info("result datas and entries \n%s", formatted_data)
         return render_template("dataresult.html", datas=datas, params=common_param_set, pvalues=pvalues,
                                query=query_string.replace(",", ", "))
+
+
+@app.route('/search/savequery', methods=["POST"])
+@login_required
+def save_query():
+    time.sleep(1.2)
+    # save query for later use (search history)
+    query_name = request.form["name"]
+    query_string = replace_newline_with_comma(request.form["query"])
+    logg.debug("got query string %s", query_string)
+    try:
+        parse_query_string(query_string)
+    except ParseException as p:
+        flash_msg = "Error in Query (not saved): {}".format(p.message)
+        flash_cat = "error"
+    else:
+        flash_msg, flash_cat = _save_query(query_string, query_name)
+
+    logg.debug(flash_msg)
+    flash(flash_msg, flash_cat)
+    return render_template("flash_msg.html")
 
 
 @app.route('/search/deletequeries', methods=["POST"])
@@ -102,8 +143,17 @@ def delete_queries():
 def search():
     """Display search page with AugQL help and search history
     """
-    query_history = HistoricQuery.query.order_by(HistoricQuery.created).limit(50).all()
+    query_history = HistoricQuery.query.order_by(HistoricQuery.created).limit(100).all()
     return render_template('search.html', query_history=query_history)
+
+
+@app.route('/search/queryhistory', methods=["GET"])
+@login_required
+def get_query_history():
+    """Function to update query history via AJAX
+    """
+    query_history = HistoricQuery.query.order_by(HistoricQuery.created).limit(100).all()
+    return render_template('queryhistory.html', query_history=query_history)
 
 
 @app.route('/searchtest')

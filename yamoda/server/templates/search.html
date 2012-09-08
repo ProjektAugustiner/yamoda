@@ -11,27 +11,27 @@
       <div class="control-group">
         <label class="control-label" for="query">Enter Query:</label>
         <div class="controls">
-            <textarea name="query" id="query_input" class="field span12" rows="8"></textarea>
+            <textarea name="query" id="query_input" class="field span12" rows="6"></textarea>
         </div>
         <label class="checkbox">Save query on run
           <input type="checkbox" id="save_query_checkbox" name="save_query"></input>
         </label>
         <input type="text" id="query_name_input" name="name"><span class="help-inline">Name of query</span>
         <label class="radio inline">
-          <input type="radio" name="show_results" value="newpage" checked />
+          <input type="radio" id="show_results_newpage" name="show_results" value="newpage" checked />
           Show query results on new page
         </label>
         <label class="radio inline">
-          <input type="radio" name="show_results" value="below"/>
+          <input type="radio" id="show_results_below" name="show_results" value="below"/>
           Show query results below
         </label>
       </div>
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">
-          <i class="icon-ok-sign icon-white"></i>Run Query</button>
+        <a href="#" id="submit_button" class="btn btn-primary" onclick="yamoda.search.send_query_request()">
+          <i class="icon-ok-sign icon-white"></i>Run Query</a>
         <button type="reset" class="btn btn-warning">
           <i class="icon-trash icon-white"></i>Clear</button>
-        <a href="#" id="save-query" class="btn" onclick="">
+        <a href="#" id="save-query" class="btn" onclick="yamoda.search.send_query_save_request()">
           <i class="icon-briefcase"></i>Save Query</a>
         <a href="#" id="show-help" class="btn" onclick="$('#help-box').show(); $(this).hide(); $('#hide-help').show()">
           <i class="icon-arrow-right"></i>Show Help</a>
@@ -69,7 +69,6 @@
       <i class="icon-list-alt"></i>Change To Results</a>
   </div>
 </div>
-<hr />
 <div class="row-fluid">
     <div id="bottom-content" class="span12">
       {{ queryhistory_table(query_history) }}
@@ -77,12 +76,13 @@
 </div>
 <script type="text/javascript" src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/queryhistory.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/queryhistory.js') }}"></script>
 <script type="text/javascript">
-yamoda.queryhistory.del_queries_url = "{{ url_for('delete_queries') }}";
 yamoda.search.search_url = "{{ url_for('search') }}";
-yamoda.logg.info("del_queries_url", yamoda.queryhistory.del_queries_url);
+yamoda.search.save_query_url = "{{ url_for('save_query') }}";
+yamoda.search.query_history_url = "{{ url_for('get_query_history') }}";
+yamoda.queryhistory.del_queries_url = "{{ url_for('delete_queries') }}";
 </script>
 {% endblock %}
 

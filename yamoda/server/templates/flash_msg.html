@@ -1,0 +1,14 @@
+{% macro flash_msg() %}
+{%- with messages = get_flashed_messages(with_categories=true) %}
+{%- for category, message in messages %}
+  <div class="alert alert-{{ category }}">
+    <a class="close" data-dismiss="alert" href="#">×</a>
+    {{ message }}
+  </div>
+{%- endfor %}
+{%- endwith %}
+{% endmacro %}
+
+{{ flash_msg() }}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab:  #}
