@@ -29,6 +29,7 @@ change_to_query_results = () ->
 
 
 intercept_query_submit = () ->
+  # unused
   show_results = $("input[name='show_results']:checked").val()
   logg.info("where to show results:", show_results)
   if show_results == "newpage"
@@ -39,6 +40,7 @@ intercept_query_submit = () ->
 
 
 send_query_history_request = () ->
+  # AJAX update query history
   $.get(yamoda.search.query_history_url, (history_content) ->
     logg.info("got history content")
     query_history_html = history_content
@@ -50,6 +52,7 @@ send_query_history_request = () ->
 
 
 send_query_request = () ->
+  # send query to server and display results below the query box
   logg.info("send query request")
   show_results = $("input[name='show_results']:checked").val()
   logg.info("where to show results:", show_results)
@@ -80,6 +83,7 @@ send_query_request = () ->
 
 
 send_query_save_request = () ->
+  # don't run query, just save it and refresh the history
   logg.info("send query save request")
   $.ajax(
     type: 'POST',
@@ -97,6 +101,8 @@ send_query_save_request = () ->
 
 
 $(document).ready(() ->
+  # hide switch buttons
+  # XXX: not very clever...
   logg.info("document.ready here")
   $("#query_history_btn").hide()
   $("#query_results_btn").hide()
@@ -106,6 +112,8 @@ $(document).ready(() ->
 
 yamoda.search = {
   request_help_content: (url) ->
+    # request content for a tab in the query help box
+    # :param url: GET URL for needed helptext 
     $.get(url, (helptext) ->
       logg.info("got helptext for", url)
       $("#help-content").html(helptext)

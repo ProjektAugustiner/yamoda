@@ -124,7 +124,6 @@ def _convert_dict_query_datas(query_dict):
     # TODO: test performance of any() and remove it if neccessary
     param_filters = query_dict.get("param_filters", {})
     for param_name, param_exprs in param_filters.iteritems():
-        # TODO: support "or"
         entry_cond = _make_entry_cond(param_name, param_exprs)
         query = query.filter(Data.entries.any(entry_cond))
 

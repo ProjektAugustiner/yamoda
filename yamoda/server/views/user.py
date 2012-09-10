@@ -26,7 +26,7 @@ def login():
         user = User.query.filter_by(name=username).first()
         if (user is not None) and user.valid_password(password):
             login_user(user, remember=remember)
-            flash('Logged in successfully.')
+            flash('Logged in successfully.', 'info')
             return redirect(request.form.get('next') or url_for('index'))
         else:
             flash('Invalid password or username.', 'error')

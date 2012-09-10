@@ -9,6 +9,8 @@ Functions:
 ----------
 do_search    -- POST queries and display results
 delete_queries    -- POST delete queries from history
+save_query    -- POST query for saving
+get_query_history -- history update via AJAX
 search   -- display search page
 searchtest   -- test searching
 '''
@@ -75,6 +77,7 @@ def do_search():
     logg.debug("query dict %s", query_dict)
     result_type, query = convert_dict_query_to_sqla(query_dict)
     logg.debug("result type %s, query %s", result_type, query)
+
     if "save_query" in request.form:
         query_name = request.form["name"]
         flash_msg, flash_cat = _save_query(query_string, query_name)
@@ -90,11 +93,16 @@ def do_search():
     elif result_type == "datas":
         # XXX: no accesscontrol for datas
         datas = query.all()
-        all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
-        common_param_set = set.intersection(*all_param_sets)
-        pvalues = view_helpers.get_pvalues(datas, common_param_set)
-        logg.info("intersected params %s", common_param_set)
         logg.info("query returned %s datas", len(datas))
+        # determine common visible parameters for all rows which will be displayed on the result page
+        all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
+        if datas:
+            common_param_set = set.intersection(*all_param_sets)
+            pvalues = view_helpers.get_pvalues(datas, common_param_set)
+            logg.info("intersected params %s", common_param_set)
+        else:
+            common_param_set = []
+            pvalues = []
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
         return render_template("dataresult.html", datas=datas, params=common_param_set, pvalues=pvalues,
@@ -104,7 +112,6 @@ def do_search():
 @app.route('/search/savequery', methods=["POST"])
 @login_required
 def save_query():
-    time.sleep(1.2)
     # save query for later use (search history)
     query_name = request.form["name"]
     query_string = replace_newline_with_comma(request.form["query"])

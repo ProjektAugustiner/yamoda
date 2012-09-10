@@ -18,7 +18,7 @@
     $("#query_history_btn").hide();
     $("#bottom-headline").text("Query History");
     yamoda.queryhistory.initialize_if_needed();
-    return query_results_shown = false;
+    query_results_shown = false;
   };
 
   change_to_query_results = function() {
@@ -28,7 +28,7 @@
     $("#query_history_btn").show();
     $("#query_results_btn").hide();
     query_results_shown = true;
-    return $("#bottom-headline").text("Query Results");
+    $("#bottom-headline").text("Query Results");
   };
 
   intercept_query_submit = function() {
@@ -44,7 +44,7 @@
   };
 
   send_query_history_request = function() {
-    return $.get(yamoda.search.query_history_url, function(history_content) {
+    $.get(yamoda.search.query_history_url, function(history_content) {
       logg.info("got history content");
       query_history_html = history_content;
       if (!query_results_shown) {
@@ -78,11 +78,6 @@
         query_results_html = data;
         change_to_query_results();
         send_query_history_request();
-        /* XXX: 
-        Add submit handler again after request because it seems 
-        to get lost somehow. Don't know why this is happening...
-        */
-
       },
       error: function() {
         $("#bottom_headline").text("Error!");
@@ -92,7 +87,7 @@
 
   send_query_save_request = function() {
     logg.info("send query save request");
-    return $.ajax({
+    $.ajax({
       type: 'POST',
       url: yamoda.search.save_query_url,
       data: {

@@ -6,6 +6,7 @@ import logging as logg
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
+from numpy import ndarray
 
 from jinja2 import Markup
 
@@ -48,6 +49,9 @@ def dataformat(value):
         if 'e' in fmt:
             fmt = Markup(fmt.replace('e', ' &times; 10<sup>') + '</sup>')
         return fmt
+    elif isinstance(value, ndarray):
+        # return arrays as 1, 2, 3, 4 ... for use with jquery.sparkline
+        return ", ".join([str(v) for v in value])
     return str(value)
 
 
@@ -55,11 +59,15 @@ def unitformat(value):
     if value is None:
         return ''
     return value
+
+
 md = markdown2.Markdown(safe_mode='escape')
 
 
 def markdown(value):
     return Markup(md.convert(value))
+
+
 app.jinja_env.filters['dtformat'] = datetimeformat
 app.jinja_env.filters['dataformat'] = dataformat
 app.jinja_env.filters['unitformat'] = unitformat
