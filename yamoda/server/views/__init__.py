@@ -11,7 +11,7 @@ from flask import render_template
 from yamoda.server import app
 
 # import other modules with views
-from yamoda.server.views import user, context, set, data, search, querylanghelp, datadisplaytest
+from yamoda.server.views import user, context, set, data, entry, search, querylanghelp, datadisplaytest
 
 
 @app.route('/')

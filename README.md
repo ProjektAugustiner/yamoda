@@ -4,6 +4,7 @@ yamoda
 Dependencies
 ------------
 
+* Python 2.7
 * SQLAlchemy
 * Flask
 * Flask-Login

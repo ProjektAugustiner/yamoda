@@ -60,9 +60,9 @@ sort_param = (param_name + sort_dir)[SortParameter.tup](name="sort_param")
 
 comparison = ((SL("<")(name="<") | SL(">")(name=">")) + float_lit)[_make_comparison](name="comparison")
 
-param_exprs = interval | comparison
+param_cond = interval | comparison
 
-filter_expr = (param_exprs + ZeroOrMore(L("or") + param_exprs))[_concat_list]
+filter_expr = (param_cond + ZeroOrMore(L("or") + param_cond))[_concat_list]
 
 ### clauses
 

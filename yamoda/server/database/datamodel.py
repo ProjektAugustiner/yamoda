@@ -134,12 +134,14 @@ class Parameter(db.Model, DescriptionMixin):
         return '<Parameter({0})>'.format(self.name)
 
 
-class HistoricQuery(db.Model, TimeStamp):
+class HistoricQuery(AccessControl, db.Model, TimeStamp):
     """An AugQL query which was run on the server earlier.
     Used to display a search history to the user"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), default="unnamed")
     query_string = db.Column(db.String)
+    query_json = db.Column(db.String)
+    favorite = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return '<HistoricQuery({0})>'.format(self.name)

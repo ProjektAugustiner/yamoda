@@ -61,6 +61,13 @@ def unitformat(value):
     return value
 
 
+def yesnoformat(truth_value):
+    if truth_value:
+        return "yes"
+    else:
+        return "no"
+
+
 md = markdown2.Markdown(safe_mode='escape')
 
 
@@ -72,6 +79,7 @@ app.jinja_env.filters['dtformat'] = datetimeformat
 app.jinja_env.filters['dataformat'] = dataformat
 app.jinja_env.filters['unitformat'] = unitformat
 app.jinja_env.filters['markdown'] = markdown
+app.jinja_env.filters['yesnoformat'] = yesnoformat
 
 import yamoda.server.views
 import yamoda.server.database

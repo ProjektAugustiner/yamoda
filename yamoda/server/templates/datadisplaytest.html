@@ -1,20 +1,42 @@
 {% extends "layout.html" %}
+{% from "plotting.html" import plotdisplay with context %}
 {% set title = "Data Display Test" %}
+{% block extrahead %}
+<!-- external libs -->
+<script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
+<!-- yamoda base module -->
+<script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    yamoda.base_url = "{{ url_for('index') }}";
+    yamoda.logg.info("base url is", yamoda.base_url);
+  })
+</script>
+<!-- yamoda modules -->
+<script src="{{ url_for('static', filename='js/datadisplaytest.js') }}"></script>
+{% endblock %}
+
 {% block body %}
+  {{ plotdisplay() }}
+  <hr>
   <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
-        <th class="hidden">#</th>
-        <th>Parameter</th>
-        <th>Value</th>
-        <th>Shape</th>
-        <th>Unit</th>
+        <th class="hidden">#
+        <th>Parameter
+        <th>Value
+        <th>Dim
+        <th>Shape
+        <th>Unit
+        <th>Visible?
       </tr>
     </thead>
     <tbody>
       {%- for entry in data %}
       <tr>
-        <td class="hidden indexcolumn" index="{{ loop.index }}" entry_id="{{entry.id}}"</td>
+        <td class="hidden indexcolumn" index="{{ loop.index }}" entry_id="{{entry.id}}"></td>
         <td>{{ entry.parameter_name }}</td>
         {% if not entry.shape %}
         <td>{{ entry.value|dataformat }}</td>
@@ -33,16 +55,14 @@
         {% else %}
         <td>Multidimensional Value</td>
         {% endif %}
-        <td>{{ entry.value|shape }}</td>
+        <td>{{ entry.value|dimension }}D</td>
+        <td data-dimension="{{ entry.value|dimension }}">{{ entry.value|shape }}</td>
         <td>{{ entry.unit|unitformat }}</td>
+        <td>{{ entry.parameter_visible|yesnoformat }}</td>
       </tr>
       {%- endfor %}
     </tbody>
   </table>
-<script type="text/javascript" src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
-<script src="{{ url_for('static', filename='js/datadisplaytest.js') }}"></script>
 {% endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

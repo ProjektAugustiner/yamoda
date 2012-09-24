@@ -1,8 +1,11 @@
-{% macro queryhistory_table(query_history) %}
+{% macro queryhistory_includes() %}
 <script src="{{ url_for('static', filename='bootstrap-popover.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap-tooltip.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery.dataTables.js') }}"></script>
 <script src="{{ url_for('static', filename='ColResize.js') }}"></script>
+{% endmacro %}
+
+{% macro queryhistory_table(query_history) %}
 <table id="queryhistory_table" class="table table-condensed table-bordered table-striped table-hover">
   <thead>
     <style type="text/css">
@@ -20,6 +23,7 @@
       <th class="header">Created</th>
       <th class="header">Name</th>
       <th class="header">Query String</th>
+      <th class="header">Favorite?</th>
       <th class="header">Insert</th>
       <th class="header">Run</th>
       <th><input type="checkbox" id="checkbox_all" onchange="yamoda.queryhistory.toggle_all_checkboxes(this, $('.querycheck'));" /></th>
@@ -32,9 +36,9 @@
       <td>{{ query.created|dtformat }}</td>
       <td id="query_name_{{ loop.index0 }}">{{ query.name }}</td>
       <td>
-        <a href="#" id="query_{{ loop.index0 }}" class="query_popover">{{- query.query_string -}}
-        </a>
+        <a href="#" id="query_{{ loop.index0 }}" class="query_popover">{{- query.query_string -}}</a>
       </td>
+      <td id="query_favorite_{{ loop.index0 }}">{{query.favorite|yesnoformat }}</td>
       <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Insert</a></td>
       <td><a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}');">Run</a></td>
       <td><input type="checkbox" class="querycheck" id="check_{{ query.id }}" value="yes" /></td>
@@ -47,6 +51,7 @@
       <th class="footer"><input type="text" name="search_created" class="search_init" value="Search in dates" /></th>
       <th class="footer"><input type="text" name="search_name" class="search_init input-medium" value="Search in names" /></th>
       <th class="footer"><input type="text" name="search_query" class="search_init input-xlarge" value="Search in queries" /></th>
+      <th class="footer"><input type="text" name="search_favorite" class="search_init input-small" value="Favorite?" /></th>
       <th class="footer" colspan="3">
         <!-- adapted from datalist.html -->
         <div id="actionbutton" style="float: right">
@@ -57,6 +62,7 @@
             </button>
             <ul class="dropdown-menu">
               <li><a href="#" onclick="yamoda.queryhistory.del_queries()">Delete</a></li>
+              <li><a href="#" onclick="yamoda.queryhistory.toggle_favorite_queries()">Toggle Favorite Status</a></li>
             </ul>
           </div>
           <div class="alert alert-error hide" id="actionerror"></div>

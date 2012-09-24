@@ -1,6 +1,31 @@
 {% extends "layout.html" %}
 {% from "queryhistory.html" import queryhistory_table with context %}
+{% from "queryhistory.html" import queryhistory_includes %}
 {% set title = "Search" %}
+{% block extrahead %}
+<!-- external libs -->
+<script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
+{{ queryhistory_includes() }}
+<!-- yamoda base module -->
+<script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
+<!-- yamoda modules -->
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+<script src="{{ url_for('static', filename='js/queryhistory.js') }}"></script>
+<script>
+  $(document).ready( function() {
+    yamoda.add_module_constants("search", {
+      search_url: "{{ url_for('search') }}",
+      save_query_url: "{{ url_for('save_query') }}",
+      query_history_url: "{{ url_for('get_query_history') }}"
+    });
+    yamoda.add_module_constants("queryhistory", {
+      del_queries_url: "{{ url_for('delete_queries') }}",
+      toggle_favorite_queries_url: "{{ url_for('toggle_favorite_queries') }}"
+    });
+  })
+</script>
+{% endblock %}
+
 {% block body %}
 <script src="{{ url_for('static', filename='bootstrap-popover.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap-tooltip.js') }}"></script>
@@ -15,6 +40,9 @@
         </div>
         <label class="checkbox">Save query on run
           <input type="checkbox" id="save_query_checkbox" name="save_query"></input>
+        </label>
+        <label class="checkbox">Favorite query
+          <input type="checkbox" id="favorite_checkbox" name="favorite"></input>
         </label>
         <input type="text" id="query_name_input" name="name"><span class="help-inline">Name of query</span>
         <label class="radio inline">
@@ -74,16 +102,6 @@
       {{ queryhistory_table(query_history) }}
     </div>
 </div>
-<script type="text/javascript" src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/queryhistory.js') }}"></script>
-<script type="text/javascript">
-yamoda.search.search_url = "{{ url_for('search') }}";
-yamoda.search.save_query_url = "{{ url_for('save_query') }}";
-yamoda.search.query_history_url = "{{ url_for('get_query_history') }}";
-yamoda.queryhistory.del_queries_url = "{{ url_for('delete_queries') }}";
-</script>
 {% endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

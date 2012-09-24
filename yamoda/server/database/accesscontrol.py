@@ -95,12 +95,21 @@ class AccessControlledQuery(BaseQuery):
             raise ValueError
 
         clause = lambda name: _entity_descriptor(self._joinpoint_zero(), name)
-        cu_grps = [g.id for g in current_user.groups]
+        # XXX: fix for anon user, improve it...
+        if hasattr(current_user, "groups"):
+            cu_grps = [g.id for g in current_user.groups]
+        else:
+            cu_grps = []
+        if hasattr(current_user, "id"):
+            user_id = current_user.id
+        else:
+            user_id = 0
+
         # XXX: some hack to make this work with queries which contain a LIMIT clause
         limit = self._limit
         self._limit = None
         return self.filter(or_(
-            and_(clause(usr) == True, clause('user_id') == current_user.id),
+            and_(clause(usr) == True, clause('user_id') == user_id),
             and_(clause(grp) == True, clause('group_id').in_(cu_grps)),
             and_(clause(all) == True))).limit(limit)
 

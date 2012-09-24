@@ -10,6 +10,7 @@ Functions:
 do_search    -- POST queries and display results
 delete_queries    -- POST delete queries from history
 save_query    -- POST query for saving
+run_query    -- GET run query by id
 get_query_history -- history update via AJAX
 search   -- display search page
 searchtest   -- test searching
@@ -18,21 +19,35 @@ searchtest   -- test searching
 import logging as logg
 import pprint
 import time
+import json
 
-from flask import render_template, request
+from flask import render_template, request, g
 from flask.helpers import flash
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
 from parcon import ParseException
 
 from yamoda.server import app, db, view_helpers
 from yamoda.query.alchemy import convert_dict_query_to_sqla
 from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
 from yamoda.server.database import HistoricQuery
+from yamoda.query.serialization import to_json, from_json
+
+
+### favorite queries displayed in layout.html
+
+def _get_fav_queries():
+    # get favorite queries
+    return HistoricQuery.query.filter_by(favorite=True).all_readable()
+
+
+@app.context_processor
+def inject_fav_queries():
+    return dict(fav_queries=_get_fav_queries())
+
 
 ### helpers ###
 
-
-def _save_query(query_string, query_name):
+def _save_query(query_string, query_dict, query_name, favorite):
     """Save query to DB for later use (search history)
     :return: Flash message and category for user response
     """
@@ -41,12 +56,42 @@ def _save_query(query_string, query_name):
     duplicate = HistoricQuery.query.filter_by(name=query_name).filter_by(query_string=query_string).all()
     logg.info("found duplicate in DB: %s", duplicate)
     if not duplicate:
-        hist_query = HistoricQuery(query_string=query_string, name=query_name)
+        hist_query = HistoricQuery(query_string=query_string, query_json=to_json(query_dict),
+                                   name=query_name, favorite=favorite,
+                                   user=current_user, group=current_user.primary_group)
         db.session.add(hist_query)
         db.session.commit()
         return ("Query saved.", "info")
     else:
         return ("Query was not saved (duplicate).", "warn")
+
+
+def _render_search_result(result_type, sqla_query, query_string):
+
+    if result_type == "sets":
+        sets = sqla_query.all_readable()
+        logg.info("query returned %s sets", len(sets))
+        logg.debug("result sets %s", sets)
+        return render_template('setresult.html', sets=sets,
+                               query=query_string.replace(",", ", "))
+
+    elif result_type == "datas":
+        # XXX: no accesscontrol for datas
+        datas = sqla_query.all()
+        logg.info("query returned %s datas", len(datas))
+        # determine common visible parameters for all rows which will be displayed on the result page
+        all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
+        if datas:
+            common_param_set = set.intersection(*all_param_sets)
+            pvalues = view_helpers.get_pvalues(datas, common_param_set)
+            logg.info("intersected params %s", common_param_set)
+        else:
+            common_param_set = []
+            pvalues = []
+        formatted_data = pprint.pformat([(d, d.entries) for d in datas])
+        logg.info("result datas and entries \n%s", formatted_data)
+        return render_template("dataresult.html", datas=datas, params=common_param_set, pvalues=pvalues,
+                               query=query_string.replace(",", ", "))
 
 ### view functions ###
 
@@ -80,33 +125,32 @@ def do_search():
 
     if "save_query" in request.form:
         query_name = request.form["name"]
-        flash_msg, flash_cat = _save_query(query_string, query_name)
+        favorite = request.form["favorite"]
+        flash_msg, flash_cat = _save_query(query_string, query_dict, query_name, favorite)
         flash(flash_msg, flash_cat)
 
-    if result_type == "sets":
-        sets = query.all_readable()
-        logg.info("query returned %s sets", len(sets))
-        logg.debug("result sets %s", sets)
-        return render_template('setresult.html', sets=sets,
-                               query=query_string.replace(",", ", "))
+    return _render_search_result(result_type, query, query_string)
 
-    elif result_type == "datas":
-        # XXX: no accesscontrol for datas
-        datas = query.all()
-        logg.info("query returned %s datas", len(datas))
-        # determine common visible parameters for all rows which will be displayed on the result page
-        all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
-        if datas:
-            common_param_set = set.intersection(*all_param_sets)
-            pvalues = view_helpers.get_pvalues(datas, common_param_set)
-            logg.info("intersected params %s", common_param_set)
-        else:
-            common_param_set = []
-            pvalues = []
-        formatted_data = pprint.pformat([(d, d.entries) for d in datas])
-        logg.info("result datas and entries \n%s", formatted_data)
-        return render_template("dataresult.html", datas=datas, params=common_param_set, pvalues=pvalues,
-                               query=query_string.replace(",", ", "))
+
+@app.route("/search/runquery/<int:query_id>", methods=["GET"])
+def run_query(query_id):
+    logg.info("run query with id: %s", query_id)
+    hist_query = HistoricQuery.query.get_or_404(query_id)
+    query_dict = from_json(hist_query.query_json)
+    result_type, sqla_query = convert_dict_query_to_sqla(query_dict)
+    return _render_search_result(result_type, sqla_query, hist_query.query_string)
+
+
+@app.route('/search/toggle_favorite_queries', methods=["POST"])
+@login_required
+def toggle_favorite_queries():
+    ids = request.form.getlist("ids[]")
+    logg.info("ids to mark as favorite: %s", ids)
+    for query_id in ids:
+        hist_query = HistoricQuery.query.get(query_id)
+        hist_query.favorite = False if hist_query.favorite else True
+    db.session.commit()
+    return ""
 
 
 @app.route('/search/savequery', methods=["POST"])
@@ -114,15 +158,16 @@ def do_search():
 def save_query():
     # save query for later use (search history)
     query_name = request.form["name"]
+    favorite = request.form["favorite"]
     query_string = replace_newline_with_comma(request.form["query"])
     logg.debug("got query string %s", query_string)
     try:
-        parse_query_string(query_string)
+        _, query_dict = parse_query_string(query_string)
     except ParseException as p:
         flash_msg = "Error in Query (not saved): {}".format(p.message)
         flash_cat = "error"
     else:
-        flash_msg, flash_cat = _save_query(query_string, query_name)
+        flash_msg, flash_cat = _save_query(query_string, query_dict, query_name, favorite)
 
     logg.debug(flash_msg)
     flash(flash_msg, flash_cat)

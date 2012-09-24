@@ -1,9 +1,20 @@
-logg = yamoda.get_logger("yamoda.search")
+###
+# search.coffee
+# search related stuff
+# 
+# @author dpausp (Tobias Stenzel)
+###
 
+###-- private module vars --###
+
+YM_MODULE_NAME = "search"
+logg = undefined
 query_results_shown = false
 query_history_html = ""
 query_results_html = "<h3>No results yet.</h3>"
 
+
+###-- module functions --###
 
 change_to_query_history = () ->
   logg.info("change_to_query_history")
@@ -100,29 +111,43 @@ send_query_save_request = () ->
   return
 
 
+###-- READY --###
+
 $(document).ready(() ->
+  if yamoda[YM_MODULE_NAME]
+    yamoda.logg.warn(YM_MODULE_NAME, "already defined, skipping!")
+    return
+  # module init
+  logg = yamoda.get_logger("yamoda.search")
+  yamoda.run_before_init(YM_MODULE_NAME)
+
   # hide switch buttons
   # XXX: not very clever...
-  logg.info("document.ready here")
   $("#query_history_btn").hide()
   $("#query_results_btn").hide()
+
+  # module def
+  module = yamoda.search = {
+    YM_MODULE_NAME: YM_MODULE_NAME
+    request_help_content: (url) ->
+      # request content for a tab in the query help box
+      # :param url: GET URL for needed helptext 
+      $.get(url, (helptext) ->
+        logg.info("got helptext for", url)
+        $("#help-content").html(helptext)
+      )
+    change_to_query_history: change_to_query_history
+    change_to_query_results: change_to_query_results
+    send_query_request: send_query_request
+    send_query_save_request: send_query_save_request
+  }
+  
+  yamoda.apply_module_constants(module)
+
+  #ok, all done
+  yamoda.logg.info("yamoda.search loaded")
   return
 )
 
 
-yamoda.search = {
-  request_help_content: (url) ->
-    # request content for a tab in the query help box
-    # :param url: GET URL for needed helptext 
-    $.get(url, (helptext) ->
-      logg.info("got helptext for", url)
-      $("#help-content").html(helptext)
-    )
-  change_to_query_history: change_to_query_history
-  change_to_query_results: change_to_query_results
-  send_query_request: send_query_request
-  send_query_save_request: send_query_save_request
-}
-
-yamoda.logg.info("yamoda.search loaded")
 

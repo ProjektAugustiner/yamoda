@@ -12,6 +12,8 @@ import matplotlib
 from flask import render_template, make_response, request, abort, jsonify
 from flask.ext.login import login_required
 from yamoda.server import app
+from yamoda.server.database import Data, Entry, Context
+from yamoda.server import db
 
 
 def count(value):
@@ -39,8 +41,19 @@ def shape(value):
     else:
         return "unknown"
 
+
+def dimension(value):
+    if isinstance(value, float) or isinstance(value, int):
+        return 0
+    if isinstance(value, ndarray):
+        return len(value.shape)
+    else:
+        return "unknown"
+
+
 app.jinja_env.filters['count'] = count
 app.jinja_env.filters['shape'] = shape
+app.jinja_env.filters['dimension'] = dimension
 
 font = {'family': 'normal',
         'weight': 'bold',
@@ -72,17 +85,17 @@ def datadisplaytest():
     """Create and return some fake values for sparkline and matplotlib testing
     """
     data = []
-    fakeentry = namedtuple("FakeEntry", "id parameter_name shape value unit lower avg upper")
+    fakeentry = namedtuple("FakeEntry", "id parameter_name parameter_visible, shape value unit lower avg upper")
     params = [
-              ("t1", "s", 30),
-              ("T1", u"°C", 30),
-              ("t2", "s", 100),
-              ("T2", u"°C", 100),
-              ("t3", "s", 300),
-              ("T3", u"°C", 300),
+              ("t1", "s", 30, False),
+              ("T1", u"°C", 30, True),
+              ("t2", "s", 100, False),
+              ("T2", u"°C", 100, True),
+              ("t3", "s", 300, False),
+              ("T3", u"°C", 300, True),
     ]
 
-    for pos, (name, unit, count) in enumerate(params):
+    for pos, (name, unit, count, visible) in enumerate(params):
         if pos % 2 == 0:
             value = arange(0, count / 10., 0.1)
             avg = lower = upper = 0
@@ -94,18 +107,22 @@ def datadisplaytest():
             shape = [count]
             lower = avg - 1 * std_
             upper = avg + 1 * std_
-        data.append(fakeentry(pos, name, shape, value, unit, lower, avg, upper))
+        data.append(fakeentry(pos, name, visible, shape, value, unit, lower, avg, upper))
 
     # scalar test
     data.append(dict(id=6, parameter_name="v", value=23, unit="m/s"))
 
     # 2D test
     img = create_example_2D_plot(lambda x, y: x ** 2 + y ** 2, 7)
-    data.append(dict(id=7, parameter_name="x**2 + y**2", value=img, unit="", shape=img.shape))
+    data.append(dict(id=7, parameter_name="x**2 + y**2", parameter_visible=True, value=img, unit="", shape=img.shape))
     img2 = create_example_2D_plot(lambda x, y: sin(x) + cos(y), 8)
-    data.append(dict(id=8, parameter_name="sin(x) + cos(y)", value=img2, unit="", shape=img2.shape))
+    data.append(dict(id=8, parameter_name="sin(x) + cos(y)", parameter_visible=False, value=img2, unit="", shape=img2.shape))
     img3 = create_example_2D_plot(lambda x, y: random([100, 100]), 9)
-    data.append(dict(id=9, parameter_name="random noise", value=img3, unit="", shape=img3.shape))
-    data.append(dict(id=10, parameter_name="X", value=42, unit="F"))
+    data.append(dict(id=9, parameter_name="random noise", parameter_visible=True, value=img3, unit="", shape=img3.shape))
+    data.append(dict(id=10, parameter_name="X", parameter_visible=True, value=42, unit="F"))
+    ctx_id = db.session.query(Context.id).filter_by(name="1DContext").subquery()
+    data1D = Data.query.filter(Data.context_id == ctx_id).first()
+    for entry in data1D.entries:
+        data.append(dict(id=10 + entry.id, parameter_name=entry.parameter.name, parameter_visible=entry.parameter.visible, value=entry.value, unit=entry.parameter.unit, shape=entry.value.shape))
 
     return render_template("datadisplaytest.html", data=data, test=(1, 2))
