@@ -70,7 +70,7 @@ def create_example_2D_plot(func, pos):
     img = func(xx, yy)
     # save image
     filepath = os.path.join(os.getcwd(), *["yamoda", "server", "static", "entry_{}.png".format(pos)])
-    logg.info("saving image to file %s", filepath)
+    logg.debug("saving image to file %s", filepath)
     fig = figure()
     ax = fig.gca()
     ax_image = ax.imshow(img)

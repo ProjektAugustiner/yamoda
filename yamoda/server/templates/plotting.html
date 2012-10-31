@@ -1,7 +1,13 @@
+{% macro plotdisplay_includes() %}
+<script src="{{ url_for('static', filename='jquery.flot.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.selection.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.resize.js') }}"></script>
+{% endmacro %}
 {% macro plotdisplay() %}
-<div id="plotdisplay" style="width:600px;height:400px;">here be dragons...</div>
-<div id="plot_hovertext">Hover...</div>
-<div id="plot_clicktext">Click...</div>
+<div class="plot-area" style="width:100%;height:85%;">here be dragons...</div>
+<input id="blah" class="plot-enable-tooltip" type="checkbox">Enable value tooltip
+<div class="plot-clickmessage">... or click a data point to display its value</div>
+<div class="plot-message">&nbsp;</div>
 {% endmacro %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

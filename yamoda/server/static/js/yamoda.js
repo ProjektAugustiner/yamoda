@@ -59,13 +59,15 @@
   apply_module_constants = function(module) {
     var constants, key, value;
     constants = module_constants[module.YM_MODULE_NAME] || {};
-    logg.debug("applying constants for", module.YM_MODULE_NAME, constants);
-    for (key in constants) {
-      if (!__hasProp.call(constants, key)) continue;
-      value = constants[key];
-      module[key] = value;
+    if (constants) {
+      logg.debug("applying constants for module", module.YM_MODULE_NAME, constants);
+      for (key in constants) {
+        if (!__hasProp.call(constants, key)) continue;
+        value = constants[key];
+        module[key] = value;
+      }
+      module_constants[module.YM_MODULE_NAME] = {};
     }
-    module_constants[module.YM_MODULE_NAME] = {};
     return module;
   };
 

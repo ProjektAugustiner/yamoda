@@ -1,0 +1,59 @@
+{% from "plotting.html" import plotdisplay with context %}
+{% from "plotting.html" import plotdisplay_includes %}
+{% macro entry1D(entry, parameter) %}
+<div class="row">
+  <h2>Entry #{{entry.id}}: {{parameter.name}}({{parameter.unit| unitformat}})</h2>
+  <div class="span8" id="plot" style="height:400px;">
+    {{ plotdisplay() }}
+  </div>
+</div>
+<hr>
+<div class="row-fluid">
+  <div class="span12" id="data" data-length="{{entry.value | length}}" data-entry-id="{{entry.id}}">
+    <h2>Raw Data (count: {{entry.value | length}})</h2>
+    {% if entry.value| length < 200 %}
+    <pre>[{{ entry.value| dataformat }}]</pre>
+    {% else %}
+    <pre id="value-display">
+      <a class="btn" onclick="yamoda.entry.get('{{url_for("entry", entry_id=entry.id)}}', function (entry) { yamoda.entry.show_values(entry, $('#value-display')) });">
+        Show values
+      </a>
+    </pre>
+    {%endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% extends "layout.html" %}
+{% set title="Entry Details" %}
+{% block extrahead %}
+<!-- external libs -->
+<script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
+{{ plotdisplay_includes() }}
+<!-- yamoda base module -->
+<script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
+<!-- yamoda modules -->
+<script src="{{ url_for('static', filename='js/entry.js') }}"></script>
+{% if entry.value | length < 200 %}
+<script>
+  var plot_and_show = function(entry) {
+    yamoda.logg.info("plot_and_show");
+    yamoda.entry.plot(entry, $("#plot"));
+    //show_values(entry)
+  };
+  $( function() {
+    yamoda.entry.add("{{url_for('entry', entry_id=entry.id)}}", 
+                    {{entry.id}}, 
+                    "{{entry.parameter.name}}",
+                    [{{entry.value | dataformat}}]);
+    yamoda.entry.flot_setup($("#plot"));
+    yamoda.entry.get("{{url_for('entry', entry_id=entry.id)}}", plot_and_show)
+    });
+</script>
+{% endif %}
+{% endblock %}
+{% block body %}
+{{ entry1D(entry, entry.parameter) }}
+{% endblock %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

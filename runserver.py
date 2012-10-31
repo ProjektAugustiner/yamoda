@@ -8,16 +8,17 @@ server.
 """
 
 import logging as logg
-logg.basicConfig(level=logg.DEBUG)
+import sys
+logg.basicConfig(level=logg.DEBUG, stream=sys.stdout)
 # INFO shows SQL statements, DEBUG even shows raw result sets
-#logg.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+# logg.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 from optparse import OptionParser
 from yamoda.server import app
 from dbsettings import DATABASE_URIS
 
 parser = OptionParser()
-parser.add_option('--debug', dest='debug', default=True,
+parser.add_option('--debug', dest='debug', default=False,
                   help='enable Flask debug mode')
 parser.add_option('--database', dest='database', default="sqlite",
                   help='Select Database backend (sqlite | mysql | postgres)')
@@ -29,4 +30,4 @@ app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URIS[options.database]
 logg.info("yamoda server init")
 logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])
 logg.info("running server...")
-app.run(debug=options.debug)
+app.run(debug=options.debug, port=5000)

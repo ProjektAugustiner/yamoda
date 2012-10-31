@@ -15,7 +15,7 @@ plot = undefined
 
 ###-- module functions --###
 
-request_fakeentry_data = (yid) ->
+_request_fakeentry_data = (yid) ->
   $.ajax(
     type: "GET"
     url: yamoda.base_url + "testentry/" + yid
@@ -103,12 +103,14 @@ $(document).ready( () ->
       $("#plot_clicktext").html("Point #" + item.dataIndex + " in plot <strong>" + item.series.label+ "</strong>")
     return
   )
-  request_fakeentry_data(0)
-  request_fakeentry_data(1)
+  _request_fakeentry_data(0)
+  _request_fakeentry_data(1)
 
   # module def
   module = yamoda.datadisplaytest = {
     YM_MODULE_NAME: YM_MODULE_NAME
+    request_entry: request_entry
+    setup_sparkline: setup_sparkline
   }
 
   yamoda.apply_module_constants(module)

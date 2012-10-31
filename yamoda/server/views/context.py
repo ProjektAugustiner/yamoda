@@ -1,16 +1,18 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
+from yamoda.server.mimerender import html_json_mimerender
+import json
+from werkzeug.exceptions import NotFound
+from flask.helpers import jsonify
 
 """
 Functions:
 ----------
-index    -- displays the main index page
-login    -- handles the user login
-logout   -- logs the current user out
-register -- handles the user registration
+context: get context in various formats
 
 """
+import logging
 from flask import render_template, request, flash, redirect, url_for
 from flask.ext.login import login_user, login_required, logout_user
 from sqlalchemy.exc import IntegrityError
@@ -19,20 +21,29 @@ from yamoda.server import app, db
 from yamoda.server.database import Context, User, Group, Set
 
 
-@app.route('/context', methods=['GET', 'POST'])
+logg = logging.getLogger("yamoda.views.context")
+
+
+def _render_contextlist_json(contextlist):
+    context_uris = [url_for("context", context_id=c.id) for c in contextlist]
+    return jsonify(context_uris=context_uris)
+
+
+@app.route('/contexts', methods=['GET', 'POST'])
 @login_required
+@html_json_mimerender("contextlist.html", _render_contextlist_json)
 def contextlist():
     """shows every context in the database"""
     if request.method == 'POST':
-        name = request.form['ctx_name']
-        brief = request.form['ctx_brief']
-        description = request.form['ctx_description']
+        name = request.form['context_name']
+        brief = request.form['context_brief']
+        description = request.form['context_description']
 
         try:
             if not name or not brief:
                 raise ValueError
-            new_ctx = Context(name=name, brief=brief, description=description)
-            db.session.add(new_ctx)
+            new_context = Context(name=name, brief=brief, description=description)
+            db.session.add(new_context)
             db.session.commit()
         except (ValueError, IntegrityError):
             db.session.rollback()
@@ -41,12 +52,31 @@ def contextlist():
             flash('Created new context: {0}'.format(name), 'info')
 
     contextlist = Context.query.all()
-    return render_template('contextlist.html', contextlist=contextlist)
+    return dict(contextlist=contextlist)
 
 
-@app.route('/context/<ctx_name>')
+def _render_context_json(context):
+    parameter_uris = [url_for("parameter", parameter_id=p.id) for p in context.parameters]
+    return json.dumps(dict(
+                id=context.id,
+                type=context.type,
+                name=context.name,
+                description=context.description,
+                parameter_uris=parameter_uris,
+                brief=context.brief))
+
+
+@app.route('/contexts/<context_name>')
+@app.route('/contexts/<int:context_id>')
 @login_required
-def context(ctx_name):
+@html_json_mimerender("context.html", _render_context_json)
+def context(context_name=None, context_id=None):
+    logg.debug("getting context: context_name %s context_id %s", context_name, context_id)
     """displays the requested context"""
-    ctx = Context.query.filter_by(name=ctx_name).first_or_404()
-    return render_template('context.html', context=ctx)
+    if context_name:
+        context = Context.query.filter_by(name=context_name).first()
+    elif context_id:
+        context = Context.query.get(context_id)
+    if context is None:
+        raise NotFound()
+    return dict(context=context)

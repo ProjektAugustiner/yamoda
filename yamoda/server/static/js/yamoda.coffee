@@ -44,11 +44,11 @@ add_module_constants = (module_name, new_constants) ->
 # apply stored constants to `module`
 apply_module_constants = (module) ->
   constants = module_constants[module.YM_MODULE_NAME] or {}
-  logg.debug("applying constants for", module.YM_MODULE_NAME, constants)
-  for own key, value of constants
-    module[key] = value
-
-  module_constants[module.YM_MODULE_NAME] = {}
+  if constants
+    logg.debug("applying constants for module", module.YM_MODULE_NAME, constants)
+    for own key, value of constants
+      module[key] = value
+    module_constants[module.YM_MODULE_NAME] = {}
   return module
 
 

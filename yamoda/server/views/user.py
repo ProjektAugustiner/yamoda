@@ -1,11 +1,18 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
+from mimeparse import best_match
+from flask.helpers import make_response
+from yamoda.server.mimerender import mimerender
 
 """
 User related views.
 """
 
+
+import logging
+import json
+from functools import partial
 from flask import render_template, request, flash, redirect, url_for
 from flask.ext.login import login_user, login_required, logout_user, \
      current_user
@@ -14,23 +21,59 @@ from sqlalchemy.exc import IntegrityError
 from yamoda.server import app, db
 from yamoda.server.database import User, Group
 
+logg = logging.getLogger("yamoda.views.user")
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route('/login', methods=['GET'])
+@mimerender(
+    html=partial(render_template, "login.html"),
+)
 def login():
-    """handles the user login"""
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        remember = request.form.get("remember", "no") == "yes"
+    """show login page"""
+    return dict(next=request.args.get('next', ''))
 
-        user = User.query.filter_by(name=username).first()
-        if (user is not None) and user.valid_password(password):
-            login_user(user, remember=remember)
-            flash('Logged in successfully.', 'info')
-            return redirect(request.form.get('next') or url_for('index'))
-        else:
-            flash('Invalid password or username.', 'error')
-    return render_template('login.html', next=request.args.get('next', ''))
+
+def _check_user_login(request_data):
+    username = request_data["username"]
+    password = request_data["password"]
+    remember = request_data.get("remember", False)
+    logg.debug("username %s type %s password %s, type %s", username, type(username), password, type(password))
+    user = User.query.filter_by(name=username).first()
+    logg.debug("user found? %s", user)
+    if (user is not None) and user.valid_password(password):
+        login_user(user, remember=remember)
+        return True
+    else:
+        return False
+
+
+def _login_html():
+    login_success = _check_user_login(request.form)
+    if login_success:
+        flash('Logged in successfully.', 'info')
+        return redirect(request.form.get('next') or url_for('index'), 302)
+    else:
+        flash('Invalid password or username.', 'error')
+        return render_template("login.html", next=request.args.get('next', ''))
+
+
+def _login_json():
+    logg.debug("request.data %s", request.data)
+    login_success = _check_user_login(request.json)
+    if login_success:
+        return make_response(json.dumps(dict(msg="success")), 200)
+    else:
+        return make_response(json.dumps(dict(msg="invalid credentials")), 401)
+
+
+@app.route('/login', methods=['POST'])
+@mimerender(
+    html=_login_html,
+    json=_login_json
+)
+def login_post():
+    """handles the user login"""
+    return {}
 
 
 @app.route("/logout")

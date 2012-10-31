@@ -6,7 +6,10 @@ Created on 08.09.2012
 @author: dpausp (Tobias Stenzel)
 '''
 from __future__ import division, absolute_import
+import logging
 from yamoda.server.database.datamodel import Entry
+
+logg = logging.getLogger("yamoda.view_helpers")
 
 
 def get_pvalues(datas, params):
@@ -23,4 +26,3 @@ def get_pvalues(datas, params):
             pvalues[-1].append(pvalue.value if pvalue else None)
 
     return pvalues
-

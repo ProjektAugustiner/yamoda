@@ -2,21 +2,27 @@
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
 
-import logging as logg
-from flask import Flask
+import logging
+import json
+from flask import Flask, request, flash, redirect, current_app, jsonify, make_response
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager
+from flask.ext.login import LoginManager, user_unauthorized, login_url
 from numpy import ndarray
 
 from jinja2 import Markup
-
+from werkzeug.exceptions import Unauthorized
+from mimeparse import best_match
 import markdown2
+from yamoda.server.mimerender import mimerender
 
 try:
     import matplotlib
     matplotlib.use('agg')
 except ImportError:
     pass
+
+
+logg = logging.getLogger("yamoda.server")
 
 # configuration
 DEBUG = True
@@ -31,10 +37,26 @@ app.config.from_envvar('YAMODA_SETTINGS', silent=True)
 # database
 db = SQLAlchemy(app)
 
+
+class MimeLoginManager(LoginManager):
+    @mimerender(
+        html=lambda login_uri: redirect(login_uri),
+        json=lambda login_uri: make_response(json.dumps(dict(login_uri=login_uri, msg="not logged in")), 401)
+        )
+    def unauthorized(self):
+        """This is called when the user is required to log in.
+        adapted from LoginManager.unauthorized
+        """
+        logg.debug("called unauthorized")
+        user_unauthorized.send(current_app)
+        if self.login_message:
+            flash(self.login_message)
+        return dict(login_uri=login_url(self.login_view, request.url))
+
 # login
-login_manager = LoginManager()
-login_manager.setup_app(app)
-login_manager.login_view = 'login'
+login_manager = MimeLoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 
 def datetimeformat(value, format='%Y-%m-%d %H:%M'):
@@ -51,8 +73,12 @@ def dataformat(value):
         return fmt
     elif isinstance(value, ndarray):
         # return arrays as 1, 2, 3, 4 ... for use with jquery.sparkline
-        return ", ".join([str(v) for v in value])
+        return ", ".join(["{:.16f}".format(v) for v in value])
     return str(value)
+
+
+def jsonformat(value):
+    return json.dumps(value)
 
 
 def unitformat(value):

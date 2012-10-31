@@ -11,10 +11,10 @@
     </tr>
     </thead>
     <tbody>
-      {%- for ctx in contextlist %}
+      {%- for context in contextlist %}
       <tr>
-        <td><a href="{{ url_for('context', ctx_name=ctx.name) }}">{{ ctx.name }}</a></td>
-        <td>{{ ctx.brief }}</td>
+        <td><a href="{{ url_for('context', context_name=context.name) }}">{{ context.name }}</a></td>
+        <td>{{ context.brief }}</td>
       </tr>
       {%- endfor %}
     </tbody>
@@ -27,11 +27,11 @@
       </div>
       <div class="modal-body">
         <label>Name</label>
-        <input type="text" class="span3" placeholder="Context name…" name="ctx_name">
+        <input type="text" class="span3" placeholder="Context name…" name="context_name">
         <label>Brief</label>
-        <input type="text" class="span12" placeholder="A brief description…" name="ctx_brief">
+        <input type="text" class="span12" placeholder="A brief description…" name="context_brief">
         <label>Description</label>
-        <textarea class="span12" name="ctx_description"
+        <textarea class="span12" name="context_description"
                   placeholder="A full description (in Markdown syntax)…"></textarea>
       </div>
       <div class="modal-footer">

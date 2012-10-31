@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% set title = "Parameter" %}
+{% block body %}
+<div class="page-header">
+    <h1>Parameter {{ parameter.name }}{% if parameter.unit %}<small>({{parameter.unit}})</small>{% endif %}</h1>
+</div>
+{% if parameter.unit %}
+<h2>Unit</h2>
+{{parameter.unit}}
+{% endif %}
+<h2>Brief description</h2>
+<p>{{ parameter.brief }}</p>
+<h2>Detailed description</h2>
+<p>{{ parameter.description|markdown }}</p>
+{% endblock %}

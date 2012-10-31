@@ -15,7 +15,9 @@ Dependencies
 * quantities (version >= 0.10.0)
 * Parcon
 * DateRangeParser
+* mimerender
 * nose (only for unit tests)
+* psycopg2 (for PostgresQL backend)
 
 Licensing
 ---------
