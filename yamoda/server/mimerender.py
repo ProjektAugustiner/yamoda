@@ -22,15 +22,18 @@ logg = logging.getLogger("yamoda.mimerender")
 
 
 mr.register_mime("png", ("image/png",))
+mr.register_mime("svg", ("image/svg+xml",))
+mr.register_mime("pdf", ("application/pdf",))
+mr.register_mime("eps", ("application/postscript",))
 
 
 class FixedFlaskMimeRender(FlaskMimeRender):
     def _set_context_var(self, key, value):
-        logg.debug("set context var %s %s", key, value)
+        #logg.debug("set context var %s %s", key, value)
         request.environ[key] = value
 
     def _clear_context_var(self, key):
-        logg.debug("remove context var %s", key)
+        #logg.debug("remove context var %s", key)
         del request.environ[key]
 
     def _make_response(self, content_or_response, headers, status):
@@ -110,3 +113,17 @@ def html_json_mimerender(html, json_func=jsonify):
         return wrapped2
 
     return wrap
+
+
+def mime_exceptions(fn):
+    functools.wraps(fn)
+    wrap = mimerender.map_exceptions(
+        mapping=(
+            (NotFound, 404),
+        ),
+        html=render_html_exception,
+        json=render_json_exception,
+        png=render_png_exception,
+        txt=render_txt_exception,
+    )
+    return wrap(fn)

@@ -17,7 +17,7 @@
       <tr>
         <td>
           {# Link to the Parameter description, parameter.brief is used as tooltip #}
-          <a href="{{ url_for('context', ctx_name=entry.parameter.context.name)
+          <a href="{{ url_for('context', context_name=entry.parameter.context.name)
                    }}#{{ entry.parameter.name }}"
              rel="tooltip" title="{{ entry.parameter.brief }}">
             {{ entry.parameter.name }}

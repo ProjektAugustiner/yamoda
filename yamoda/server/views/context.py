@@ -9,8 +9,9 @@ from flask.helpers import jsonify
 """
 Functions:
 ----------
-context: get context in various formats
-
+contexts: get context list as HTML or JSON
+context: get context as HTML or JSON
+create_context: new context (POST)
 """
 import logging
 from flask import render_template, request, flash, redirect, url_for
@@ -24,36 +25,23 @@ from yamoda.server.database import Context, User, Group, Set
 logg = logging.getLogger("yamoda.views.context")
 
 
+#### contexts
+
 def _render_contextlist_json(contextlist):
     context_uris = [url_for("context", context_id=c.id) for c in contextlist]
     return jsonify(context_uris=context_uris)
 
 
-@app.route('/contexts', methods=['GET', 'POST'])
+@app.route('/contexts', methods=['GET'])
 @login_required
 @html_json_mimerender("contextlist.html", _render_contextlist_json)
-def contextlist():
-    """shows every context in the database"""
-    if request.method == 'POST':
-        name = request.form['context_name']
-        brief = request.form['context_brief']
-        description = request.form['context_description']
-
-        try:
-            if not name or not brief:
-                raise ValueError
-            new_context = Context(name=name, brief=brief, description=description)
-            db.session.add(new_context)
-            db.session.commit()
-        except (ValueError, IntegrityError):
-            db.session.rollback()
-            flash('Invalid Input', 'error')
-        else:
-            flash('Created new context: {0}'.format(name), 'info')
-
+def contexts():
+    """Retrieve a listing of all contexts"""
     contextlist = Context.query.all()
     return dict(contextlist=contextlist)
 
+
+#### context
 
 def _render_context_json(context):
     parameter_uris = [url_for("parameter", parameter_id=p.id) for p in context.parameters]
@@ -80,3 +68,25 @@ def context(context_name=None, context_id=None):
     if context is None:
         raise NotFound()
     return dict(context=context)
+
+
+#### contextcreate
+
+@app.route('/contexts/create', methods=['POST'])
+@login_required
+def create_context():
+    """Creates a new context from a POST request"""
+    name = request.form['context_name']
+    brief = request.form['context_brief']
+    description = request.form['context_description']
+    try:
+        if not name or not brief:
+            raise ValueError
+        new_context = Context(name=name, brief=brief, description=description)
+        db.session.add(new_context)
+        db.session.commit()
+    except (ValueError, IntegrityError):
+        db.session.rollback()
+        flash('Invalid Input', 'error')
+    else:
+        flash('Created new context: {0}'.format(name), 'info')

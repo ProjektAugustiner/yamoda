@@ -9,8 +9,8 @@
     <strong>Error:</strong> <span id="errortext"></span></div>
   <div style="display: none" id="success" class="alert alert-success">
     <span id="successtext"></span></div>
-  <p>Import data into set <a href="{{ url_for('set', id=set.id) }}">{{ set.name }}</a>:</p>
-  <form id="impform" action="{{ url_for('setimport_do', id=set.id) }}" method="post"
+  <p>Import data into set <a href="{{ url_for('set', set_id=set.id) }}">{{ set.name }}</a>:</p>
+  <form id="impform" action="{{ url_for('setimport_do', set_id=set.id) }}" method="post"
         enctype="multipart/form-data" class="form-horizontal">
     <div class="control-group">
       <label class="control-label" for="importer">Importer:</label>
@@ -31,7 +31,7 @@
         <p class="help-block">Multiple files can be selected in each field.</p>
       </div>
     </div>
-    <div style="display: none" id="missing" class="well"></div>
+    <div style="display: none" id="missing" class="well"></set_div>
     <div class="form-actions">
       <button type="submit" class="btn btn-primary" id="submit" data-loading-text="Importing...">
       <i class="icon-upload icon-white"></i> Import</button>

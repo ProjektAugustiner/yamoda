@@ -1,9 +1,15 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
+from werkzeug.exceptions import NotFound
+from flask.helpers import url_for
+from yamoda.server.mimerender import html_json_mimerender
 
 """
 Data related views.
+
+data: render a data instance (HTML or JSON)
+datadelete: delete some data instances (POST)
 """
 
 import cStringIO
@@ -17,45 +23,37 @@ from yamoda.server import app, db
 from yamoda.server.database import Data, Entry
 
 
-@app.route('/data/<int:id>')
+#### data
+
+def _render_data_json(data):
+    entry_uris = [url_for("entry", entry_id=e.id) for e in data.entries]
+    return jsonify(id=data.id,
+                   name=data.name,
+                   context_uri=url_for("context", context_id=data.context.id),
+                   entry_uris=entry_uris)
+
+
+@app.route('/datas/<int:data_id>')
 @login_required
-def data(id):
-    d = Data.query.get_or_404(id)
-    return render_template('data.html', data=d)
+@html_json_mimerender("data.html", _render_data_json)
+def data(data_id):
+    d = Data.query.get(data_id)
+    if not d:
+        raise NotFound()
+    return dict(data=d)
 
 
-@app.route('/data/delete', methods=['POST'])
+@app.route('/datas/delete', methods=['POST'])
 @login_required
 def datadelete():
     try:
         ids = map(int, request.form.getlist('ids[]'))
-        for id in ids:
-            d = Data.query.get(id)
-            #if d.writeable():  # XXX Data is not AccessControl'd
+        for data_id in ids:
+            d = Data.query.get(data_id)
+            # if d.writeable():  # XXX Data is not AccessControl'd
             db.session.delete(d)
         db.session.commit()
     except Exception, err:
         return jsonify(result='error', data=str(err))
     return jsonify(result='success', data=None)
 
-
-@app.route('/entry/plot/<int:xid>/<int:yid>')
-@login_required
-def plot(yid, xid):
-    import matplotlib.pyplot as plt
-
-    ex = Entry.query.get_or_404(xid)
-    ey = Entry.query.get_or_404(yid)
-    if not isinstance(ex.value, ndarray) or not isinstance(ey.value, ndarray) \
-       or len(ex.value) != len(ey.value):
-        abort(415)
-    fig = plt.figure()
-    ax = fig.gca()
-    ax.plot(ex.value, ey.value)
-    ax.set_xlabel('%s (%s)' % (ex.parameter.name, ex.parameter.unit))
-    ax.set_ylabel('%s (%s)' % (ey.parameter.name, ey.parameter.unit))
-    fp = cStringIO.StringIO()
-    fig.savefig(fp)
-    resp = make_response(fp.getvalue())
-    resp.headers['Content-Type'] = 'image/png'
-    return resp

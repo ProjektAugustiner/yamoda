@@ -6,31 +6,35 @@ Return entries in various shapes and formats
 
 Functions (all GET):
 ----------
-entry: get an entry in various formats (specified by Accept header)
-testentry_1D_1D: used for datadisplaytest
+entry: get an entry in various formats (see function decorator)
+entry_1D_1D: convenience view for two 1D entries, for example for x-y plotting
 
 Created on 19.09.2012
 @author: dpausp (Tobias Stenzel)
 """
 from __future__ import division, absolute_import
 import itertools as it
-
-import numpy as np
-import pylab
+from functools import partial
 import logging as logg
 import os
-from functools import partial
+
+import numpy as np
+import matplotlib.pyplot as plt
 
 from flask import render_template, make_response, request, abort, jsonify, url_for
 from flask.ext.login import login_required
 
 from yamoda.server import app, db
 from yamoda.server.database import Data, Entry, Context
-from yamoda.server.mimerender import html_json_mimerender, mimerender, render_html_exception, render_json_exception, \
-    render_txt_exception, render_png_exception
+from yamoda.server.mimerender import html_json_mimerender, mimerender, mime_exceptions
 from werkzeug.exceptions import NotFound, UnsupportedMediaType
 from flask.helpers import send_from_directory
+import cStringIO
 
+# TODO: should be configurable, this is only for development!
+GEN_IMAGE_DIR = os.path.join(os.getcwd(), "yamoda", "server", "generated")
+
+### entry view helpers
 
 def _render_entry_json(entry):
     value = entry.value
@@ -57,58 +61,55 @@ def _render_entry_plain(entry):
     return str(entry.value)
 
 
-def _save_png_1D(value, filepath):
-    logg.debug("saving 1D image to file %s", filepath)
-    fig = pylab.figure()
+def _save_image_1D(img_type, value, label, filepath):
+    logg.debug("saving 1D image of type %s to file %s", img_type, filepath)
+    fig = plt.figure()
     ax = fig.gca()
     ax.plot(value)
+    ax.set_title(label)
     ax.grid(1)
-    fig.savefig(filepath, format="png", bbox_inches='tight', transparent=True)
+    fig.savefig(filepath, format=img_type, bbox_inches='tight', transparent=True)
 
 
-def _save_png_2D(value, filepath):
-    logg.debug("saving 2D image to file %s", filepath)
-    fig = pylab.figure()
+def _save_image_2D(img_type, value, label, filepath):
+    logg.debug("saving 2D image of type %s to file %s", img_type, filepath)
+    fig = plt.figure()
     ax = fig.gca()
     ax_image = ax.imshow(value)
+    ax.set_title(label)
     fig.colorbar(ax_image)
     ax.grid(1)
-    fig.savefig(filepath, format="png", bbox_inches='tight', transparent=True)
+    fig.savefig(filepath, format=img_type, bbox_inches='tight', transparent=True)
 
 
-def _render_entry_png(entry):
+def _render_entry_image(img_type, entry):
     value = entry.value
     if isinstance(value, np.ndarray):
-        directory = os.path.join(os.getcwd(), "yamoda", "server", "static")
-        filename = "entry_{}.png".format(entry.id)
-        filepath = os.path.join(directory, filename)
+        filename = "entry_{}.{}".format(entry.id, img_type)
+        filepath = os.path.join(GEN_IMAGE_DIR, filename)
+        label = "{} ({})".format(entry.parameter.name, entry.parameter.unit)
         if len(value.shape) == 1:
-            save_func = _save_png_1D
+            save_func = _save_image_1D
         elif len(value.shape) == 2:
-            save_func = _save_png_2D
+            save_func = _save_image_2D
         else:
             return "", 406
         if not os.path.isfile(filepath):
-            save_func(value, filepath)
-        return send_from_directory(directory, filename, as_attachment=True)
+            save_func(img_type, value, label, filepath)
+        return send_from_directory(GEN_IMAGE_DIR, filename, as_attachment=True)
     return "", 406
 
 
 @app.route('/entries/<int:entry_id>')
 @login_required
-@mimerender.map_exceptions(
-    mapping=(
-        (NotFound, 404),
-    ),
-    html=render_html_exception,
-    json=render_json_exception,
-    png=render_png_exception,
-    txt=render_txt_exception,
-)
+@mime_exceptions
 @mimerender(
     html=_render_entry_html,
     json=_render_entry_json,
-    png=_render_entry_png,
+    png=partial(_render_entry_image, "png"),
+    svg=partial(_render_entry_image, "svg"),
+    eps=partial(_render_entry_image, "eps"),
+    pdf=partial(_render_entry_image, "pdf"),
     txt=_render_entry_plain
 )
 def entry(entry_id):
@@ -118,24 +119,48 @@ def entry(entry_id):
     return dict(entry=entry)
 
 
+### entry_1D_1D view helpers
+
+def _save_image_1D_1D(filepath, img_type, values_x, values_y, label_x, label_y):
+    fig = plt.figure()
+    ax = fig.gca()
+    ax.plot(values_x, values_y)
+    ax.grid(1)
+    ax.set_xlabel(label_x)
+    ax.set_ylabel(label_y)
+    fig.savefig(filepath, format=img_type, bbox_inches='tight', transparent=True)
+
+
+def _render_entry1D_1D_image(img_type, id_x, id_y, **kw):
+    filename = "entry_{}x{}.{}".format(id_x, id_y, img_type)
+    filepath = os.path.join(GEN_IMAGE_DIR, filename)
+    if not os.path.isfile(filepath):
+        logg.debug("saving plot for entry %s against %s to file %s as %s", id_x, id_y, filepath, img_type.upper())
+        _save_image_1D_1D(filepath, img_type, **kw)
+    return send_from_directory(GEN_IMAGE_DIR, filename, as_attachment=True)
+
+
+def _render_entry1D_1D_json(values_x, values_y, **kw):
+    return jsonify(values_x=list(values_x), values_y=list(values_y), **kw)
+
 @app.route('/entries/<int:xid>/<int:yid>')
 @login_required
+@mime_exceptions
+@mimerender(
+    json=_render_entry1D_1D_json,
+    png=partial(_render_entry1D_1D_image, "png"),
+    svg=partial(_render_entry1D_1D_image, "svg"),
+    eps=partial(_render_entry1D_1D_image, "eps"),
+    pdf=partial(_render_entry1D_1D_image, "pdf")
+)
 def entry_1D_1D(xid, yid):
-    ex = Entry.query.get_or_404(xid)
-    ey = Entry.query.get_or_404(yid)
-    if not isinstance(ex.value, np.ndarray) or not isinstance(ey.value, np.ndarray) \
-       or len(ex.value) != len(ey.value):
-        abort(415)
-    data = zip(ex.value, ey.value)
-    return jsonify(data=data, parameter_x=ex.parameter.name, parameter_y=ey.parameter.name)
-
-
-@app.route('/testentry/<int:yid>')
-@login_required
-def testentry_1D_1D(yid):
-    ctx_id = db.session.query(Context.id).filter_by(name="1DContext").subquery()
-    data1D = Data.query.filter(Data.context_id == ctx_id).first()
-    entries = dict((e.parameter.name, e) for e in data1D.entries)
-    second_param = "T" if yid == 0 else "I"
-    logg.info("returning %s", second_param)
-    return entry_1D_1D(entries["t"].id, entries[second_param].id)
+    ex = Entry.query.get(xid)
+    ey = Entry.query.get(yid)
+    if not (ex and ey):
+        raise NotFound()
+    elif not isinstance(ex.value, np.ndarray) or not isinstance(ey.value, np.ndarray) \
+       or len(ex.value) != len(ey.value) or len(ex.value.shape) > 1 or len(ey.value.shape) > 1:
+        abort(406)
+    label_x = "{} ({})".format(ex.parameter.name, ex.parameter.unit)
+    label_y = "{} ({})".format(ey.parameter.name, ey.parameter.unit)
+    return dict(values_x=ex.value, values_y=ey.value, label_x=label_x, label_y=label_y, id_x=ex.id, id_y=ey.id)

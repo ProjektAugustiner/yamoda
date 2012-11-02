@@ -33,11 +33,11 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data<b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="{{ url_for('setlist', which='all') }}">View all</a></li>
-                  <li><a href="{{ url_for('setlist', which='mine') }}">View mine</a></li>
+                  <li><a href="{{ url_for('sets', which='all') }}">View all</a></li>
+                  <li><a href="{{ url_for('sets', which='mine') }}">View mine</a></li>
                 </ul>
               </li>
-              <li><a href="{{ url_for('contextlist') }}">Contexts</a></li>
+              <li><a href="{{ url_for('contexts') }}">Contexts</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Favorite Queries<b class="caret"></b></a>
                 <ul class="dropdown-menu">

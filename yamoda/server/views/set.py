@@ -1,9 +1,13 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
+from yamoda.server.mimerender import html_json_mimerender
+from werkzeug.exceptions import NotFound
 
 """
 Data set related views.
+set: render a data set (HTML or JSON)
+sets: show a list of all sets 
 """
 
 import os
@@ -18,10 +22,24 @@ from yamoda.importer import list_importers, load_importer
 from yamoda.importer.base import MissingInfo, ImporterError
 
 
-@app.route('/set/<int:id>')
+#### set
+
+def _render_set_json(set, **kw):
+    data_uris = [url_for("data", data_id=d.id) for d in set.datas]
+    child_uris = [url_for("set", set_id=c.id) for c in set.children]
+    return jsonify(id=set.id,
+            name=set.name,
+            data_uris=data_uris,
+            child_uris=child_uris)
+
+
+@app.route('/sets/<int:set_id>')
 @login_required
-def set(id):
-    s = Set.query.get_readable_or_404(id)
+@html_json_mimerender("set.html", _render_set_json)
+def set(set_id):
+    s = Set.query.get_readable(set_id)
+    if not s:
+        raise NotFound()
     # determine a context to use for displaying parameters
     if s.datas:
         ctx = s.datas[0].context
@@ -30,18 +48,31 @@ def set(id):
     else:
         params = []
         pvalues = []
-
-    return render_template('set.html', set=s,
-                           params=params, pvalues=pvalues)
+    return dict(set=s, params=params, pvalues=pvalues)
 
 
-@app.route('/set/<int:id>/import/do', methods=['POST'])
-def setimport_do(id):
+#### sets
+
+@app.route('/sets')
+@app.route('/sets/<which>')
+@login_required
+def sets(which='mine'):
+    if which == 'all':
+        setlist = Set.query.all_readable()
+    else:
+        setlist = Set.query.filter_by(user=current_user).all_readable()
+    return render_template('setlist.html', sets=setlist)
+
+
+#### setsimportdo
+
+@app.route('/sets/<int:set_id>/import/do', methods=['POST'])
+def setimport_do(set_id):
     userinfo = {}
     filenames = []
     orig_names = []
     try:
-        s = Set.query.get(id)
+        s = Set.query.get(set_id)
         for ffield in sorted(request.files):
             for fstorage in request.files.getlist(ffield):
                 name = fstorage.filename
@@ -93,9 +124,11 @@ def setimport_do(id):
     return jsonify(result=res, data=data)
 
 
+#### setcreate
+
 @app.route('/set/create', methods=['POST'])
 @login_required
-def setcreate():
+def create_set():
     name = request.form['name']
     s = Set(name=name, user=current_user, group=current_user.primary_group)
     parent_set_id = request.form.get("parent_set")
@@ -109,21 +142,4 @@ def setcreate():
     return redirect(url_for('set', id=s.id))
 
 
-@app.route('/set/<int:id>/import')
-@login_required
-def setimport(id):
-    s = Set.query.get_or_404(id)
-    contexts = iter(Context.query)
-    return render_template('setimport.html', set=s,
-                           importers=list_importers(), contexts=contexts)
 
-
-@app.route('/sets')
-@app.route('/sets/<which>')
-@login_required
-def setlist(which='mine'):
-    if which == 'all':
-        setlist = Set.query.all_readable()
-    else:
-        setlist = Set.query.filter_by(user=current_user).all_readable()
-    return render_template('setlist.html', sets=setlist)
