@@ -17,7 +17,7 @@
     {%- for data in datas %}
       <tr>
         <td>{{ loop.index }}</td>
-        <td><a href="{{ url_for('data', id=data.id) }}">{{ data.name }}</a></td>
+        <td><a href="{{ url_for('data', data_id=data.id) }}">{{ data.name }}</a></td>
         <td><a href="{{ url_for('context', context_name=data.context.name) }}">{{ data.context.name }}</a></td>
         <td>{{ data.entries|length }}</td>
         <td>{{ data.created|dtformat }}</td>

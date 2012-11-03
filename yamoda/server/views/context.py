@@ -45,13 +45,13 @@ def contexts():
 
 def _render_context_json(context):
     parameter_uris = [url_for("parameter", parameter_id=p.id) for p in context.parameters]
-    return json.dumps(dict(
+    return jsonify(
                 id=context.id,
                 type=context.type,
                 name=context.name,
                 description=context.description,
                 parameter_uris=parameter_uris,
-                brief=context.brief))
+                brief=context.brief)
 
 
 @app.route('/contexts/<context_name>')

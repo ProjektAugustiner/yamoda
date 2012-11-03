@@ -25,14 +25,15 @@ from flask import render_template, make_response, request, abort, jsonify, url_f
 from flask.ext.login import login_required
 
 from yamoda.server import app, db
-from yamoda.server.database import Data, Entry, Context
+from yamoda.server.database import Data, Entry, Context, Parameter
 from yamoda.server.mimerender import html_json_mimerender, mimerender, mime_exceptions
-from werkzeug.exceptions import NotFound, UnsupportedMediaType
+from werkzeug.exceptions import NotFound, UnsupportedMediaType, BadRequest
 from flask.helpers import send_from_directory
 import cStringIO
 
 # TODO: should be configurable, this is only for development!
 GEN_IMAGE_DIR = os.path.join(os.getcwd(), "yamoda", "server", "generated")
+
 
 # ## entry view helpers
 
@@ -101,6 +102,7 @@ def _render_entry_image(img_type, entry):
 
 
 @app.route('/entries/<int:entry_id>')
+@app.route('/entries')
 @login_required
 @mime_exceptions
 @mimerender(
@@ -112,8 +114,28 @@ def _render_entry_image(img_type, entry):
     pdf=partial(_render_entry_image, "pdf"),
     txt=_render_entry_plain
 )
-def entry(entry_id):
-    entry = Entry.query.get(entry_id)
+def entry(entry_id=None):
+    if entry_id:
+        entry = Entry.query.get(entry_id)
+    else:
+        parameter_id = request.args.get("parameter_id")
+        data_id = request.args.get("data_id")
+        parameter_name = request.args.get("parameter_name")
+
+        if parameter_id and data_id:
+            logg.debug("looking for an entry with parameter id %s for data id %s", parameter_id, data_id)
+            entry = Entry.query.filter_by(parameter_id=parameter_id, data_id=data_id).first()
+        elif parameter_name and data_id:
+            logg.debug("looking for an entry with parameter name %s for data id %s", parameter_name, data_id)
+            # TODO: optimize
+            data = Data.query.get(data_id)
+            if not data:
+                raise NotFound()
+            parameter_sq = Parameter.query.filter_by(context=data.context, name=parameter_name).subquery()
+            entry = Entry.query.filter_by(data_id=data_id).filter_by(parameter_id=parameter_sq.c.id).first()
+        else:
+            raise BadRequest()
+
     if entry is None:
         raise NotFound()
     return dict(entry=entry)

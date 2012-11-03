@@ -17,7 +17,7 @@ from flask import render_template, request, flash, redirect, url_for, jsonify
 from flask.ext.login import login_required, current_user
 
 from yamoda.server import app, db, view_helpers
-from yamoda.server.database import Set, Context, Entry
+from yamoda.server.database import Set, Context
 from yamoda.importer import list_importers, load_importer
 from yamoda.importer.base import MissingInfo, ImporterError
 
@@ -66,12 +66,22 @@ def sets(which='mine'):
         setlist = Set.query.all_readable()
     else:
         setlist = Set.query.filter_by(user=current_user).all_readable()
-    return render_template('setlist.html', sets=setlist)
+    return dict(sets=setlist)
 
 
-#### setsimportdo
+#### setimport
+
+@app.route('/sets/<int:set_id>/import')
+@login_required
+def setimport(set_id):
+    s = Set.query.get_or_404(set_id)
+    contexts = iter(Context.query)
+    return render_template('setimport.html', set=s,
+                           importers=list_importers(), contexts=contexts)
+
 
 @app.route('/sets/<int:set_id>/import/do', methods=['POST'])
+@login_required
 def setimport_do(set_id):
     userinfo = {}
     filenames = []
@@ -144,7 +154,7 @@ def create_set():
     db.session.add(s)
     db.session.commit()
     flash('New dataset successfully created.', 'success')
-    return redirect(url_for('set', id=s.id))
+    return redirect(url_for('set', set_id=s.id))
 
 
 
