@@ -53,9 +53,14 @@ def set(set_id):
 
 #### sets
 
+def _render_sets_json(sets):
+    return jsonify(set_uris=[url_for("set", set_id=s.id) for s in sets])
+
+
 @app.route('/sets')
 @app.route('/sets/<which>')
 @login_required
+@html_json_mimerender("setlist.html", _render_sets_json)
 def sets(which='mine'):
     if which == 'all':
         setlist = Set.query.all_readable()

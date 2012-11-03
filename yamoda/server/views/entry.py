@@ -34,7 +34,7 @@ import cStringIO
 # TODO: should be configurable, this is only for development!
 GEN_IMAGE_DIR = os.path.join(os.getcwd(), "yamoda", "server", "generated")
 
-### entry view helpers
+# ## entry view helpers
 
 def _render_entry_json(entry):
     value = entry.value
@@ -119,7 +119,7 @@ def entry(entry_id):
     return dict(entry=entry)
 
 
-### entry_1D_1D view helpers
+# ## entry_1D_1D view helpers
 
 def _save_image_1D_1D(filepath, img_type, values_x, values_y, label_x, label_y):
     fig = plt.figure()
@@ -142,6 +142,7 @@ def _render_entry1D_1D_image(img_type, id_x, id_y, **kw):
 
 def _render_entry1D_1D_json(values_x, values_y, **kw):
     return jsonify(values_x=list(values_x), values_y=list(values_y), **kw)
+
 
 @app.route('/entries/<int:xid>/<int:yid>')
 @login_required

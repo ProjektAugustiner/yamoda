@@ -35,8 +35,8 @@ def _render_parameter_json(parameter):
 
 
 @app.route('/parameters/<int:parameter_id>')
-@html_json_mimerender(html="parameter.html", json_func=_render_parameter_json)
 @login_required
+@html_json_mimerender(html="parameter.html", json_func=_render_parameter_json)
 def parameter(parameter_id):
     parameter = Parameter.query.get(parameter_id)
     if parameter is None:
