@@ -29,11 +29,11 @@ mr.register_mime("eps", ("application/postscript",))
 
 class FixedFlaskMimeRender(FlaskMimeRender):
     def _set_context_var(self, key, value):
-        #logg.debug("set context var %s %s", key, value)
+        # logg.debug("set context var %s %s", key, value)
         request.environ[key] = value
 
     def _clear_context_var(self, key):
-        #logg.debug("remove context var %s", key)
+        # logg.debug("remove context var %s", key)
         del request.environ[key]
 
     def _make_response(self, content_or_response, headers, status):
@@ -45,7 +45,10 @@ class FixedFlaskMimeRender(FlaskMimeRender):
         """
         if isinstance(content_or_response, BaseResponse):
             logg.debug("is response object")
-            return content_or_response
+            response = content_or_response
+            response.headers.extend(headers)
+            logg.debug("response headers %s", response.headers)
+            return response
         else:
             if isinstance(content_or_response, tuple) and len(content_or_response) == 2:
                 content, status = content_or_response

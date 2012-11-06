@@ -16,6 +16,7 @@ Dependencies
 * Parcon
 * DateRangeParser
 * mimerender
+* Coffeescript compiler (on node.js)
 * nose (only for unit tests)
 * psycopg2 (for PostgresQL backend)
 
@@ -38,7 +39,7 @@ Running The Server
 
 Start it with:
 
-    python runserver.py 
+    python runserver.py [--debug True]
     
 To select the DB backend (default is SQLite):
 

@@ -13,8 +13,7 @@
 
 
 (function() {
-  var YM_MODULE_NAME, add, entries, flot_setup, get, logg, plot, show_values, _show_plot_tooltip,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var YM_MODULE_NAME, add, entries, flot_setup, get, hide_plot, logg, plot, show_plot, show_values, _show_plot_tooltip;
 
   YM_MODULE_NAME = "entry";
 
@@ -38,8 +37,9 @@
   };
 
   get = function(entry_url, success_fn) {
-    if (__indexOf.call(entries, entry_url) < 0) {
+    if (!(entry_url in entries)) {
       logg.debug(entry_url, "unknown, requesting it from server...");
+      logg.debug("current entries", entries);
       $.ajax({
         type: "GET",
         url: entry_url,
@@ -102,13 +102,28 @@
     $plot_area = $target.children(".plot-area");
     prev_plot = $plot_area.data("plot");
     if (prev_plot) {
+      logg.debug("previous plot exists");
       plot_data = prev_plot.getData();
       plot_data.push(series);
     } else {
       plot_data = [series];
     }
     plot = $.plot($plot_area, plot_data, options);
-    $plot_area.data("plot", plot);
+    $plot_area.data("plot", plot).removeClass("placeholder");
+  };
+
+  show_plot = function($target) {
+    var $plot_area, prev_plot;
+    $plot_area = $target.children(".plot-area");
+    prev_plot = $plot_area.data("plot");
+    plot = $.plot($plot_area, prev_plot.getData(), prev_plot.getOptions());
+    $plot_area.data("plot", plot).removeClass("placeholder");
+  };
+
+  hide_plot = function($target) {
+    var $plot_area;
+    $plot_area = $target.children(".plot-area");
+    $plot_area.text("Plot hidden").addClass("placeholder");
   };
 
   show_values = function(entry, $values_div) {
@@ -186,6 +201,8 @@
       add: add,
       get: get,
       plot: plot,
+      hide_plot: hide_plot,
+      show_plot: show_plot,
       flot_setup: flot_setup,
       show_values: show_values
     };

@@ -31,22 +31,46 @@ from werkzeug.exceptions import NotFound, UnsupportedMediaType, BadRequest
 from flask.helpers import send_from_directory
 import cStringIO
 
-# TODO: should be configurable, this is only for development!
-GEN_IMAGE_DIR = os.path.join(os.getcwd(), "yamoda", "server", "generated")
+GEN_IMAGE_DIR = app.config["GENERATED_DIR"]
 
 
 # ## entry view helpers
 
+def _save_entry_image_if_needed(img_type, entry):
+    value = entry.value
+    if isinstance(value, np.ndarray):
+        filename = "entry_{}.{}".format(entry.id, img_type)
+        filepath = os.path.join(GEN_IMAGE_DIR, filename)
+        if not os.path.isfile(filepath):
+            label = "{} ({})".format(entry.parameter.name, entry.parameter.unit)
+            if len(value.shape) == 1:
+                save_func = _save_image_1D
+            elif len(value.shape) == 2:
+                save_func = _save_image_2D
+            else:
+                return
+            save_func(img_type, value, label, filepath)
+    return filename
+
+
 def _render_entry_json(entry):
+    logg.debug("_render_entry_json")
     value = entry.value
     if isinstance(value, np.ndarray):
         if len(value.shape) == 1:
-            parameter_uri = url_for("parameter", parameter_id=entry.parameter.id)
-            parameter_name = entry.parameter.name
-            return jsonify(id=entry.id,
-                           values=list(entry.value),
-                           parameter_uri=parameter_uri,
-                           parameter_name=parameter_name)
+            # special handling if client wants a image uri
+            img_type = request.args.get("img_url_for_type")
+            if img_type is not None:
+                filename = _save_entry_image_if_needed(img_type.lower(), entry)
+                return jsonify(img_url=url_for("generated", filename=filename), image_type=img_type)
+            else:
+                # default entry rendering
+                parameter_uri = url_for("parameter", parameter_id=entry.parameter.id)
+                parameter_name = entry.parameter.name
+                return jsonify(id=entry.id,
+                               values=list(entry.value),
+                               parameter_uri=parameter_uri,
+                               parameter_name=parameter_name)
     return "", 406
 
 
@@ -84,21 +108,11 @@ def _save_image_2D(img_type, value, label, filepath):
 
 
 def _render_entry_image(img_type, entry):
-    value = entry.value
-    if isinstance(value, np.ndarray):
-        filename = "entry_{}.{}".format(entry.id, img_type)
-        filepath = os.path.join(GEN_IMAGE_DIR, filename)
-        label = "{} ({})".format(entry.parameter.name, entry.parameter.unit)
-        if len(value.shape) == 1:
-            save_func = _save_image_1D
-        elif len(value.shape) == 2:
-            save_func = _save_image_2D
-        else:
-            return "", 406
-        if not os.path.isfile(filepath):
-            save_func(img_type, value, label, filepath)
-        return send_from_directory(GEN_IMAGE_DIR, filename, as_attachment=True)
-    return "", 406
+    logg.debug("_render_entry_image")
+    filename = _save_entry_image_if_needed(img_type, entry)
+    if not filename:
+        return "", 406
+    return send_from_directory(GEN_IMAGE_DIR, filename, as_attachment=True)
 
 
 @app.route('/entries/<int:entry_id>')

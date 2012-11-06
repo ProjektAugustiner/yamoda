@@ -71,7 +71,7 @@ run_before_init = (module_name) ->
 
 ###-- READY --###
 
-$(document).ready( () ->
+$( () ->
   if that.yamoda
     console.log("yamoda already defined, skipping!")
     return

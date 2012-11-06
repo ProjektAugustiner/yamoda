@@ -28,8 +28,9 @@ add = (entry_url, entry_id, parameter_name, entry_values) ->
 
 
 get = (entry_url, success_fn) ->
-  if entry_url not in entries
+  if entry_url not of entries
     logg.debug(entry_url, "unknown, requesting it from server...")
+    logg.debug("current entries", entries)
     $.ajax(
       type: "GET"
       url: entry_url
@@ -76,6 +77,7 @@ plot = (entry, $target) ->
   $plot_area = $target.children(".plot-area")
   prev_plot = $plot_area.data("plot")
   if prev_plot
+      logg.debug("previous plot exists")
       plot_data = prev_plot.getData()
       plot_data.push(series)
   else
@@ -83,7 +85,21 @@ plot = (entry, $target) ->
       plot_data = [series]
       
   plot = $.plot($plot_area, plot_data, options)
-  $plot_area.data("plot", plot)
+  $plot_area.data("plot", plot).removeClass("placeholder")
+  return
+
+
+show_plot = ($target) ->
+  $plot_area = $target.children(".plot-area")
+  prev_plot = $plot_area.data("plot")
+  plot = $.plot($plot_area, prev_plot.getData(), prev_plot.getOptions())
+  $plot_area.data("plot", plot).removeClass("placeholder")
+  return
+
+
+hide_plot = ($target) ->
+  $plot_area = $target.children(".plot-area")
+  $plot_area.text("Plot hidden").addClass("placeholder")
   return
 
 
@@ -167,6 +183,8 @@ $( () ->
     add: add
     get: get
     plot: plot
+    hide_plot: hide_plot
+    show_plot: show_plot
     flot_setup: flot_setup
     show_values: show_values
   }

@@ -14,6 +14,7 @@ from werkzeug.exceptions import Unauthorized
 from mimeparse import best_match
 import markdown2
 from yamoda.server.mimerender import mimerender
+import os
 
 try:
     import matplotlib
@@ -30,9 +31,11 @@ SECRET_KEY = 'development key'
 
 # create application
 app = Flask('yamoda.server')
+app.jinja_env.add_extension("yamoda.server.coffeeforjinja.CoffeeExtension")
 
 app.config.from_object(__name__)
 app.config.from_envvar('YAMODA_SETTINGS', silent=True)
+app.config["GENERATED_DIR"] = os.path.join(os.getcwd(), "yamoda", "server", "generated")
 
 # database
 db = SQLAlchemy(app)

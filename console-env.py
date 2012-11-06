@@ -15,7 +15,7 @@ from dbsettings import DATABASE_URIS
 q = db.session.query
 rollback = db.session.rollback
 
-DATABASE = "sqlite"
+DATABASE = "postgres"
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URIS[DATABASE]
 
 logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])

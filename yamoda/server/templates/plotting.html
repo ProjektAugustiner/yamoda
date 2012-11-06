@@ -4,7 +4,17 @@
 <script src="{{ url_for('static', filename='jquery.flot.resize.js') }}"></script>
 {% endmacro %}
 {% macro plotdisplay() %}
-<div class="plot-area" style="width:100%;height:85%;">here be dragons...</div>
+<style>
+  .plot-area { 
+    width:100%;
+    height:85%;
+    margin-bottom: 10px;
+  }
+  div.placeholder {
+    border: 1px solid #aaaaaa; 
+  }
+</style>
+<div class="plot-area placeholder">No content to display</div>
 <input id="blah" class="plot-enable-tooltip" type="checkbox">Enable value tooltip
 <div class="plot-clickmessage">... or click a data point to display its value</div>
 <div class="plot-message">&nbsp;</div>
