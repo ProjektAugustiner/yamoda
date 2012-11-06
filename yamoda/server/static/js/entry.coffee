@@ -16,7 +16,7 @@ entries = {}
 ###-- module functions --###
 
 
-add = (entry_url, entry_id, parameter_name, entry_values) ->
+add = (entry_url, entry_id, parameter_name, entry_value) ->
   entry = {
     id: entry_id
     parameter_name: parameter_name
@@ -49,7 +49,7 @@ get = (entry_url, success_fn) ->
 plot = (entry, $target) ->
   logg.info("plotting entry", entry.id, "...")
   series = {
-    data: ([i, value] for value,i in entry.values)
+    data: ([i, value] for value,i in entry.value)
     label: "<strong>" + entry.parameter_name + "</strong>"
     clickable: true
     hoverable: true
@@ -60,6 +60,7 @@ plot = (entry, $target) ->
         show: true
       points:
         show: true
+        radius: 0.4
     xaxis:
       zoomRange: [2, 100]
       panRange: [0, 100]
@@ -105,7 +106,7 @@ hide_plot = ($target) ->
 
 show_values = (entry, $values_div) ->
   logg.info("showing values of entry #", entry.id, "...")
-  $values_div.text(JSON.stringify(entry.values).replace(/,/g, ", "))
+  $values_div.text(JSON.stringify(entry.value).replace(/,/g, ", "))
   return
 
 
@@ -133,14 +134,14 @@ flot_setup = ($plot_div) ->
   $plot_clickmessage = $plot_div.children(".plot-clickmessage")
   $plot_enable_tooltip = $plot_div.children(".plot-enable-tooltip")
 
-  $plot_area.bind("plotclick", (ev, pos, item) ->
+  $plot_area.on("plotclick", (ev, pos, item) ->
     if item
       y = item.datapoint[1].toFixed(4)
       $plot_clickmessage.html("<strong>" + item.series.label + "</strong> #" + item.dataIndex + ": " + y)
     return
   )
   # click support (display value and parameter name in a hovering tooltip)
-  $plot_area.bind("plothover", (ev, pos, item) ->
+  $plot_area.on("plothover", (ev, pos, item) ->
     if $plot_enable_tooltip.attr("checked") == "checked"
       $plot_tooltip = $plot_div.children(".plot-tooltip")
       if item
@@ -149,21 +150,43 @@ flot_setup = ($plot_div) ->
           $plot_tooltip.remove()
           x = item.dataIndex
           y = item.datapoint[1].toFixed(4)
-          logg.info("show_tooltip", x, y)
+          #logg.info("show_tooltip", x, y)
           _show_plot_tooltip(item.pageX, item.pageY, item.series.label + " at " + x + ": " + y, $plot_div)
       else
         $plot_tooltip.remove()
         $plot_area.removeData("previous_hover_point")
+    return
   )
 
   # zooming with navigation plugin and mousewheel doesn't work with JQuery 1.7(NaN!!)
   # deactivated zooming for now
-  $plot_area.bind("plotzoom", (ev, plot) ->
+  $plot_area.on("plotzoom", (ev, plot) ->
     axes = plot.getAxes()
     $plot_message.html("Zooming to x: " + axes.xaxis.min.toFixed(2) + " &ndash; " + axes.xaxis.max.toFixed(2) +
                             " and y; " + axes.yaxis.min.toFixed(2) + " &ndash; " + axes.yaxis.max.toFixed(2)
     )
+    return
   )
+
+
+sparkline_setup = ($target) ->
+  # sparkline setup for a target containing data which can be plotted
+    logg.info("sparkline for target", $target.selector)
+    value_count = $target.attr("count")
+    cell_width = $target.width()
+    pixel_per_value = cell_width / value_count
+    logg.debug("cell width", cell_width, "pixel_per_value", pixel_per_value)
+    $target.sparkline(
+      "html",
+      type: "line"
+      height: "60"
+      tooltipFormat: '<span style="color: {{color}}">&#9679;</span> {{prefix}}{{x}} | {{y}}{{suffix}}'
+      defaultPixelsPerValue: 1
+      normalRangeMin: $target.attr("normalMin")
+      normalRangeMax: $target.attr("normalMax")
+      fillColor: false
+    )
+    return
 
 
 ###-- READY --###
@@ -187,6 +210,7 @@ $( () ->
     show_plot: show_plot
     flot_setup: flot_setup
     show_values: show_values
+    sparkline_setup: sparkline_setup
   }
 
   yamoda.apply_module_constants(module)
@@ -195,3 +219,5 @@ $( () ->
   logg.info("yamoda." + YM_MODULE_NAME, "loaded")
   return
 )
+
+# vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #

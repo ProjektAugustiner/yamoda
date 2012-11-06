@@ -4,7 +4,7 @@
 import random
 import logging as logg
 logg.basicConfig(level=logg.INFO)
-#logg.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+# logg.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 from optparse import OptionParser
 
 import numpy as np
@@ -88,7 +88,7 @@ if options.testdata:
         db.session.commit()
 
     def create_testdata_1D():
-        ### 1D test data context
+        # ## 1D test data context
         print "adding 1DContext"
         brief = 'just a time series'
         desc = "spam"
@@ -128,6 +128,62 @@ if options.testdata:
         db.session.add(a_set)
         db.session.commit()
 
+    def create_testdata_all():
+
+        # ## 1D test data context
+        print "adding 2DContext"
+        brief = 'just random data'
+        desc = "spam"
+        ctx = Context(name='2DContext', brief=brief, description=desc)
+        db.session.add(ctx)
+
+        par_a = Parameter(
+            name='a', brief='a',
+            description='random scalar',
+            unit='au', context=ctx, visible=True)
+
+        par_b = Parameter(
+            name='b', brief='b',
+            description='random 1D array',
+            unit='bu', context=ctx, visible=True)
+
+        par_c = Parameter(
+            name='c', brief='c',
+            description='random 2D array',
+            unit='cu', context=ctx, visible=True)
+
+        db.session.add(par_a)
+        db.session.add(par_b)
+        db.session.add(par_c)
+
+        val_a = np.random.random()
+        val_b = np.random.random(1670)
+
+        def create_example_2D_values(func):
+            arr = np.arange(-5, 5, 0.1)
+            xx, yy = np.meshgrid(arr, arr)
+            return func(xx, yy)
+
+        val_c = create_example_2D_values(lambda x, y: np.sin(x) + np.cos(y))
+
+        e_a = Entry(value=val_a, parameter=par_a)
+        e_b = Entry(value=val_b, parameter=par_b)
+        e_c = Entry(value=val_c, parameter=par_c)
+        db.session.add(e_a)
+        db.session.add(e_b)
+        db.session.add(e_c)
+
+        # finished entry creation
+        data = Data(name="random scalar / 1D / 2D", entries=[e_a, e_b, e_c], context=ctx)
+        db.session.add(data)
+        a_set = Set(name="random scalar / 1D / 2D", datas=[data], user=admin, group=admin_group)
+        db.session.add(a_set)
+
+        # finished set
+        db.session.commit()
+
     create_testdata_scalar()
     create_testdata_1D()
+    create_testdata_all()
+
 

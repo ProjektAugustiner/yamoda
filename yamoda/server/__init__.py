@@ -7,7 +7,7 @@ import json
 from flask import Flask, request, flash, redirect, current_app, jsonify, make_response
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager, user_unauthorized, login_url
-from numpy import ndarray
+from numpy import ndarray, std, average
 
 from jinja2 import Markup
 from werkzeug.exceptions import Unauthorized
@@ -66,7 +66,10 @@ def datetimeformat(value, format='%Y-%m-%d %H:%M'):
     return value.strftime(format)
 
 
-def dataformat(value):
+def dataformat(value, maxlen=None):
+    """Format data for HTML display
+    The returned value is compatible with JQuery.sparkline
+    """
     if value is None:
         return ''
     elif isinstance(value, float):
@@ -76,8 +79,24 @@ def dataformat(value):
         return fmt
     elif isinstance(value, ndarray):
         # return arrays as 1, 2, 3, 4 ... for use with jquery.sparkline
-        return ", ".join(["{:.16f}".format(v) for v in value])
+        if maxlen is not None:
+            # if array is too long: shorten array by sampling it
+            step = len(value) // maxlen
+            value = value[::step]
+            if step > 1:
+                # if we omit values we must send matching xvalues so that sparkline knows what to do
+                return ", ".join(["{}:{:.8f}".format(i * step, v) for i, v in enumerate(value)])
+        # just send yvalues
+        return ", ".join(["{:.8f}".format(v) for v in value])
     return str(value)
+
+
+def normal_min(value):
+    return average(value) - std(value)
+
+
+def normal_max(value):
+    return average(value) + std(value)
 
 
 def jsonformat(value):
@@ -109,6 +128,9 @@ app.jinja_env.filters['dataformat'] = dataformat
 app.jinja_env.filters['unitformat'] = unitformat
 app.jinja_env.filters['markdown'] = markdown
 app.jinja_env.filters['yesnoformat'] = yesnoformat
+app.jinja_env.filters['average'] = average
+app.jinja_env.filters['normal_min'] = normal_min
+app.jinja_env.filters['normal_max'] = normal_max
 
 import yamoda.server.views
 import yamoda.server.database

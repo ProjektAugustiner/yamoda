@@ -13,7 +13,7 @@
 
 
 (function() {
-  var YM_MODULE_NAME, add, entries, flot_setup, get, hide_plot, logg, plot, show_plot, show_values, _show_plot_tooltip;
+  var YM_MODULE_NAME, add, entries, flot_setup, get, hide_plot, logg, plot, show_plot, show_values, sparkline_setup, _show_plot_tooltip;
 
   YM_MODULE_NAME = "entry";
 
@@ -25,7 +25,7 @@
   */
 
 
-  add = function(entry_url, entry_id, parameter_name, entry_values) {
+  add = function(entry_url, entry_id, parameter_name, entry_value) {
     var entry;
     entry = {
       id: entry_id,
@@ -61,7 +61,7 @@
     series = {
       data: (function() {
         var _i, _len, _ref, _results;
-        _ref = entry.values;
+        _ref = entry.value;
         _results = [];
         for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
           value = _ref[i];
@@ -79,7 +79,8 @@
           show: true
         },
         points: {
-          show: true
+          show: true,
+          radius: 0.4
         }
       },
       xaxis: {
@@ -128,7 +129,7 @@
 
   show_values = function(entry, $values_div) {
     logg.info("showing values of entry #", entry.id, "...");
-    $values_div.text(JSON.stringify(entry.values).replace(/,/g, ", "));
+    $values_div.text(JSON.stringify(entry.value).replace(/,/g, ", "));
   };
 
   _show_plot_tooltip = function(x, y, contents, $plot_div) {
@@ -151,14 +152,14 @@
     $plot_message = $plot_div.children(".plot-message");
     $plot_clickmessage = $plot_div.children(".plot-clickmessage");
     $plot_enable_tooltip = $plot_div.children(".plot-enable-tooltip");
-    $plot_area.bind("plotclick", function(ev, pos, item) {
+    $plot_area.on("plotclick", function(ev, pos, item) {
       var y;
       if (item) {
         y = item.datapoint[1].toFixed(4);
         $plot_clickmessage.html("<strong>" + item.series.label + "</strong> #" + item.dataIndex + ": " + y);
       }
     });
-    $plot_area.bind("plothover", function(ev, pos, item) {
+    $plot_area.on("plothover", function(ev, pos, item) {
       var $plot_tooltip, x, y;
       if ($plot_enable_tooltip.attr("checked") === "checked") {
         $plot_tooltip = $plot_div.children(".plot-tooltip");
@@ -168,19 +169,36 @@
             $plot_tooltip.remove();
             x = item.dataIndex;
             y = item.datapoint[1].toFixed(4);
-            logg.info("show_tooltip", x, y);
-            return _show_plot_tooltip(item.pageX, item.pageY, item.series.label + " at " + x + ": " + y, $plot_div);
+            _show_plot_tooltip(item.pageX, item.pageY, item.series.label + " at " + x + ": " + y, $plot_div);
           }
         } else {
           $plot_tooltip.remove();
-          return $plot_area.removeData("previous_hover_point");
+          $plot_area.removeData("previous_hover_point");
         }
       }
     });
-    return $plot_area.bind("plotzoom", function(ev, plot) {
+    return $plot_area.on("plotzoom", function(ev, plot) {
       var axes;
       axes = plot.getAxes();
-      return $plot_message.html("Zooming to x: " + axes.xaxis.min.toFixed(2) + " &ndash; " + axes.xaxis.max.toFixed(2) + " and y; " + axes.yaxis.min.toFixed(2) + " &ndash; " + axes.yaxis.max.toFixed(2));
+      $plot_message.html("Zooming to x: " + axes.xaxis.min.toFixed(2) + " &ndash; " + axes.xaxis.max.toFixed(2) + " and y; " + axes.yaxis.min.toFixed(2) + " &ndash; " + axes.yaxis.max.toFixed(2));
+    });
+  };
+
+  sparkline_setup = function($target) {
+    var cell_width, pixel_per_value, value_count;
+    logg.info("sparkline for target", $target.selector);
+    value_count = $target.attr("count");
+    cell_width = $target.width();
+    pixel_per_value = cell_width / value_count;
+    logg.debug("cell width", cell_width, "pixel_per_value", pixel_per_value);
+    $target.sparkline("html", {
+      type: "line",
+      height: "60",
+      tooltipFormat: '<span style="color: {{color}}">&#9679;</span> {{prefix}}{{x}} | {{y}}{{suffix}}',
+      defaultPixelsPerValue: 1,
+      normalRangeMin: $target.attr("normalMin"),
+      normalRangeMax: $target.attr("normalMax"),
+      fillColor: false
     });
   };
 
@@ -204,7 +222,8 @@
       hide_plot: hide_plot,
       show_plot: show_plot,
       flot_setup: flot_setup,
-      show_values: show_values
+      show_values: show_values,
+      sparkline_setup: sparkline_setup
     };
     yamoda.apply_module_constants(module);
     logg.info("yamoda." + YM_MODULE_NAME, "loaded");
