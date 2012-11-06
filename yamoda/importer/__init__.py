@@ -4,6 +4,8 @@
 
 """
 Importer submodules.
+
+TODO: do automatic importer discovery somehow (simple solution: iterate over modules below yamoda.importer)
 """
 
 import sys
@@ -13,11 +15,14 @@ import sys
 
 importers = {
     'mira_single': ('MIRA single counter data',),
-    'vsm':('VSM magnetisation data',),
+    'vsm': ('VSM magnetisation data',),
+    'priusminiscanner': ('Prius Miniscanner data',),
 }
+
 
 def list_importers():
     return importers.iteritems()
+
 
 def load_importer(name):
     """Load the given importer module and return its Importer class."""
