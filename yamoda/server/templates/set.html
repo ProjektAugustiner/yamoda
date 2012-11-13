@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% from "setlist.html" import setlist with context %}
-{% from "data_macros.html" import datatable %}
+{% from "data_macros.html" import datatable, datatable_script %}
 {% block extrahead %}
 <!-- external libs -->
 <script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
@@ -12,6 +12,7 @@ $ ->
   yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "100%")
   return
 {% endcoffee %}
+{{ datatable_script() }}
 </script>
 {% endblock %}
 

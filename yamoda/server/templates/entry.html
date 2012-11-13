@@ -1,9 +1,18 @@
 {% macro script_1D() %}
 {% coffee "main" %}
+set_plot_area_height = ->
+  # some hack, maybe this can be improved...
+  # TODO duplicate function in other macro!
+  height = $(window).height() * 0.45
+  yamoda.logg.info("new height of plot", height)
+  $("#plot>.plot-area").height(height)
+  return
+
 plot_and_show = (entry) ->
   yamoda.logg.info("plot_and_show")
-  yamoda.entry.plot(entry, $("#plot"))
+  set_plot_area_height()
   yamoda.entry.show_values(entry, $("#value-display"))
+  yamoda.entry.plot(entry, $("#plot"))
   return
 
 $ ->
@@ -12,6 +21,9 @@ $ ->
                   "{{entry.parameter.name}}",
                   [{{entry.value | dataformat}}])
   yamoda.entry.get("{{url_for('entry', entry_id=entry.id)}}", plot_and_show)
+  $(window).resize ->
+    set_plot_area_height()
+    return
   return
 {% endcoffee %}
 {% endmacro %}
@@ -22,7 +34,8 @@ $ ->
 
 
 set_plot_area_height = ->
-  # some hack, maybe this can be improved...
+  # TODO some hack, maybe this can be improved...
+  # TODO duplicate function in other macro!
   height = $(window).height() * 0.45
   yamoda.logg.info("new height of plot", height)
   $("#plot>.plot-area").height(height)

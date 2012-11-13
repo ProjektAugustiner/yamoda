@@ -94,7 +94,7 @@
   */
 
 
-  $(document).ready(function() {
+  $(function() {
     var console_appender, console_layout, root_logger, yamoda;
     if (that.yamoda) {
       console.log("yamoda already defined, skipping!");

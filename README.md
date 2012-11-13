@@ -27,6 +27,16 @@ You should have received a copy of the [GNU General Public License][] along
 with yamoda; see the file COPYING.
   [GNU General Public License]: http://www.gnu.org/licenses/gpl.html
 
+
+Compiling coffeescript files (.coffee)
+--------------------------------------
+
+Some coffeescript modules in yamoda/server/static/js must be compiled before the app can be use.
+Run:
+
+    python compile_coffeescript.py
+
+
 Creating Test Data
 ------------------
 

@@ -33,7 +33,7 @@ from yamoda.server.database import HistoricQuery
 from yamoda.query.serialization import to_json, from_json
 
 
-### favorite queries displayed in layout.html
+# ## favorite queries displayed in layout.html
 
 def _get_fav_queries():
     # get favorite queries
@@ -83,14 +83,14 @@ def _render_search_result(result_type, sqla_query, query_string):
         all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
         if datas:
             common_param_set = set.intersection(*all_param_sets)
-            pvalues = view_helpers.get_pvalues(datas, common_param_set)
+            entries = view_helpers.get_entries(datas, common_param_set)
             logg.info("intersected params %s", common_param_set)
         else:
             common_param_set = []
-            pvalues = []
+            entries = []
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
-        return render_template("dataresult.html", datas=datas, params=common_param_set, pvalues=pvalues,
+        return render_template("dataresult.html", datas=datas, params=common_param_set, entries=entries,
                                query=query_string.replace(",", ", "))
 
 ### view functions ###

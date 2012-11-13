@@ -26,7 +26,7 @@ add = (entry_url, entry_id, parameter_name, entry_value) ->
   entry = {
     id: entry_id
     parameter_name: parameter_name
-    values: entry_value
+    value: entry_value
   }
   logg.debug("adding entry", entry)
   entries[entry_url] = entry
@@ -145,7 +145,8 @@ hide_plot = ($target) ->
 
 show_values = (entry, $values_div) ->
   logg.info("showing values of entry #", entry.id, "...")
-  $values_div.text(JSON.stringify(entry.value).replace(/,/g, ", "))
+  as_string = JSON.stringify(entry.value)
+  $values_div.text(as_string.replace(/,/g, ", "))
   return
 
 

@@ -30,7 +30,7 @@
     entry = {
       id: entry_id,
       parameter_name: parameter_name,
-      values: entry_value
+      value: entry_value
     };
     logg.debug("adding entry", entry);
     entries[entry_url] = entry;
@@ -152,8 +152,10 @@
   };
 
   show_values = function(entry, $values_div) {
+    var as_string;
     logg.info("showing values of entry #", entry.id, "...");
-    $values_div.text(JSON.stringify(entry.value).replace(/,/g, ", "));
+    as_string = JSON.stringify(entry.value);
+    $values_div.text(as_string.replace(/,/g, ", "));
   };
 
   _show_plot_tooltip = function(x, y, contents, $plot_div) {

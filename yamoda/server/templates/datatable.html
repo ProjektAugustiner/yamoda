@@ -7,7 +7,7 @@
 <script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
 <!-- yamoda modules -->
 <script src="{{ url_for('static', filename='js/entry.js') }}"></script>
-<script type="text/javascript">
+<script>
 {% coffee "main" %}
 $ ->
   yamoda.entry.setup_2D_preview_images($("#datatable td.2d-preview"), "30%")

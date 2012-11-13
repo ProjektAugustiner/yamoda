@@ -1,10 +1,24 @@
 {% extends "layout.html" %}
-{% from "datatable.html" import datatable with context %}
-{% set title = "Results For Data Query" %}
+{% from "data_macros.html" import datatable, datatable_script %}
+{%block extrahead %}
+<!-- external libs -->
+<script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
+<!-- yamoda modules -->
+<script src="{{ url_for('static', filename='js/entry.js') }}"></script>
+<script>
+{% coffee "main" %}
+$ ->
+  yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "100%")
+  return
+{% endcoffee %}
+{{ datatable_script() }}
+</script>
+{% endblock %}
+% set title = "Results For Data Query" %}
 {% block body %}
 <h2>Data results for query</h2>
 <p>{{ query }}</p>
-{{ datatable(datas, params, pvalues) }}
+{{ datatable(datas, params, entries) }}
 {% endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}
