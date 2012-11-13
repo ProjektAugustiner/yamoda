@@ -1,18 +1,33 @@
 {% extends "layout.html" %}
 {% from "setlist.html" import setlist with context %}
-{% from "datatable.html" import datatable with context %}
+{% from "data_macros.html" import datatable %}
+{% block extrahead %}
+<!-- external libs -->
+<script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
+<!-- yamoda modules -->
+<script src="{{ url_for('static', filename='js/entry.js') }}"></script>
+<script type="text/javascript">
+{% coffee "main" %}
+$ ->
+  yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "100%")
+  return
+{% endcoffee %}
+</script>
+{% endblock %}
+
 {% set title = "Dataset" %}
+
 {% block body %}
   <h2>Dataset: {{ set.name }}</h2>
   <h3>Subsets</h3>
-  {{ setlist(set.children, set) }}
+  {# setlist(set.children, set) #}
   <br />
   <hr />
   <h3>Data in this Set</h3>
   <div id="newbutton"><a class="btn" href="{{ url_for('setimport', set_id=set.id) }}">Import data</a></div>
-  {%- if set.datas %}
+  {% if set.datas -%}
 
-  {{ datatable(set.datas, params, pvalues) }}
+  {{ datatable(set.datas, params, entries) }}
 
   {%- else %}
   <hr />

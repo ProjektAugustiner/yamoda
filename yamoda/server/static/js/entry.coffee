@@ -1,7 +1,7 @@
-### 
+###
 # entry.coffee
 # displaying / plotting entries
-# # 
+# #
 # @author dpausp (Tobias Stenzel)
 ###
 
@@ -17,10 +17,16 @@ entries = {}
 
 
 add = (entry_url, entry_id, parameter_name, entry_value) ->
+  # manually add an entry to the entry cache
+  # :param entry_url: url like entries/220 which is used as key
+  # :param entry_id: id of the entry like 220
+  # :param parameter_name: name of the corresponding parameter
+  # :param entry_value: 1D array of entry values
+
   entry = {
     id: entry_id
     parameter_name: parameter_name
-    values: entry_values
+    values: entry_value
   }
   logg.debug("adding entry", entry)
   entries[entry_url] = entry
@@ -28,6 +34,10 @@ add = (entry_url, entry_id, parameter_name, entry_value) ->
 
 
 get = (entry_url, success_fn) ->
+  # get an entry (maybe from cache) and call a function
+  # :param entry_url: like entries/220
+  # :param success_fn: callback which gets the entry as first argument
+
   if entry_url not of entries
     logg.debug(entry_url, "unknown, requesting it from server...")
     logg.debug("current entries", entries)
@@ -46,7 +56,34 @@ get = (entry_url, success_fn) ->
   return
         
 
+_do_ajax_2D_preview_images = ($target, height) ->
+  image_url = $target.children("a").attr("imageUrl")
+  $target.children("a").replaceWith("Loading...")
+  $.getJSON(image_url, (json) ->
+    $target.html('<img width="' + height + '" src="' + json.img_url + '"></img>')
+    return
+  )
+
+
+fetch_2D_preview_images = ($target, height) ->
+  $target.each ->
+    _do_ajax_2D_preview_images($(this), height)
+  return
+
+
+setup_2D_preview_images_ondemand = ($target, height) ->
+  $target.each ->
+    $(this).children("a").click ->
+      _do_ajax_2D_preview_images($(this), height)
+      return
+  return
+
+
 plot = (entry, $target) ->
+  # use flot to a create a plot of an entry
+  # :param entry: entry to plot
+  # :param $taget: JQuery selector for the node that will display the plot
+
   logg.info("plotting entry", entry.id, "...")
   series = {
     data: ([i, value] for value,i in entry.value)
@@ -76,23 +113,25 @@ plot = (entry, $target) ->
   }
   # get old plot and its data if there is one
   $plot_area = $target.children(".plot-area")
-  prev_plot = $plot_area.data("plot")
+  prev_plot = $target.data("plot")
   if prev_plot
-      logg.debug("previous plot exists")
-      plot_data = prev_plot.getData()
-      plot_data.push(series)
+    logg.debug("previous plot exists")
+    plot_data = prev_plot.getData()
+    plot_data.push(series)
   else
-      # new plot
-      plot_data = [series]
+    # new plot
+    plot_data = [series]
       
   plot = $.plot($plot_area, plot_data, options)
-  $plot_area.data("plot", plot).removeClass("placeholder")
+  $target.data("plot", plot)
+  $plot_area.removeClass("placeholder")
   return
 
 
 show_plot = ($target) ->
+  # show plot which was hidden previously. To draw a plot for the first time, use plot function
   $plot_area = $target.children(".plot-area")
-  prev_plot = $plot_area.data("plot")
+  prev_plot = $target.data("plot")
   plot = $.plot($plot_area, prev_plot.getData(), prev_plot.getOptions())
   $plot_area.data("plot", plot).removeClass("placeholder")
   return
@@ -100,7 +139,7 @@ show_plot = ($target) ->
 
 hide_plot = ($target) ->
   $plot_area = $target.children(".plot-area")
-  $plot_area.text("Plot hidden").addClass("placeholder")
+  $plot_area.replaceWith('<div class="plot-area placeholder">Plot hidden</div>')
   return
 
 
@@ -171,22 +210,22 @@ flot_setup = ($plot_div) ->
 
 sparkline_setup = ($target) ->
   # sparkline setup for a target containing data which can be plotted
-    logg.info("sparkline for target", $target.selector)
-    value_count = $target.attr("count")
-    cell_width = $target.width()
-    pixel_per_value = cell_width / value_count
-    logg.debug("cell width", cell_width, "pixel_per_value", pixel_per_value)
-    $target.sparkline(
-      "html",
-      type: "line"
-      height: "60"
-      tooltipFormat: '<span style="color: {{color}}">&#9679;</span> {{prefix}}{{x}} | {{y}}{{suffix}}'
-      defaultPixelsPerValue: 1
-      normalRangeMin: $target.attr("normalMin")
-      normalRangeMax: $target.attr("normalMax")
-      fillColor: false
-    )
-    return
+  logg.info("sparkline for target", $target.selector)
+  value_count = $target.attr("count")
+  cell_width = $target.width()
+  pixel_per_value = Math.max(Math.floor(cell_width / value_count), 1)
+  logg.debug("cell width", cell_width, "pixel_per_value", pixel_per_value)
+  $target.sparkline(
+    "html",
+    type: "line"
+    height: "60"
+    tooltipFormat: '<span style="color: {{color}}">&#9679;</span> {{prefix}}{{x}} | {{y}}{{suffix}}'
+    defaultPixelsPerValue: pixel_per_value
+    normalRangeMin: $target.attr("normalMin")
+    normalRangeMax: $target.attr("normalMax")
+    fillColor: false
+  )
+  return
 
 
 ###-- READY --###
@@ -211,6 +250,8 @@ $( () ->
     flot_setup: flot_setup
     show_values: show_values
     sparkline_setup: sparkline_setup
+    setup_2D_preview_images_ondemand: setup_2D_preview_images_ondemand
+    fetch_2D_preview_images: fetch_2D_preview_images
   }
 
   yamoda.apply_module_constants(module)

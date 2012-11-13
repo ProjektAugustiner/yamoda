@@ -4,25 +4,27 @@
   <head>
     <meta charset="utf-8">
     <title>yamoda &mdash; {{ title }}</title>
-    <link rel="stylesheet" type="text/css"
-          href="{{ url_for('static', filename='bootstrap.css') }}">
-    <link rel="stylesheet" type="text/css"
-          href="{{ url_for('static', filename='bootstrap-responsive.css') }}">
-    <link rel="stylesheet" type="text/css"
-          href="{{ url_for('static', filename='yamoda.css') }}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="{{ url_for("static", filename="jquery.js") }}">\x3C/script>')
-    </script>
-    <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
-    <script src="{{ url_for('static', filename='jquery.dataTables.js') }}"></script>
+    <!-- stylesheets -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap-responsive.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='yamoda.css') }}">
     <style type="text/css">
       body {
         padding-top: 60px;
         padding-bottom: 40px;
       }
     </style>
+    <!-- external libs -->
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='log4javascript.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.dataTables.js') }}"></script>
+    <!-- yamoda base module -->
+    <script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
+    <!-- extra stuff -->
     {% block extrahead %}{% endblock %}
   </head>
+
   <body>
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">

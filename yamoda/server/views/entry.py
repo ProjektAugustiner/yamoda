@@ -81,8 +81,8 @@ def _render_entry_json(entry):
 def _render_entry_html(entry):
     value = entry.value
     if isinstance(value, np.ndarray):
-        if len(value.shape) == 1:
-            return render_template("entry1D.html", entry=entry)
+        if len(value.shape) < 3:
+            return render_template("entry.html", entry=entry)
     return "", 406
 
 

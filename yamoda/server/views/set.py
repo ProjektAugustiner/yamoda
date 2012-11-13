@@ -44,11 +44,11 @@ def set(set_id):
     if s.datas:
         ctx = s.datas[0].context
         params = [p for p in ctx.parameters if p.visible]
-        pvalues = view_helpers.get_pvalues(s.datas, params)
+        entries = view_helpers.get_entries(s.datas, params)
     else:
         params = []
-        pvalues = []
-    return dict(set=s, params=params, pvalues=pvalues)
+        entries = []
+    return dict(set=s, params=params, entries=entries, num_entries=len(entries))
 
 
 #### sets

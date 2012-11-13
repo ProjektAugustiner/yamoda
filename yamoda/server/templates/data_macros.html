@@ -1,0 +1,80 @@
+{% from "entry_macros.html" import entryvalue %}
+{% macro datatable(datas, params, entries) %}
+<table id="datatable" class="table table-condensed table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Context</th>
+      <th>Entries</th>
+      <th>Created</th>
+      {% for p in params %}
+      <th rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
+      {% endfor %}
+      <th><input type="checkbox" onchange="toggleall(this)" /></th>
+    </tr>
+  </thead>
+  <tbody>
+  {%- for data in datas %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td><a href="{{ url_for('data', data_id=data.id) }}">{{ data.name }}</a></td>
+      <td><a href="{{ url_for('context', context_name=data.context.name) }}">{{ data.context.name }}</a></td>
+      <td>{{ data.entries|length }}</td>
+      <td>{{ data.created|dtformat }}</td>
+      {% for entry in entries[loop.index0] %}
+        {{ entryvalue(entry, 660 / (params|length)) }}
+      {% endfor %}
+      <td><input type="checkbox" class="datacheck" id="check_{{ data.id }}" value="yes" /></td>
+    </tr>
+
+  {%- endfor %}
+  </tbody>
+</table>
+<div id="actionbutton" style="float: right">
+  <div class="btn-group">
+    <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
+      With selected
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#" onclick="deletedatas()">Delete</a></li>
+    </ul>
+  </div>
+  <div class="alert alert-error hide" id="actionerror"></div>
+</div>
+<script>
+{% coffee "main" %}
+$( ->
+  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn"))
+)
+{% endcoffee %}
+
+$(document).ready(function() {
+  $('#datatable').dataTable({
+    bLengthChange: true, bPaginate: true, sDom: 'f<"datatoolbar">rtip<"databottombar">'});
+  $(".datatoolbar").append($("#newbutton").remove());
+  $(".databottombar").append($("#actionbutton").remove());
+});
+function toggleall(check) {
+  if (check.checked)
+    $('.datacheck').attr('checked', 'checked');
+  else
+    $('.datacheck').removeAttr('checked');
+}
+function deletedatas() {
+  var ids = $.map($('.datacheck:checked'), function(el) { return el.id.substr(6); });
+  if (!ids) return;
+  $("#actionbutton button").button("loading");
+  $.ajax({url: "{{ url_for('datadelete') }}",
+          type: "POST",
+          data: {"ids": ids},
+          success: function(data, st, xhr) { window.location.reload(); },
+          error: function(xhr, st, err) { $("#actionbutton button").button("reset");
+                                          $("#actionerror").text(err).show(); }
+          });
+  return false;
+}
+</script>
+{% endmacro %}
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

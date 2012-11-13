@@ -81,7 +81,7 @@ def dataformat(value, maxlen=None):
         # return arrays as 1, 2, 3, 4 ... for use with jquery.sparkline
         if maxlen is not None:
             # if array is too long: shorten array by sampling it
-            step = len(value) // maxlen
+            step = max(len(value) // maxlen, 1)
             value = value[::step]
             if step > 1:
                 # if we omit values we must send matching xvalues so that sparkline knows what to do
@@ -89,6 +89,16 @@ def dataformat(value, maxlen=None):
         # just send yvalues
         return ", ".join(["{:.8f}".format(v) for v in value])
     return str(value)
+
+
+def count_formatted(value, maxlen=None):
+    """Return count of values as returned by dataformat with same maxlen argument"""
+    if maxlen is None:
+        return valuecount(value)
+    else:
+        # if array is too long: shorten array by sampling it
+        step = max(len(value) // maxlen, 1)
+        return valuecount(value[::step])
 
 
 def normal_min(value):
@@ -119,6 +129,13 @@ def yesnoformat(truth_value):
 md = markdown2.Markdown(safe_mode='escape')
 
 
+def valuecount(value):
+    if isinstance(value, ndarray):
+        return len(value.ravel())
+    else:
+        return len(value)
+
+
 def markdown(value):
     return Markup(md.convert(value))
 
@@ -131,6 +148,8 @@ app.jinja_env.filters['yesnoformat'] = yesnoformat
 app.jinja_env.filters['average'] = average
 app.jinja_env.filters['normal_min'] = normal_min
 app.jinja_env.filters['normal_max'] = normal_max
+app.jinja_env.filters['valuecount'] = valuecount
+app.jinja_env.filters['count_formatted'] = count_formatted
 
 import yamoda.server.views
 import yamoda.server.database

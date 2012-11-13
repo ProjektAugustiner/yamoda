@@ -1,8 +1,8 @@
+{% from "entry_macros.html" import entryvalue %}
 {% extends "layout.html" %}
 {% set title = "Data" %}
 {% block extrahead %}
 <!-- external libs -->
-<script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
 <!-- yamoda base module -->
 <script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
@@ -45,25 +45,7 @@
             {{ entry.parameter.name }}
           </a>
         </td>
-        {% if not entry.value.shape %}
-        <td>{{ entry.value|dataformat }}</td>
-        {% elif entry.value.shape|length == 1 %}
-        <td class="valuecolumn" 
-          values="{{ entry.value|dataformat(600) }}" 
-          count = "0"
-          normalMin="0"
-          normalMax="0">
-          Loading...
-        </td>
-        {% elif entry.value.shape|length == 2 %}
-        <td class="2d-preview">
-          <a class="preview-image-link" imageUrl="{{url_for('entry', entry_id=entry.id)}}?img_url_for_type=png" href="#">
-            Show image
-          </a>
-        </td>
-        {% else %}
-        <td>Multidimensional Value</td>
-        {% endif %}
+        {{ entryvalue(entry, 600) }}
         <td>{{ entry.parameter.unit|unitformat }}</td>
         {% if entry.value.shape %}
         <td><a href="{{url_for('entry', entry_id=entry.id)}}">Show...</a></td>
@@ -109,19 +91,7 @@ $( () ->
   datatable_setup()
   yamoda.entry.sparkline_setup($("#datatable td.valuecolumn"))
   # 2D preview image setup
-  $("#datatable td.2d-preview").each( (index) ->
-    $that = $(this)
-    $that.children("a").click(() ->
-
-      display_preview_image = (json) ->
-        $that.html('<img width="40%" src="' + json.img_url + '"></img>')
-        return
-
-      image_url = $that.children("a").attr("imageUrl")
-      $.getJSON(image_url, display_preview_image)
-    )
-    return
-  )
+  yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "35%")
   $('a[rel=tooltip]').tooltip()
   return
 )
