@@ -21,16 +21,16 @@ $ ->
 {% block body %}
   <h2>Dataset: {{ set.name }}</h2>
   <h3>Subsets</h3>
-  {# setlist(set.children, set) #}
+  {{ setlist(set.children, set) }}
   <br />
   <hr />
   <h3>Data in this Set</h3>
-  <div id="newbutton"><a class="btn" href="{{ url_for('setimport', set_id=set.id) }}">Import data</a></div>
-  {% if set.datas -%}
+  <a class="btn" href="{{ url_for('setimport', set_id=set.id) }}">Import data</a>
+  {% if set.datas %}
 
   {{ datatable(set.datas, params, entries) }}
 
-  {%- else %}
+  {% else %}
   <hr />
   <p>There is no data in this set.</p>
   <hr />
