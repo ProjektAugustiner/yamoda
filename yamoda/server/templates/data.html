@@ -1,20 +1,42 @@
+{% from "entry_macros.html" import entryvalue %}
 {% extends "layout.html" %}
 {% set title = "Data" %}
+{% block extrahead %}
+<!-- external libs -->
+<script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
+<!-- yamoda base module -->
+<script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    yamoda.base_url = "{{ url_for('index') }}";
+    yamoda.logg.info("base url is", yamoda.base_url);
+  })
+</script>
+<!-- yamoda modules -->
+<script src="{{ url_for('static', filename='js/entry.js') }}"></script>
+{% endblock %}
 {% block body %}
   <h2>Data: {{ data.name }}
   <small>Created {{ data.created|dtformat }}</small></h2>
-  <p>Entries:</p>
+  <h3>Entries:</h3>
+  <hr>
   <table id="datatable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
+        <th class="hidden"></th>
         <th>Parameter</th>
         <th>Value</th>
         <th>Unit</th>
+        <th>Details</th>
+        <th>Dim</th>
+        <th>Size</th>
+        <th>Visible?</th>
       </tr>
     </thead>
     <tbody>
       {%- for entry in data.entries %}
       <tr>
+        <td class="hidden indexcolumn" index="{{ loop.index }}" entry_id="{{entry.id}}"></td>
         <td>
           {# Link to the Parameter description, parameter.brief is used as tooltip #}
           <a href="{{ url_for('context', context_name=entry.parameter.context.name)
@@ -23,17 +45,58 @@
             {{ entry.parameter.name }}
           </a>
         </td>
-        <td>{{ entry.value|dataformat }}</td>
+        {{ entryvalue(entry, 600) }}
         <td>{{ entry.parameter.unit|unitformat }}</td>
+        {% if entry.value.shape %}
+        <td><a href="{{url_for('entry', entry_id=entry.id)}}">Show...</a></td>
+        {% else %}
+        <td>-</td>
+        {% endif %}
+        <td class="value-dimension">{{ entry.value|dimension }}D</td>
+        {% if entry.value.shape %}
+        <td>{{ entry.value|shape }}</td>
+        {% else %}
+        <td>-</td>
+        {% endif %}
+        <td>{{ entry.parameter.visible|yesnoformat }}</td>
       </tr>
       {%- endfor %}
     </tbody>
   </table>
-  <script>
-    $(document).ready(function() { $('#datatable').dataTable({
-    "bLengthChange": false, "bPaginate": false}); });
-    $(function(){ $('a[rel=tooltip]').tooltip();});
-  </script>
+
+<script>
+{% coffee "main" %}
+datatable_setup = () ->
+  $("#datatable").dataTable(
+    bStateSave: false
+    aaSorting: [[7, "desc"], [5, "asc"], [1, "asc"]]
+    #aoColumns: [
+    #  null,
+    #  null,
+    #  null,
+    #  null,
+      #sType:
+      #    "dimension"
+   #   null,
+    #  null,
+    #  null
+    #]
+  )
+  return
+
+
+
+$( () ->
+  #$("#datatable").dataTable()
+  datatable_setup()
+  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn"))
+  # 2D preview image setup
+  yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "35%")
+  $('a[rel=tooltip]').tooltip()
+  return
+)
+{% endcoffee %}
+</script>
 {% endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

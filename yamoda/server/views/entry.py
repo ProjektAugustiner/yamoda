@@ -56,29 +56,33 @@ def _save_entry_image_if_needed(img_type, entry):
 def _render_entry_json(entry):
     logg.debug("_render_entry_json")
     value = entry.value
-    if isinstance(value, np.ndarray):
-        if len(value.shape) == 1:
-            # special handling if client wants a image uri
-            img_type = request.args.get("img_url_for_type")
-            if img_type is not None:
-                filename = _save_entry_image_if_needed(img_type.lower(), entry)
-                return jsonify(img_url=url_for("generated", filename=filename), image_type=img_type)
-            else:
-                # default entry rendering
-                parameter_uri = url_for("parameter", parameter_id=entry.parameter.id)
-                parameter_name = entry.parameter.name
-                return jsonify(id=entry.id,
-                               values=list(entry.value),
-                               parameter_uri=parameter_uri,
-                               parameter_name=parameter_name)
-    return "", 406
+    # special handling if client wants a image uri
+    img_type = request.args.get("img_url_for_type")
+    if img_type is not None:
+        if isinstance(value, np.ndarray) and len(value.shape) <= 2:
+            filename = _save_entry_image_if_needed(img_type.lower(), entry)
+            return jsonify(img_url=url_for("generated", filename=filename), image_type=img_type)
+        else:
+            return "", 406
+    else:
+        if isinstance(value, np.ndarray):
+            # convert ndarrays to a (nested) list for JSON serializer
+            value = value.tolist()
+
+        # make json content
+        parameter_uri = url_for("parameter", parameter_id=entry.parameter.id)
+        parameter_name = entry.parameter.name
+        return jsonify(id=entry.id,
+                       value=value,
+                       parameter_uri=parameter_uri,
+                       parameter_name=parameter_name)
 
 
 def _render_entry_html(entry):
     value = entry.value
     if isinstance(value, np.ndarray):
-        if len(value.shape) == 1:
-            return render_template("entry1D.html", entry=entry)
+        if len(value.shape) < 3:
+            return render_template("entry.html", entry=entry)
     return "", 406
 
 

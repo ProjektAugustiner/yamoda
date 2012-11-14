@@ -1,0 +1,23 @@
+{% macro entryvalue(entry, width) %}
+{% if not entry.value.shape %}
+<td>{{ entry.value|dataformat }}</td>
+{% elif entry.value.shape|length == 1 %}
+<td class="valuecolumn" width="{{width}}px"
+  values="{{ entry.value|dataformat(width) }}" 
+  count = "{{ entry.value|count_formatted(width)}}"
+  normalMin="0"
+  normalMax="0">
+  Loading...
+</td>
+{% elif entry.value.shape|length == 2 %}
+<td class="2d-preview">
+  <a class="preview-image-link" imageUrl="{{url_for('entry', entry_id=entry.id)}}?img_url_for_type=png" href="#">
+    Show image
+  </a>
+</td>
+{% else %}
+<td>Value with Dim &gt; 2</td>
+{% endif %}
+{% endmacro %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

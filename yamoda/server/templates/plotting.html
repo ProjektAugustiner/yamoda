@@ -3,11 +3,10 @@
 <script src="{{ url_for('static', filename='jquery.flot.selection.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery.flot.resize.js') }}"></script>
 {% endmacro %}
-{% macro plotdisplay() %}
+{% macro plotdisplay1D() %}
 <style>
-  .plot-area { 
-    width:100%;
-    height:85%;
+  .plot-area {
+    height: auto;
     margin-bottom: 10px;
   }
   div.placeholder {
@@ -15,9 +14,22 @@
   }
 </style>
 <div class="plot-area placeholder">No content to display</div>
-<input id="blah" class="plot-enable-tooltip" type="checkbox">Enable value tooltip
+<input class="plot-enable-tooltip" type="checkbox">Enable value tooltip
 <div class="plot-clickmessage">... or click a data point to display its value</div>
 <div class="plot-message">&nbsp;</div>
+{% endmacro %}
+
+{# TODO this is just a static matplotlib image display #}
+{% macro plotdisplay2D() %}
+<style>
+  .plot-area { 
+    margin-bottom: 10px;
+  }
+  div.placeholder {
+    border: 1px solid #aaaaaa; 
+  }
+</style>
+<div class="plot-area placeholder">No content to display</div>
 {% endmacro %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

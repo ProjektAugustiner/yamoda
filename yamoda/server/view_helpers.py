@@ -12,17 +12,17 @@ from yamoda.server.database.datamodel import Entry
 logg = logging.getLogger("yamoda.view_helpers")
 
 
-def get_pvalues(datas, params):
-    """Get values for params.
+def get_entries(datas, params):
+    """Get entries for params.
     Moved from views/set.py.
     FIXME: this is quick and dirty, and way too inefficient.  Must be
     rewritten using fewer queries.
     """
-    pvalues = []
+    entries = []
     for d in datas:
-        pvalues.append([])
+        entries.append([])
         for p in params:
-            pvalue = Entry.query.filter_by(data=d, parameter=p).first()
-            pvalues[-1].append(pvalue.value if pvalue else None)
+            entry = Entry.query.filter_by(data=d, parameter=p).first()
+            entries[-1].append(entry)
 
-    return pvalues
+    return entries
