@@ -11,7 +11,7 @@ set_plot_area_height = ->
 plot_and_show = (entry) ->
   yamoda.logg.info("plot_and_show")
   set_plot_area_height()
-  yamoda.entry.show_values(entry, $("#value-display"))
+  yamoda.entry.show_values(entry, $("#values-display"))
   yamoda.entry.plot(entry, $("#plot"))
   return
 

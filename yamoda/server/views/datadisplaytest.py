@@ -28,38 +28,6 @@ def count(value):
         return "unknown"
 
 
-def shape(value):
-    """Shape.
-    :param value: float, int or ndarray are recognized
-    :returns: string "scalar" or numpy shape, like "100, 100"
-    """
-    if isinstance(value, float) or isinstance(value, int):
-        return "scalar"
-    if isinstance(value, ndarray):
-        shapestr = str(value.shape).strip("(),")
-        return shapestr
-    else:
-        return "unknown"
-
-
-def dimension(value):
-    if isinstance(value, float) or isinstance(value, int):
-        return 0
-    if isinstance(value, ndarray):
-        return len(value.shape)
-    else:
-        return "unknown"
-
-
-app.jinja_env.filters['count'] = count
-app.jinja_env.filters['shape'] = shape
-app.jinja_env.filters['dimension'] = dimension
-
-font = {'family': 'normal',
-        'weight': 'bold',
-        'size': 14}
-
-matplotlib.rc('font', **font)
 
 
 def create_example_2D_plot(func, pos):

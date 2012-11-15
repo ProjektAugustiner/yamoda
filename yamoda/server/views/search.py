@@ -31,6 +31,7 @@ from yamoda.query.alchemy import convert_dict_query_to_sqla
 from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
 from yamoda.server.database import HistoricQuery
 from yamoda.query.serialization import to_json, from_json
+from flask_login import AnonymousUser
 
 
 # ## favorite queries displayed in layout.html
@@ -42,7 +43,13 @@ def _get_fav_queries():
 
 @app.context_processor
 def inject_fav_queries():
-    return dict(fav_queries=_get_fav_queries())
+    # TODO: perhaps this isn't the best solution...
+    # without that, python complains that AnonymousUser has no attribute "groups"...
+    # this really looks like a problem with accesscontrol
+    if current_user.is_anonymous():
+        return dict(fav_queries=[])
+    else:
+        return dict(fav_queries=_get_fav_queries())
 
 
 ### helpers ###
