@@ -140,6 +140,39 @@ def markdown(value):
     return Markup(md.convert(value))
 
 
+def shape(value):
+    """Shape.
+    :param value: float, int or ndarray are recognized
+    :returns: string "scalar" or numpy shape, like "100, 100"
+    """
+    if isinstance(value, float) or isinstance(value, int):
+        return "scalar"
+    if isinstance(value, ndarray):
+        shapestr = str(value.shape).strip("(),")
+        return shapestr
+    else:
+        return "unknown"
+
+
+def dimension(value):
+    if isinstance(value, float) or isinstance(value, int):
+        return 0
+    if isinstance(value, ndarray):
+        return len(value.shape)
+    else:
+        return "unknown"
+
+# matplot setup
+
+font = {'family': 'normal',
+        'weight': 'bold',
+        'size': 14}
+
+matplotlib.rc('font', **font)
+
+
+# add all jinja filters used in the project below
+
 app.jinja_env.filters['dtformat'] = datetimeformat
 app.jinja_env.filters['dataformat'] = dataformat
 app.jinja_env.filters['unitformat'] = unitformat
@@ -150,6 +183,8 @@ app.jinja_env.filters['normal_min'] = normal_min
 app.jinja_env.filters['normal_max'] = normal_max
 app.jinja_env.filters['valuecount'] = valuecount
 app.jinja_env.filters['count_formatted'] = count_formatted
+app.jinja_env.filters['shape'] = shape
+app.jinja_env.filters['dimension'] = dimension
 
 import yamoda.server.views
 import yamoda.server.database
