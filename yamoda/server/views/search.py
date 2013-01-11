@@ -128,10 +128,9 @@ def do_search():
     result_type, query = convert_dict_query_to_sqla(query_dict)
     logg.debug("result type %s, query %s", result_type, query)
 
-    if "save_query" in request.form:
-        query_name = request.form["name"]
-        flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
-        flash(flash_msg, flash_cat)
+    query_name = request.form["name"]
+    flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
+    flash(flash_msg, flash_cat)
 
     return _render_search_result(result_type, query, query_string)
 
