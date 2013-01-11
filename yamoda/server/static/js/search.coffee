@@ -39,17 +39,6 @@ change_to_query_results = () ->
   return
 
 
-intercept_query_submit = () ->
-  # unused
-  show_results = $("input[name='show_results']:checked").val()
-  logg.info("where to show results:", show_results)
-  if show_results == "newpage"
-    return true
-  else
-    send_query_request()
-    return false
-
-
 send_query_history_request = () ->
   # AJAX update query history
   $.get(yamoda.search.query_history_url, (history_content) ->
@@ -67,10 +56,6 @@ send_query_request = () ->
   logg.info("send query request")
   show_results = $("input[name='show_results']:checked").val()
   logg.info("where to show results:", show_results)
-  if show_results == "newpage"
-    $("#query_form").submit()
-    return
-
   $("#bottom-headline").text("Processing...")
   save_query = $("#save_query_checkbox").attr("checked")
   $.ajax(

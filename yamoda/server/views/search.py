@@ -54,7 +54,7 @@ def inject_fav_queries():
 
 ### helpers ###
 
-def _save_query(query_string, query_dict, query_name, favorite):
+def _save_query(query_string, query_dict, query_name):
     """Save query to DB for later use (search history)
     :return: Flash message and category for user response
     """
@@ -64,7 +64,7 @@ def _save_query(query_string, query_dict, query_name, favorite):
     logg.info("found duplicate in DB: %s", duplicate)
     if not duplicate:
         hist_query = HistoricQuery(query_string=query_string, query_json=to_json(query_dict),
-                                   name=query_name, favorite=favorite,
+                                   name=query_name, favorite=True if query_name else False,
                                    user=current_user, group=current_user.primary_group)
         db.session.add(hist_query)
         db.session.commit()
@@ -79,8 +79,7 @@ def _render_search_result(result_type, sqla_query, query_string):
         sets = sqla_query.all_readable()
         logg.info("query returned %s sets", len(sets))
         logg.debug("result sets %s", sets)
-        return render_template('setresult.html', sets=sets,
-                               query=query_string.replace(",", ", "))
+        return render_template('settable.html', sets=sets)
 
     elif result_type == "datas":
         # XXX: no accesscontrol for datas
@@ -97,8 +96,7 @@ def _render_search_result(result_type, sqla_query, query_string):
             entries = []
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
-        return render_template("dataresult.html", datas=datas, params=common_param_set, entries=entries,
-                               query=query_string.replace(",", ", "))
+        return render_template("datatable.html", datas=datas, params=common_param_set, entries=entries)
 
 ### view functions ###
 
@@ -132,8 +130,7 @@ def do_search():
 
     if "save_query" in request.form:
         query_name = request.form["name"]
-        favorite = request.form["favorite"]
-        flash_msg, flash_cat = _save_query(query_string, query_dict, query_name, favorite)
+        flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
         flash(flash_msg, flash_cat)
 
     return _render_search_result(result_type, query, query_string)
@@ -227,6 +224,6 @@ def searchtest():
     result = query.all_readable()
 
     if result_type == "sets":
-        return render_template('setresult.html', sets=result)
+        return render_template('settable.html', sets=result)
     else:
-        return render_template('dataresult.html', datas=result, params=[], pvalues=[], query=query_string)
+        return render_template('datatable.html', datas=result, params=[], pvalues=[], query=query_string)

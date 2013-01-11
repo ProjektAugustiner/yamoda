@@ -32,13 +32,6 @@
           <a class="brand" href="{{ url_for('index') }}">YAMODA</a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data<b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="{{ url_for('sets', which='all') }}">View all</a></li>
-                  <li><a href="{{ url_for('sets', which='mine') }}">View mine</a></li>
-                </ul>
-              </li>
               <li><a href="{{ url_for('contexts') }}">Contexts</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Favorite Queries<b class="caret"></b></a>
@@ -51,7 +44,6 @@
                   {% endif %}
                 </ul>
               </li>
-              <li><a href="{{ url_for('search') }}">Search</a></li>
             </ul>
             <ul class="nav pull-right">
               {%- if current_user.is_authenticated() %}

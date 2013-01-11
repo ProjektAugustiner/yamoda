@@ -8,7 +8,7 @@ from flask_login import login_required
 Flask views for yamoda.
 """
 
-from flask import render_template
+from flask import render_template, redirect, url_for
 
 from yamoda.server import app
 
@@ -19,7 +19,7 @@ from yamoda.server.views import user, context, set, data, entry, search, queryla
 @app.route('/')
 def index():
     """displays the main index page"""
-    return render_template('index.html')
+    return redirect(url_for('search'))
 
 
 @app.route("/generated/<filename>", methods=["GET"])

@@ -28,13 +28,39 @@ with yamoda; see the file COPYING.
   [GNU General Public License]: http://www.gnu.org/licenses/gpl.html
 
 
-Compiling coffeescript files (.coffee)
---------------------------------------
+Installing via zc.buildout + virtualenv
+---------------------------------------
 
-Some coffeescript modules in yamoda/server/static/js must be compiled before the app can be use.
-Run:
+Install Python 2.7 and virtualenv on your machine.
 
-    python compile_coffeescript.py
+Create virtualenv:
+
+    virtualenv --distribute --no-site-packages yamoda_buildout     
+    cd yamoda_buildout
+    
+Get bootstrap.py and buildout.cfg from yamoda <branch>:
+
+    wget http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
+    wget https://github.com/ProjektAugustiner/yamoda/raw/<branch>/buildout.cfg
+
+
+Install numpy:
+
+    bin/pip install numpy
+    
+Bootstrap and buildout:
+
+    bin/python bootstrap.py
+    bin/buildout -c buildout.cfg
+    
+
+Some coffeescript modules in yamoda/server/static/js must be compiled before the app can be used. Run:
+
+    cd src/yamoda
+    ../../bin/python compile_coffee.py
+
+
+Executable scripts are installed in bin/, see below for help
 
 
 Creating Test Data
@@ -49,9 +75,12 @@ Running The Server
 
 Start it with:
 
-    python runserver.py [--debug True]
+    python run_server.py [--debug True]
     
 To select the DB backend (default is SQLite):
 
-    python runserver.py --database sqlite | postgres | mysql
+    python run_server.py --database sqlite | postgres | mysql
 
+
+Testing importers
+-----------------

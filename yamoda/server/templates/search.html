@@ -38,29 +38,22 @@
         <div class="controls">
             <textarea name="query" id="query_input" class="field span12" rows="6"></textarea>
         </div>
+        <input type="text" id="query_name_input" name="name"><span class="help-inline">Name of query</span>
+        <!--
         <label class="checkbox">Save query on run
           <input type="checkbox" id="save_query_checkbox" name="save_query"></input>
         </label>
-        <label class="checkbox">Favorite query
-          <input type="checkbox" id="favorite_checkbox" name="favorite"></input>
-        </label>
-        <input type="text" id="query_name_input" name="name"><span class="help-inline">Name of query</span>
-        <label class="radio inline">
-          <input type="radio" id="show_results_newpage" name="show_results" value="newpage" checked />
-          Show query results on new page
-        </label>
-        <label class="radio inline">
-          <input type="radio" id="show_results_below" name="show_results" value="below"/>
-          Show query results below
-        </label>
+        -->
       </div>
       <div class="form-actions">
         <a href="#" id="submit_button" class="btn btn-primary" onclick="yamoda.search.send_query_request()">
           <i class="icon-ok-sign icon-white"></i>Run Query</a>
         <button type="reset" class="btn btn-warning">
           <i class="icon-trash icon-white"></i>Clear</button>
+        <!--
         <a href="#" id="save-query" class="btn" onclick="yamoda.search.send_query_save_request()">
           <i class="icon-briefcase"></i>Save Query</a>
+        -->
         <a href="#" id="show-help" class="btn" onclick="$('#help-box').show(); $(this).hide(); $('#hide-help').show()">
           <i class="icon-arrow-right"></i>Show Help</a>
         <a href="#" style="display: none;" id="hide-help" class="btn" onclick="$('#help-box').hide(); $(this).hide(); $('#show-help').show()">
