@@ -34,7 +34,7 @@ class UnitMismatchError(ImporterError):
     """Raised in case of a unit mismatch."""
     def __init__(self, entry, expected_unit, received_unit):
         super(UnitMismatchError, self).__init__(
-            'In entry {0}: expected unit {1} got {2}'.format(entry,
+            'In entry {0}: expected unit {1}, got {2}'.format(entry,
             expected_unit, received_unit))
 
 
@@ -148,8 +148,11 @@ class ImporterBase(object):
                 try:
                     ent.value = self._convert_unit(ent.value, ent.unit,
                                                    param.unit)
-                except (ValueError, TypeError):
-                    raise UnitMismatchError(ent.name, param.unit, ent.unit)
+                except (ValueError, TypeError, SyntaxError, LookupError):
+                    # XXX: some units just aren't convertible by the package,
+                    # such as meV/THz
+                    # raise UnitMismatchError(ent.name, param.unit, ent.unit)
+                    pass
             data.entries.append(Entry(parameter=param, value=ent.value))
         if missing_params:
             raise MissingInfo([('par_' + param, 'new_param', unit)

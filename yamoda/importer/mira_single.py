@@ -17,6 +17,13 @@ from yamoda.importer.base import ImporterBase, ParsingError, ImportEntry
 from yamoda.server.database import Context, Parameter
 
 
+def try_float(s):
+    try:
+        return float(s)
+    except ValueError:
+        return s
+
+
 class Importer(ImporterBase):
     def __init__(self, target):
         super(Importer, self).__init__('Mira singlecounter', target)
@@ -39,16 +46,18 @@ class Importer(ImporterBase):
                 break
             if line.startswith('# '):
                 items = line.strip().split(None, 3)
-                try:
-                    val, unit = items[3].split(None, 1)
-                    val = float(val)
-                except ValueError:
-                    try:
-                        val = float(items[3])
-                    except ValueError:
-                        val = items[3]
-                    unit = None
                 key = items[1]
+                if line.endswith(' ') or key.endswith('_status'):
+                    val = try_float(items[3])
+                    unit = None
+                else:
+                    try:
+                        val, unit = items[3].rsplit(None, 1)
+                    except ValueError:
+                        val = try_float(items[3])
+                        unit = None
+                    else:
+                        val = try_float(val)
                 if key.endswith('_value'):
                     key = key[:-6]
                 entries[key] = ImportEntry(name=key, value=val, unit=unit)
