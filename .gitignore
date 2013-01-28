@@ -8,3 +8,6 @@ localsettings.py
 *.swo
 *.swn
 yamoda.egg-info/
+*.pdf
+*.png
+*.svg
