@@ -1,0 +1,70 @@
+th.header.colresize { 
+  border-right: 1px solid #aaaaaa; 
+  border-left: 1px solid #aaaaaa; 
+}
+
+th.footer { 
+  border-width: 1px; 
+  vertical-align: middle;
+}
+
+th > input.search-input {
+  margin-bottom: 0px;
+}
+
+/* JQuery datatables page navigation */
+
+a.paginate_button, a.paginate_active {
+  color: #555555;
+  border: 1px solid #aaaaaa;
+  cursor: pointer;
+  margin-left: 6px;
+  padding: 5px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+}
+
+a.paginate_active {
+  background-color: #aaaffe;
+  color: #000000;
+}
+
+a.paginate_button_disabled {
+  color: #bbbbbb;
+  background-color: white;
+  text-decoration: none;
+  pointer-events: none;
+  cursor: default !important;
+}
+
+a.previous.paginate_button {
+  padding-left: 20px;
+	background: url('../img/back_enabled.png') no-repeat center left;
+}
+
+a.previous.paginate_button:hover {
+	background: url('../img/back_enabled_hover.png') no-repeat center left;
+}
+
+a.previous.paginate_button_disabled, a.previous.paginate_button_disabled:hover {
+	background: url('../img/back_disabled.png') no-repeat center left;
+  text-decoration: none;
+  pointer-events: none;
+  cursor: default !important;
+}
+
+a.next.paginate_button {
+  padding-right: 20px;
+	background: url('../img/forward_enabled.png') no-repeat center right;
+}
+
+a.next.paginate_button:hover {
+	background: url('../img/forward_enabled_hover.png') no-repeat center right;
+}
+
+a.next.paginate_button_disabled, a.next.paginate_button_disabled:hover {
+	background: url('../img/forward_disabled.png') no-repeat center right;
+}
+
+/* vim: set filetype=css sw=2 ts=2 sts=2 expandtab: */

@@ -24,6 +24,7 @@ import json
 from flask import render_template, request, g
 from flask.helpers import flash
 from flask.ext.login import login_required, current_user
+from flask.ext.sqlalchemy import SQLAlchemy
 from parcon import ParseException
 
 from yamoda.server import app, db, view_helpers
@@ -34,7 +35,10 @@ from yamoda.query.serialization import to_json, from_json
 from flask_login import AnonymousUser
 
 
+assert isinstance(db, SQLAlchemy)
+
 # ## favorite queries displayed in layout.html
+
 
 def _get_fav_queries():
     # get favorite queries
@@ -96,7 +100,7 @@ def _render_search_result(result_type, sqla_query, query_string):
             entries = []
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
-        return render_template("datatable.html", datas=datas, params=common_param_set, entries=entries)
+        return render_template("dataresult.html", datas=datas, params=common_param_set, entries=entries)
 
 ### view functions ###
 
@@ -128,9 +132,12 @@ def do_search():
     result_type, query = convert_dict_query_to_sqla(query_dict)
     logg.debug("result type %s, query %s", result_type, query)
 
-    query_name = request.form["name"]
-    flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
-    flash(flash_msg, flash_cat)
+    # save query if requested
+    logg.info("save query? %s", request.form["save_query"])
+    if request.form["save_query"] == "true":
+        query_name = request.form["name"]
+        flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
+        flash(flash_msg, flash_cat)
 
     return _render_search_result(result_type, query, query_string)
 

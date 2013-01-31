@@ -16,18 +16,21 @@ asInitVals = []
 
 setup_datatable = () ->
   # initialize jquery.dataTables and some helpers for the filter boxes.
-  table = $("#queryhistory_table")
+  table = $("#query_history_table")
   if table.hasClass("initialized")
     logg.info("table already initialized, doing nothing")
     return
-  logg.debug("activating dataTable for queryhistory_table")
+  logg.debug("activating dataTable for query_history_table")
   dtable = table.addClass("initialized").dataTable(
     bStateSave: true
-    # z in sDom is for table column resize plugin
-    sDom: "zrltpi"
+    #sDom: "rltpi"
     sPaginationType: "full_numbers"
     oLanguage:
-      sSearch: "Search all columns"
+      sSearch: "Search all columns: "
+    aoColumnDefs: [
+      {asSorting: [], aTargets: [5, 6]}
+    ]
+    
   )
   # helper functions adopted from jquery.datatables example
   $("tfoot input").keyup((i) ->
@@ -68,6 +71,9 @@ setup_datatable = () ->
       placement: "top"
     }
   )
+  # resizable columns plugin
+  logg.info("colResizable")
+  dtable.colResizable()
   return
 
 
@@ -103,7 +109,7 @@ $ ->
       # kill remaining popovers
       $(".popover").remove()
       $("#save_query_checkbox").removeAttr("checked")
-      yamoda.search.send_query_request()
+      yamoda.search.send_query_request(false)
       return
 
     toggle_all_checkboxes: (master_checkbox, slave_checkboxes$) ->
@@ -182,4 +188,6 @@ $ ->
   # ok, all ready
   logg.info("yamoda.queryhistory loaded")
   return
+
+# vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #
 

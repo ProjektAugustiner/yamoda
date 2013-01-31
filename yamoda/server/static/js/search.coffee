@@ -49,13 +49,12 @@ send_query_history_request = () ->
   return
 
 
-send_query_request = () ->
+send_query_request = (save_query=true) ->
   # send query to server and display results below the query box
   logg.info("send query request")
   show_results = $("input[name='show_results']:checked").val()
   logg.info("where to show results:", show_results)
   $("#bottom-headline").text("Processing...")
-  save_query = $("#save_query_checkbox").attr("checked")
   $.ajax(
     type: 'POST',
     url: yamoda.search.search_url
@@ -132,5 +131,6 @@ $(document).ready(() ->
   return
 )
 
+# vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #
 
 

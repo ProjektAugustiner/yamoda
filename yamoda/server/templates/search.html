@@ -14,7 +14,7 @@
 <script>
   $(document).ready( function() {
     yamoda.add_module_constants("search", {
-      search_url: "{{ url_for('search') }}",
+      search_url: "{{ url_for('do_search') }}",
       save_query_url: "{{ url_for('save_query') }}",
       query_history_url: "{{ url_for('get_query_history') }}"
     });
@@ -27,8 +27,8 @@
 {% endblock %}
 
 {% block body %}
-<script src="{{ url_for('static', filename='bootstrap-popover.js') }}"></script>
-<script src="{{ url_for('static', filename='bootstrap-tooltip.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap/bootstrap-popover.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap/bootstrap-tooltip.js') }}"></script>
 <div class="row-fluid">
   <div class="span5">
     <h2>Search for sets or datas</h2>
