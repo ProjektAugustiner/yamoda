@@ -3,7 +3,7 @@
 /*
 # queryhistory.coffee
 # query history related stuff
-# 
+#
 # @author dpausp (Tobias Stenzel)
 */
 
@@ -26,7 +26,7 @@
 
 
   setup_datatable = function() {
-    var dtable, table;
+    var dtable, query_links, table;
     table = $("#queryhistory_table");
     if (table.hasClass("initialized")) {
       logg.info("table already initialized, doing nothing");
@@ -36,6 +36,7 @@
     dtable = table.addClass("initialized").dataTable({
       bStateSave: true,
       sDom: "zrltpi",
+      sPaginationType: "full_numbers",
       oLanguage: {
         sSearch: "Search all columns"
       }
@@ -65,14 +66,26 @@
         this.value = asInitVals[$("tfoot input").index(this)];
       }
     });
+    query_links = $(".query_popover");
+    query_links.each(function(index, link) {
+      var text;
+      text = link.text.replace(/,/g, "<br>");
+      return $("#query_" + index).popover({
+        content: text,
+        title: "Query #" + (index + 1) + " (click to run)",
+        html: true,
+        trigger: "hover",
+        placement: "top"
+      });
+    });
   };
 
   /*-- READY --
   */
 
 
-  $(document).ready(function() {
-    var module, query_links, that;
+  $(function() {
+    var module, that;
     if (yamoda[YM_MODULE_NAME]) {
       yamoda.logg.warn(YM_MODULE_NAME, "already defined, skipping!");
       return;
@@ -80,18 +93,6 @@
     logg = yamoda.get_logger("yamoda.queryhistory");
     yamoda.run_before_init(YM_MODULE_NAME);
     setup_datatable();
-    query_links = $(".query_popover");
-    query_links.each(function(index, link) {
-      var text;
-      text = link.text.replace(/,/g, "<br>");
-      return $("#query_" + index).popover({
-        content: text,
-        title: "Query #" + (index + 1),
-        html: true,
-        trigger: "hover",
-        placement: "top"
-      });
-    });
     that = module = yamoda.queryhistory = {
       YM_MODULE_NAME: YM_MODULE_NAME,
       insert_query: function(row) {
@@ -105,6 +106,7 @@
       run_query: function(row) {
         logg.debug("called run_query");
         that.insert_query(row);
+        $(".popover").remove();
         $("#save_query_checkbox").removeAttr("checked");
         yamoda.search.send_query_request();
       },

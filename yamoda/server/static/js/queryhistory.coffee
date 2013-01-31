@@ -1,7 +1,7 @@
 ###
 # queryhistory.coffee
 # query history related stuff
-# 
+#
 # @author dpausp (Tobias Stenzel)
 ###
 
@@ -25,8 +25,9 @@ setup_datatable = () ->
     bStateSave: true
     # z in sDom is for table column resize plugin
     sDom: "zrltpi"
+    sPaginationType: "full_numbers"
     oLanguage:
-        sSearch: "Search all columns"
+      sSearch: "Search all columns"
   )
   # helper functions adopted from jquery.datatables example
   $("tfoot input").keyup((i) ->
@@ -42,24 +43,37 @@ setup_datatable = () ->
     logg.debug("input focus")
     t$ = $(this)
     if t$.hasClass("search_init")
-        t$.removeClass("search_init")
-        this.value = ""
+      t$.removeClass("search_init")
+      this.value = ""
     return
   )
   $("tfoot input").blur((i) ->
     logg.debug("input blur")
     if this.value == ""
-        t$ = $(this)
-        t$.addClass("search_init")
-        this.value = asInitVals[$("tfoot input").index(this)]
+      t$ = $(this)
+      t$.addClass("search_init")
+      this.value = asInitVals[$("tfoot input").index(this)]
     return
+  )
+
+  # setup popovers which show the query string in formatted form (newlines).
+  query_links = $(".query_popover")
+  query_links.each((index, link) ->
+    text = link.text.replace(/,/g, "<br>")
+    $("#query_" + index).popover {
+      content: text
+      title: "Query #" + (index + 1) + " (click to run)"
+      html: true
+      trigger: "hover"
+      placement: "top"
+    }
   )
   return
 
 
 ###-- READY --###
 
-$(document).ready(() ->
+$ ->
   if yamoda[YM_MODULE_NAME]
     yamoda.logg.warn(YM_MODULE_NAME, "already defined, skipping!")
     return
@@ -67,19 +81,6 @@ $(document).ready(() ->
   logg = yamoda.get_logger("yamoda.queryhistory")
   yamoda.run_before_init(YM_MODULE_NAME)
   setup_datatable()
-
-  # setup popovers which show the query string in formatted form (newline style).
-  query_links = $(".query_popover")
-  query_links.each((index, link) ->
-    text = link.text.replace(/,/g, "<br>")
-    $("#query_" + index).popover {
-      content: text
-      title: "Query #" + (index + 1)
-      html: true
-      trigger: "hover"
-      placement: "top"
-    }
-  )
 
   # module def
   that = module = yamoda.queryhistory = {
@@ -99,12 +100,15 @@ $(document).ready(() ->
       # :param row: table row from which the query is taken.
       logg.debug("called run_query")
       that.insert_query(row)
+      # kill remaining popovers
+      $(".popover").remove()
       $("#save_query_checkbox").removeAttr("checked")
       yamoda.search.send_query_request()
       return
 
     toggle_all_checkboxes: (master_checkbox, slave_checkboxes$) ->
-      # toggle some "slave" checkboxes depending on the state of another "master" checkbox.
+      # toggle some "slave" checkboxes depending on the state of another
+      # "master" checkbox.
       # :param master_checkbox: box which determines the toggle state.
       # :param slave_checkboxes: list of boxes to toggle.
       logg.debug("called toggle_all_checkboxes")
@@ -178,5 +182,4 @@ $(document).ready(() ->
   # ok, all ready
   logg.info("yamoda.queryhistory loaded")
   return
-)
 

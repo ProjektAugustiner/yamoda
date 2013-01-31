@@ -11,15 +11,15 @@ YM_MODULE_NAME = "search"
 logg = undefined
 query_results_shown = false
 query_history_html = ""
-query_results_html = "<h3>No results yet.</h3>"
+query_results_html = ""
 
 
 ###-- module functions --###
 
 change_to_query_history = () ->
   logg.info("change_to_query_history")
-  query_results_html = $("#bottom-content").html()
-  $("#bottom-content").html(query_history_html)
+  $("#query_results_content").hide()
+  $("#query_history_content").show()
   $("#query_results_btn").show()
   $("#query_history_btn").hide()
   $("#bottom-headline").text("Query History")
@@ -30,8 +30,8 @@ change_to_query_history = () ->
 
 change_to_query_results = () ->
   logg.info("change_to_query_results")
-  query_history_html = $("#bottom-content").html()
-  $("#bottom-content").html(query_results_html)
+  $("#query_results_content").show()
+  $("#query_history_content").hide()
   $("#query_history_btn").show()
   $("#query_results_btn").hide()
   query_results_shown = true
@@ -43,10 +43,7 @@ send_query_history_request = () ->
   # AJAX update query history
   $.get(yamoda.search.query_history_url, (history_content) ->
     logg.info("got history content")
-    query_history_html = history_content
-    if not query_results_shown
-      $("#bottom-content").html(query_history_html)
-      yamoda.queryhistory.initialize_if_needed()
+    $("#query_history_content").html(history_content)
   )
   return
 
@@ -65,9 +62,9 @@ send_query_request = () ->
       query: $("#query_input").val()
       name:  $("#query_name_input").val()
       save_query: save_query
-    success: (data) ->
+    success: (query_result) ->
       logg.info("received query request answer")
-      query_results_html = data
+      $("#query_results_content").html(query_result)
       change_to_query_results()
       # refresh history in background
       send_query_history_request()

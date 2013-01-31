@@ -6,18 +6,9 @@
 {% endmacro %}
 
 {% macro queryhistory_table(query_history) %}
+<link rel="stylesheet" type="text/css" href="static/yamoda-datatable.css" />
 <table id="queryhistory_table" class="table table-condensed table-bordered table-striped table-hover">
   <thead>
-    <style type="text/css">
-      th.header { border-right:3px solid #aaaaaa; border-bottom:1px solid #aaaaaa; }
-      th.footer { border-width:1px; }
-      .paginate_disabled_previous, .paginate_enabled_previous, .paginate_disabled_next, .paginate_enabled_next {
-        color: #111111 !important;
-        cursor: pointer;
-        float: left;
-        height: 19px;
-      }
-    </style>
     <tr>
       <th class="header">#</th>
       <th class="header">Created</th>
@@ -25,7 +16,6 @@
       <th class="header">Query String</th>
       <th class="header">Favorite?</th>
       <th class="header">Insert</th>
-      <th class="header">Run</th>
       <th><input type="checkbox" id="checkbox_all" onchange="yamoda.queryhistory.toggle_all_checkboxes(this, $('.querycheck'));" /></th>
     </tr>
   </thead>
@@ -36,27 +26,26 @@
       <td>{{ query.created|dtformat }}</td>
       <td id="query_name_{{ loop.index0 }}">{{ query.name }}</td>
       <td>
-        <a href="#" id="query_{{ loop.index0 }}" class="query_popover">{{- query.query_string -}}</a>
+        <a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}');" id="query_{{ loop.index0 }}" class="query_popover">{{- query.query_string -}}</a>
       </td>
       <td id="query_favorite_{{ loop.index0 }}">{{query.favorite|yesnoformat }}</td>
-      <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Insert</a></td>
-      <td><a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}');">Run</a></td>
+      <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Edit</a></td>
       <td><input type="checkbox" class="querycheck" id="check_{{ query.id }}" value="yes" /></td>
     </tr>
     {%- endfor %}
   </tbody>
   <tfoot>
     <tr>
-      <th class="footer"><input type="text" name="search_number" class="search_init input-small" value="Search in #" /></th>
-      <th class="footer"><input type="text" name="search_created" class="search_init" value="Search in dates" /></th>
-      <th class="footer"><input type="text" name="search_name" class="search_init input-medium" value="Search in names" /></th>
-      <th class="footer"><input type="text" name="search_query" class="search_init input-xlarge" value="Search in queries" /></th>
-      <th class="footer"><input type="text" name="search_favorite" class="search_init input-small" value="Favorite?" /></th>
-      <th class="footer" colspan="3">
+      <th class="footer"><input type="text" name="search_number" class="search-input search_init input-small" value="Search in #" /></th>
+      <th class="footer"><input type="text" name="search_created" class="search-input search_init" value="Search in dates" /></th>
+      <th class="footer"><input type="text" name="search_name" class="search-input search_init input-medium" value="Search in names" /></th>
+      <th class="footer"><input type="text" name="search_query" class="search-input search_init input-xlarge" value="Search in queries" /></th>
+      <th class="footer"><input type="text" name="search_favorite" class="search-input search_init input-small" value="Favorite?" /></th>
+      <th class="footer" colspan="2">
         <!-- adapted from datalist.html -->
-        <div id="actionbutton" style="float: right">
-          <div class="btn-group">
-            <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
+        <div id="actionbutton">
+          <div id="action-group" class="btn-group">
+            <button id="action-dropdown" class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
               With selected
               <span class="caret"></span>
             </button>

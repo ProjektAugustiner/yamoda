@@ -13,7 +13,7 @@
 
 
 (function() {
-  var YM_MODULE_NAME, change_to_query_history, change_to_query_results, intercept_query_submit, logg, query_history_html, query_results_html, query_results_shown, send_query_history_request, send_query_request, send_query_save_request;
+  var YM_MODULE_NAME, change_to_query_history, change_to_query_results, logg, query_history_html, query_results_html, query_results_shown, send_query_history_request, send_query_request, send_query_save_request;
 
   YM_MODULE_NAME = "search";
 
@@ -23,7 +23,7 @@
 
   query_history_html = "";
 
-  query_results_html = "<h3>No results yet.</h3>";
+  query_results_html = "";
 
   /*-- module functions --
   */
@@ -31,8 +31,8 @@
 
   change_to_query_history = function() {
     logg.info("change_to_query_history");
-    query_results_html = $("#bottom-content").html();
-    $("#bottom-content").html(query_history_html);
+    $("#query_results_content").hide();
+    $("#query_history_content").show();
     $("#query_results_btn").show();
     $("#query_history_btn").hide();
     $("#bottom-headline").text("Query History");
@@ -42,34 +42,18 @@
 
   change_to_query_results = function() {
     logg.info("change_to_query_results");
-    query_history_html = $("#bottom-content").html();
-    $("#bottom-content").html(query_results_html);
+    $("#query_results_content").show();
+    $("#query_history_content").hide();
     $("#query_history_btn").show();
     $("#query_results_btn").hide();
     query_results_shown = true;
     $("#bottom-headline").text("Query Results");
   };
 
-  intercept_query_submit = function() {
-    var show_results;
-    show_results = $("input[name='show_results']:checked").val();
-    logg.info("where to show results:", show_results);
-    if (show_results === "newpage") {
-      return true;
-    } else {
-      send_query_request();
-      return false;
-    }
-  };
-
   send_query_history_request = function() {
     $.get(yamoda.search.query_history_url, function(history_content) {
       logg.info("got history content");
-      query_history_html = history_content;
-      if (!query_results_shown) {
-        $("#bottom-content").html(query_history_html);
-        return yamoda.queryhistory.initialize_if_needed();
-      }
+      return $("#query_history_content").html(history_content);
     });
   };
 
@@ -78,10 +62,6 @@
     logg.info("send query request");
     show_results = $("input[name='show_results']:checked").val();
     logg.info("where to show results:", show_results);
-    if (show_results === "newpage") {
-      $("#query_form").submit();
-      return;
-    }
     $("#bottom-headline").text("Processing...");
     save_query = $("#save_query_checkbox").attr("checked");
     return $.ajax({
@@ -92,9 +72,9 @@
         name: $("#query_name_input").val(),
         save_query: save_query
       },
-      success: function(data) {
+      success: function(query_result) {
         logg.info("received query request answer");
-        query_results_html = data;
+        $("#query_results_content").html(query_result);
         change_to_query_results();
         send_query_history_request();
       },

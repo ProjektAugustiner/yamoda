@@ -81,7 +81,7 @@ user_spec = (L("user") + ":" + user_name)[UserRepr]
 
 # Date range like: '12 August 2012 to 12 December 2012'
 # XXX: we could allow more date range formats because daterangeparser understands many other formats
-date_interval = Expected(Regex(r"\d{1,2} \w+ \d{2,4} to \d\d \w+ \d{2,4}"), "'date string (like >11 August 2011 to 12 September 2012<)'")
+date_interval = Expected(Regex(r"\d{1,2} \w+ \d{2,4} to \d\d \w+ \d{2,4}"), "'date string (like 11 August 2011 to 12 September 2012)'")
 
 creation_time_spec = (L("created") + ":" + date_interval)[lambda t: TimeInterval(*daterangeparser.parse(t))]
 

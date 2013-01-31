@@ -92,7 +92,12 @@
 </div>
 <div class="row-fluid">
     <div id="bottom-content" class="span12">
-      {{ queryhistory_table(query_history) }}
+      <div id="query_history_content">
+        {{ queryhistory_table(query_history) }}
+      </div>
+      <div id="query_results_content" style="display:none;">
+        <h3>No results yet.</h3>
+      </div>
     </div>
 </div>
 {% endblock %}
