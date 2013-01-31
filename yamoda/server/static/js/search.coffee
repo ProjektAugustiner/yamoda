@@ -22,6 +22,7 @@ change_to_query_history = () ->
   $("#query_history_content").show()
   $("#query_results_btn").show()
   $("#query_history_btn").hide()
+  $("#action_dropdown").dropdown()
   $("#bottom-headline").text("Query History")
   yamoda.queryhistory.initialize_if_needed()
   query_results_shown = false
