@@ -1,22 +1,30 @@
 ###
 # search.coffee
 # search related stuff
-# 
+#
 # @author dpausp (Tobias Stenzel)
 ###
 
 ###-- private module vars --###
 
-YM_MODULE_NAME = "search"
+MODULE_NAME = "yamoda.search"
 logg = undefined
 query_results_shown = false
-query_history_html = ""
-query_results_html = ""
 
 
 ###-- module functions --###
 
-change_to_query_history = () ->
+request_help_content = (url) ->
+  # Request content for a tab in the query help box
+  # :param url: GET URL for needed helptext
+  $.get(url, (helptext) ->
+    logg.info("got helptext for", url)
+    $("#help-content").html(helptext)
+    return
+  )
+  return
+
+change_to_query_history = ->
   logg.info("change_to_query_history")
   $("#query_results_content").hide()
   $("#query_history_content").show()
@@ -24,12 +32,11 @@ change_to_query_history = () ->
   $("#query_history_btn").hide()
   $("#action_dropdown").dropdown()
   $("#bottom-headline").text("Query History")
-  yamoda.queryhistory.initialize_if_needed()
   query_results_shown = false
   return
 
 
-change_to_query_results = () ->
+change_to_query_results = ->
   logg.info("change_to_query_results")
   $("#query_results_content").show()
   $("#query_history_content").hide()
@@ -40,17 +47,18 @@ change_to_query_results = () ->
   return
 
 
-send_query_history_request = () ->
+send_query_history_request = ->
   # AJAX update query history
   $.get(yamoda.search.query_history_url, (history_content) ->
     logg.info("got history content")
     $("#query_history_content").html(history_content)
+    yamoda.queryhistory.setup_datatable()
   )
   return
 
 
 send_query_request = (save_query=true) ->
-  # send query to server and display results below the query box
+  # Send query to server and display results below the query box.
   logg.info("send query request")
   show_results = $("input[name='show_results']:checked").val()
   logg.info("where to show results:", show_results)
@@ -75,8 +83,8 @@ send_query_request = (save_query=true) ->
   )
 
 
-send_query_save_request = () ->
-  # don't run query, just save it and refresh the history
+send_query_save_request = ->
+  # Don't run query, just save it and refresh the history
   logg.info("send query save request")
   $.ajax(
     type: 'POST',
@@ -95,41 +103,18 @@ send_query_save_request = () ->
 
 ###-- READY --###
 
-$(document).ready(() ->
-  if yamoda[YM_MODULE_NAME]
-    yamoda.logg.warn(YM_MODULE_NAME, "already defined, skipping!")
-    return
-  # module init
-  logg = yamoda.get_logger("yamoda.search")
-  yamoda.run_before_init(YM_MODULE_NAME)
-
-  # hide switch buttons
-  # XXX: not very clever...
-  $("#query_history_btn").hide()
-  $("#query_results_btn").hide()
-
+$ ->
   # module def
-  module = yamoda.search = {
-    YM_MODULE_NAME: YM_MODULE_NAME
-    request_help_content: (url) ->
-      # request content for a tab in the query help box
-      # :param url: GET URL for needed helptext 
-      $.get(url, (helptext) ->
-        logg.info("got helptext for", url)
-        $("#help-content").html(helptext)
-      )
+  that = yamoda.search = yamoda.make_module(MODULE_NAME,
+    request_help_content: request_help_content
     change_to_query_history: change_to_query_history
     change_to_query_results: change_to_query_results
     send_query_request: send_query_request
     send_query_save_request: send_query_save_request
-  }
-  
-  yamoda.apply_module_constants(module)
-
-  #ok, all done
-  yamoda.logg.info("yamoda.search loaded")
+  )
+  # other stuff to do
+  logg = that.logg
   return
-)
 
 # vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #
 

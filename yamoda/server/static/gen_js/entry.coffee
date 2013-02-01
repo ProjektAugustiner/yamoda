@@ -1,13 +1,13 @@
 ###
 # entry.coffee
-# displaying / plotting entries
-# #
+# common functions for displaying / plotting entries
+#
 # @author dpausp (Tobias Stenzel)
 ###
 
 ###-- private module vars --###
 
-YM_MODULE_NAME = "entry"
+MODULE_NAME = "yamoda.entry"
 logg = undefined
 # entry cache
 entries = {}
@@ -15,9 +15,8 @@ entries = {}
 
 ###-- module functions --###
 
-
 add = (entry_url, entry_id, parameter_name, entry_value) ->
-  # manually add an entry to the entry cache
+  # Manually add an entry to the entry cache.
   # :param entry_url: url like entries/220 which is used as key
   # :param entry_id: id of the entry like 220
   # :param parameter_name: name of the corresponding parameter
@@ -34,7 +33,7 @@ add = (entry_url, entry_id, parameter_name, entry_value) ->
 
 
 get = (entry_url, success_fn) ->
-  # get an entry (maybe from cache) and call a function
+  # Get an entry (maybe from cache) and call a function.
   # :param entry_url: like entries/220
   # :param success_fn: callback which gets the entry as first argument
 
@@ -129,7 +128,8 @@ plot = (entry, $target) ->
 
 
 show_plot = ($target) ->
-  # show plot which was hidden previously. To draw a plot for the first time, use plot function
+  # Show plot which was hidden previously. 
+  # To draw a plot for the first time, use plot function.
   $plot_area = $target.children(".plot-area")
   prev_plot = $target.data("plot")
   plot = $.plot($plot_area, prev_plot.getData(), prev_plot.getOptions())
@@ -207,6 +207,7 @@ flot_setup = ($plot_div) ->
     )
     return
   )
+  return
 
 
 sparkline_setup = ($target) ->
@@ -231,18 +232,9 @@ sparkline_setup = ($target) ->
 
 ###-- READY --###
 
-$( () ->
-  if yamoda[YM_MODULE_NAME]
-    yamoda.logg.warn(YM_MODULE_NAME, "already defined, skipping!")
-    return
-  # module init
-  logg = yamoda.get_logger("yamoda." + YM_MODULE_NAME)
-  yamoda.run_before_init(YM_MODULE_NAME)
-
-
+$ ->
   # module def
-  module = yamoda.entry = {
-    YM_MODULE_NAME: YM_MODULE_NAME
+  that = yamoda.entry = yamoda.make_module(MODULE_NAME,
     add: add
     get: get
     plot: plot
@@ -253,13 +245,9 @@ $( () ->
     sparkline_setup: sparkline_setup
     setup_2D_preview_images_ondemand: setup_2D_preview_images_ondemand
     fetch_2D_preview_images: fetch_2D_preview_images
-  }
-
-  yamoda.apply_module_constants(module)
-
-  # ok, all ready
-  logg.info("yamoda." + YM_MODULE_NAME, "loaded")
+  )
+  # other stuff to do
+  logg = that.logg
   return
-)
 
 # vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #

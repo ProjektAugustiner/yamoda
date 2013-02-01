@@ -7,18 +7,18 @@
 <script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
 {{ queryhistory_includes() }}
 <!-- yamoda base module -->
-<script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
+<script src="{{ url_for('static', filename='gen_js/yamoda.js') }}"></script>
 <!-- yamoda modules -->
-<script src="{{ url_for('static', filename='js/search.js') }}"></script>
-<script src="{{ url_for('static', filename='js/queryhistory.js') }}"></script>
+<script src="{{ url_for('static', filename='gen_js/search.js') }}"></script>
+<script src="{{ url_for('static', filename='gen_js/queryhistory.js') }}"></script>
 <script>
   $(document).ready( function() {
-    yamoda.add_module_constants("search", {
+    yamoda.add_module_constants("yamoda.search", {
       search_url: "{{ url_for('do_search') }}",
       save_query_url: "{{ url_for('save_query') }}",
       query_history_url: "{{ url_for('get_query_history') }}"
     });
-    yamoda.add_module_constants("queryhistory", {
+    yamoda.add_module_constants("yamoda.queryhistory", {
       del_queries_url: "{{ url_for('delete_queries') }}",
       toggle_favorite_queries_url: "{{ url_for('toggle_favorite_queries') }}"
     });
@@ -84,9 +84,9 @@
     <h2 id="bottom-headline">Query History</h2>
   </div>
   <div class="span9">
-    <a href="#" id="query_history_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_history()">
+    <a href="#" id="query_history_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_history()" style="display:none;">
       <i class="icon-list"></i>Change To History</a>
-    <a href="#" id="query_results_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_results()">
+    <a href="#" id="query_results_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_results()" style="display:none;">
       <i class="icon-list-alt"></i>Change To Results</a>
   </div>
 </div>

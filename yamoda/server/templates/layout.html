@@ -8,21 +8,15 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/bootstrap.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/bootstrap-responsive.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/yamoda.css') }}">
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-    </style>
     <!-- external libs -->
-    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/bootstrap.js') }}"></script>
-    <script src="{{ url_for('static', filename='log4javascript.js') }}"></script>
-    <script src="{{ url_for('static', filename='jquery.dataTables.js') }}"></script>
-    <script src="{{ url_for('static', filename='colResizable-1.3.source.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery/jquery.dataTables.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery/colResizable-1.3.source.js') }}"></script>
     <!-- yamoda base module -->
-    <script src="{{ url_for('static', filename='js/yamoda.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery_testplugin.js') }}"></script>
+    <script src="{{ url_for('static', filename='gen_js/yamoda.js') }}"></script>
+    <script src="{{ url_for('static', filename='gen_js/jquery_testplugin.js') }}"></script>
     <!-- extra stuff -->
     {% block extrahead %}{% endblock %}
   </head>

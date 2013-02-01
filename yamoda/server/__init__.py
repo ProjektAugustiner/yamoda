@@ -87,7 +87,8 @@ def dataformat(value, maxlen=None):
                 # if we omit values we must send matching xvalues so that sparkline knows what to do
                 return ", ".join(["{}:{:.8f}".format(i * step, v) for i, v in enumerate(value)])
         # just send yvalues
-        return ", ".join(["{:.8f}".format(v) for v in value])
+        logg.debug("type %s, values: %s", type(value), value)
+        return ", ".join("{:.8f}".format(v) for v in value.ravel())
     return str(value)
 
 

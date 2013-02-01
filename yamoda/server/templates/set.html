@@ -3,9 +3,9 @@
 {% from "data_macros.html" import datatable, datatable_script %}
 {% block extrahead %}
 <!-- external libs -->
-<script src="{{ url_for('static', filename='jquery.sparkline.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery/jquery.sparkline.js') }}"></script>
 <!-- yamoda modules -->
-<script src="{{ url_for('static', filename='js/entry.js') }}"></script>
+<script src="{{ url_for('static', filename='gen_js/entry.js') }}"></script>
 <script type="text/javascript">
 {% coffee "main" %}
 $ ->

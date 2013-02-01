@@ -1,166 +1,7 @@
-{% macro script_1D() %}
-{% coffee "main" %}
-set_plot_area_height = ->
-  # some hack, maybe this can be improved...
-  # TODO duplicate function in other macro!
-  height = $(window).height() * 0.45
-  yamoda.logg.info("new height of plot", height)
-  $("#plot>.plot-area").height(height)
-  return
-
-plot_and_show = (entry) ->
-  yamoda.logg.info("plot_and_show")
-  set_plot_area_height()
-  yamoda.entry.show_values(entry, $("#values-display"))
-  yamoda.entry.plot(entry, $("#plot"))
-  return
-
-$ ->
-  yamoda.entry.add("{{url_for('entry', entry_id=entry.id)}}",
-                  {{entry.id}},
-                  "{{entry.parameter.name}}",
-                  [{{entry.value | dataformat}}])
-  yamoda.entry.get("{{url_for('entry', entry_id=entry.id)}}", plot_and_show)
-  $(window).resize ->
-    set_plot_area_height()
-    return
-  return
-{% endcoffee %}
-{% endmacro %}
-
-
-{% macro script_1D_ondemand() %}
-{% coffee "main_ondemand" %}
-
-
-set_plot_area_height = ->
-  # TODO some hack, maybe this can be improved...
-  # TODO duplicate function in other macro!
-  height = $(window).height() * 0.45
-  yamoda.logg.info("new height of plot", height)
-  $("#plot>.plot-area").height(height)
-  return
-
-show_plot = () ->
-  yamoda.logg.debug("Show plot")
-  $("#plot-toggle-btn").text("Wait...")
-  set_plot_area_height()
-  yamoda.entry.show_plot($("#plot"))
-  $("#plot-toggle-btn").text("Hide plot")
-  return
-
-hide_plot = () ->
-  yamoda.logg.debug("Hide plot")
-  yamoda.entry.hide_plot($("#plot"))
-  $("#plot>.plot-area").height("auto")
-  $("#plot-toggle-btn").text("Show plot")
-  return
-
-show_values = () ->
-  yamoda.logg.debug("Show values")
-  $("#values-display").text("Wait...")
-  yamoda.entry.get('{{url_for("entry", entry_id=entry.id)}}', (entry) ->
-    yamoda.entry.show_values(entry, $("#values-display"))
-    $("#values-toggle-btn").text("Hide values")
-  )
-  return
-
-hide_values = () ->
-  yamoda.logg.debug("Hide values")
-  $("#values-display").text("Values hidden")
-  $("#values-toggle-btn").text("Show values")
-  return
-
-initial_cb_plot = () ->
-  $("#plot-toggle-btn").text("Wait...")
-  yamoda.entry.get('{{url_for("entry", entry_id=entry.id)}}', (entry) ->
-    # callback: plot entry
-    set_plot_area_height()
-    yamoda.entry.plot(entry, $('#plot'))
-    $("#plot-toggle-btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial")
-    $(window).resize ->
-      yamoda.logg.info("resize!")
-      if not $("#plot>.plot-area").hasClass("placeholder")
-        set_plot_area_height()
-      return
-    values_btn = $("#values-toggle-btn")
-    if values_btn.hasClass("initial")
-      # other button is still in initial state, change it
-      values_btn.text("Show values").removeClass("initial")
-  )
-  return
-
-initial_cb_values = () ->
-  $("#values-toggle-btn").text("Wait...")
-  yamoda.entry.get('{{url_for("entry", entry_id=entry.id)}}', (entry) ->
-    yamoda.entry.show_values(entry, $("#values-display"))
-    $("#values-toggle-btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial")
-    plot_btn = $("#plot-toggle-btn")
-    if plot_btn.hasClass("initial")
-      # other button is still in initial state, change it
-      plot_btn.text("Show plot").removeClass("initial")
-  )
-  return
-
-$ ->
-  $("#plot-toggle-btn").click(initial_cb_plot).text("Request values and plot...")
-  $("#values-toggle-btn").click(initial_cb_values)
-  return
-{% endcoffee %}
-{% endmacro %}
-
-
-{% macro script_2D() %}
-{% coffee "main_2D" %}
-initial_cb_values = () ->
-  $("#values-toggle-btn").text("Wait...")
-  yamoda.entry.get('{{url_for("entry", entry_id=entry.id)}}', (entry) ->
-    yamoda.entry.show_values(entry, $("#values-display"))
-    $("#values-toggle-btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial")
-  )
-  return
-
-# same as above in script_1D_ondemand!
-show_values = () ->
-  yamoda.logg.debug("Show values")
-  $("#values-display").text("Wait...")
-  yamoda.entry.get('{{url_for("entry", entry_id=entry.id)}}', (entry) ->
-    yamoda.entry.show_values(entry, $("#values-display"))
-    $("#values-toggle-btn").text("Hide values")
-  )
-  return
-
-# same as above in script_1D_ondemand!
-hide_values = () ->
-  yamoda.logg.debug("Hide values")
-  $("#values-display").text("Values hidden")
-  $("#values-toggle-btn").text("Show values")
-  return
-
-show_image = ->
-    $("#plot>.plot-area").html('<img src="{{url_for("entry", entry_id=entry.id)}}" alt="Plot image cannot be displayed">').removeClass("placeholder")
-    $("#plot-toggle-btn").text("Hide Image")
-    return
-
-hide_image = ->
-    $("#plot>.plot-area").text("Image hidden").addClass("placeholder")
-    $("#plot-toggle-btn").text("Show Image")
-    return
-
-$ ->
-  $("#static-download-btn").text("Download image")
-  $("#plot-toggle-btn").text("Show image").toggle(show_image, hide_image)
-  $("#values-toggle-btn").click(initial_cb_values)
-  return
-{% endcoffee %}
-{% endmacro %}
-
-
 {% from "plotting.html" import plotdisplay1D, plotdisplay2D %}
 {% from "plotting.html" import plotdisplay_includes %}
 
 {% macro entry1D2D(entry, parameter) %}
-
 <div id="plot-row" class="row-fluid">
   <h2>Entry #{{entry.id}}: {{parameter.name}}({{parameter.unit| unitformat}})</h2>
   <div class="span11" id="plot">
@@ -223,11 +64,31 @@ $ ->
 <!-- external libs -->
 {{ plotdisplay_includes() }}
 <!-- yamoda modules -->
-<script src="{{ url_for('static', filename='js/entry.js') }}"></script>
+<script src="{{ url_for('static', filename='gen_js/entry.js') }}"></script>
+<script src="{{ url_for('static', filename='gen_js/entrydisplay.js') }}"></script>
 
 <script>
-{% coffee "download_dialog" %}
+{% coffee "main" %}
 $ ->
+  yamoda.add_module_constants("yamoda.entrydisplay",
+    ENTRY_URL: "{{url_for('entry', entry_id=entry.id)}}"
+    ENTRY_ID: {{entry.id}}
+    PARAMETER_NAME: "{{entry.parameter.name}}"
+    ENTRY_VALUE: [{{entry.value | dataformat}}]
+  )
+  # init stuff
+  {% if entry.value.shape|length == 2 %}
+  # 2D entry
+  yamoda.entrydisplay.e2D_ondemand.init()
+  {% elif entry.value|valuecount < 200 %}
+  # small 1D entry
+  # is displayed on page load
+  yamoda.entrydisplay.e1D.init()
+  {% else %}
+  # large 1D entry is displayed when the user requests it
+  yamoda.entrydisplay.e1D_ondemand.init()
+  {% endif %}
+
   $("#static-download-btn").click -> $('#download-modal').modal()
 
   $("#show-img-btn").click ->
@@ -246,18 +107,6 @@ $ ->
 
   yamoda.entry.flot_setup($("#plot"))
 {% endcoffee %}
-
-{% if entry.value.shape|length == 2 %}
-// 2D entry
-{{ script_2D()}}
-{% elif entry.value|valuecount < 200 %}
-// small 1D entry
-// is displayed on page load
-{{ script_1D()}}
-{% else %}
-// large 1D entry is displayed when the user requests it
-{{ script_1D_ondemand()}}
-{% endif %}
 </script>
 {% endblock %}
 
