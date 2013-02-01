@@ -5,7 +5,7 @@
 {% block extrahead %}
 <!-- external libs -->
 <script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
-{{ queryhistory_includes() }}
+{# {{ queryhistory_includes() }} #}
 <!-- yamoda base module -->
 <script src="{{ url_for('static', filename='gen_js/yamoda.js') }}"></script>
 <!-- yamoda modules -->
@@ -27,8 +27,6 @@
 {% endblock %}
 
 {% block body %}
-<script src="{{ url_for('static', filename='bootstrap/bootstrap-popover.js') }}"></script>
-<script src="{{ url_for('static', filename='bootstrap/bootstrap-tooltip.js') }}"></script>
 <div class="row-fluid">
   <div class="span5">
     <h2>Search for sets or datas</h2>
