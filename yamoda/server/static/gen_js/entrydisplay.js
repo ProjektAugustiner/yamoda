@@ -2,7 +2,7 @@
 
 /*
 # entrydisplay.coffee
-# backing code for entry.html
+# backing code for entrydisplay.html
 #
 # @author dpausp (Tobias Stenzel)
 #

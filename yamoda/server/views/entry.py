@@ -82,7 +82,7 @@ def _render_entry_html(entry):
     value = entry.value
     if isinstance(value, np.ndarray):
         if len(value.shape) < 3:
-            return render_template("entry.html", entry=entry)
+            return render_template("entrydisplay.html", entry=entry)
     return "", 406
 
 

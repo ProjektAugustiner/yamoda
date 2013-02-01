@@ -12,20 +12,24 @@
     {% endif %}
   </div>
 </div>
-<hr>
 
 <div class="row-fluid">
-  <div class="span6" id="plot-buttons">
+  <div class="span6 small-control-row">
     {% if entry.value|valuecount >= 200 %}
-      <a id="plot-toggle-btn" class="btn btn-primary initial">Show Plot</a>
-      <a id="static-download-btn" class="btn" onclick="">Download Image</a>
+    <button id="plot-toggle-btn" class="btn btn-primary initial">Show Plot</button>
+    <button id="download-img-btn" class="btn btn-primary">Download</button>
     {% endif %}
+    <label for="img-type-select">Select Image Type:</label>
+    <select id="img-type-select" class="span4">
+      <option>PNG
+      <option>SVG
+      <option>PDF
+      <option>EPS
+    </select>
   </div>
   <div class="span6" id="plot-panel"></div>
 </div>
-<hr>
-<hr>
-
+<hr class="small-vertical-margin">
 <div class="row-fluid">
   <div class="span12" id="data" data-length="{{entry.value|valuecount}}" data-entry-id="{{entry.id}}">
     <h2>Raw Data (count: {{entry.value|valuecount}})</h2>
@@ -33,27 +37,6 @@
       <a id="values-toggle-btn" class="btn btn-primary initial">Request and show values</a>
     {% endif %}
     <pre id="values-display">No values loaded</pre>
-  </div>
-</div>
-
-<div id="download-modal" class="modal hide fade" tabindex="-1" role="dialog">
-  <div class="modal-header">
-    <h3>Plot Download</h3>
-  </div>
-  <div class="modal-body">
-    <h4>Select image type</h4>
-    <select id="img-type-select">
-      <option>PNG
-      <option>SVG
-      <option>PDF
-      <option>EPS
-    </select>
-  </div>
-  <div id="img-placeholder"></div>
-  <div class="modal-footer">
-    <button id="show-img-btn" class="btn">Show</button>
-    <button id="download-img-btn" class="btn">Download</button>
-    <button class="btn" data-dismiss="modal">Close</button>
   </div>
 </div>
 {% endmacro %}
@@ -80,6 +63,7 @@ $ ->
   {% if entry.value.shape|length == 2 %}
   # 2D entry
   yamoda.entrydisplay.e2D_ondemand.init()
+  $("#plot-toggle-btn").click()
   {% elif entry.value|valuecount < 200 %}
   # small 1D entry
   # is displayed on page load
@@ -87,16 +71,8 @@ $ ->
   {% else %}
   # large 1D entry is displayed when the user requests it
   yamoda.entrydisplay.e1D_ondemand.init()
+  $("#plot-toggle-btn").click()
   {% endif %}
-
-  $("#static-download-btn").click -> $('#download-modal').modal()
-
-  $("#show-img-btn").click ->
-    img_type = $("#img-type-select").val()
-    $.getJSON '{{url_for("entry", entry_id=entry.id)}}' + '?img_url_for_type=' + img_type, (json) ->
-      $("#img-placeholder").html('<img src="' + json.img_url + '" alt="Plot image cannot be displayed">')
-      return
-    return
 
   $("#download-img-btn").click ->
     img_type = $("#img-type-select").val()

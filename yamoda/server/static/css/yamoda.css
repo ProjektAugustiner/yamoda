@@ -7,4 +7,28 @@ body {
   padding-bottom: 40px;
 }
 
+div.small-control-row {
+  margin-top: 6px;
+  margin-bottom: 10px;
+  padding: 12px 10px 10px 10px;
+  background-color: #F5F5F5;
+  border-top: 1px solid #E5E5E5;
+}
+
+div.small-control-row * {
+  float: left;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+div.small-control-row label {
+  margin-left:15px;
+  margin-top:5px;
+}
+
+hr.small-vertical-margin {
+  margin-top:8px;
+  margin-bottom:4px;
+}
+
 /* vim: set filetype=css sw=2 ts=2 sts=2 expandtab: */
