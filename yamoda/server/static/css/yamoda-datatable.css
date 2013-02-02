@@ -117,4 +117,11 @@ a.next.paginate_button_disabled, a.next.paginate_button_disabled:hover {
 	background: url('../img/forward_disabled.png') no-repeat center right;
 }
 
+/* sparkline in tables */
+td.valuecolumn>.sparkline>canvas {
+  margin-top: -5px;
+  margin-bottom: -4px;
+}
+ 
+
 /* vim: set filetype=css sw=2 ts=2 sts=2 expandtab: */

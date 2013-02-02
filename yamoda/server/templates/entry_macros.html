@@ -2,12 +2,17 @@
 {% if not entry.value.shape %}
 <td>{{ entry.value|dataformat }}</td>
 {% elif entry.value.shape|length == 1 %}
-<td class="valuecolumn" width="{{width}}px"
-  values="{{ entry.value|dataformat(width) }}" 
-  count = "{{ entry.value|count_formatted(width)}}"
-  normalMin="0"
-  normalMax="0">
+<td class="valuecolumn">
+  <strong>Max:</strong> {{ entry.value|max|dataformat }}
+  <span class="sparkline"
+    width="{{width}}px"
+    values="{{ entry.value|dataformat(width) }}" 
+    count="{{ entry.value|count_formatted(width) }}"
+    normalMin="0"
+    normalMax="0">
   Loading...
+  </span>
+  <strong>Min:</strong> {{ entry.value|min|dataformat }}
 </td>
 {% elif entry.value.shape|length == 2 %}
 <td class="2d-preview">

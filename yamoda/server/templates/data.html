@@ -89,7 +89,7 @@ datatable_setup = () ->
 $( () ->
   #$("#datatable").dataTable()
   datatable_setup()
-  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn"))
+  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn .sparkline"))
   # 2D preview image setup
   yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "35%")
   $('a[rel=tooltip]').tooltip()

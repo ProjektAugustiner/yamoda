@@ -48,7 +48,7 @@
 {% macro datatable_script() %}
 {% coffee "main" %}
 $ ->
-  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn"))
+  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn .sparkline"))
 
 {% endcoffee %}
 
