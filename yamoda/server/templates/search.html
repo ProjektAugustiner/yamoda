@@ -3,11 +3,7 @@
 {% from "queryhistory.html" import queryhistory_includes %}
 {% set title = "Search" %}
 {% block extrahead %}
-<!-- external libs -->
-<script src="{{ url_for('static', filename='js/log4javascript.js') }}"></script>
 {# {{ queryhistory_includes() }} #}
-<!-- yamoda base module -->
-<script src="{{ url_for('static', filename='gen_js/yamoda.js') }}"></script>
 <!-- yamoda modules -->
 <script src="{{ url_for('static', filename='gen_js/search.js') }}"></script>
 <script src="{{ url_for('static', filename='gen_js/queryhistory.js') }}"></script>
@@ -52,15 +48,15 @@
         <a href="#" id="save-query" class="btn" onclick="yamoda.search.send_query_save_request()">
           <i class="icon-briefcase"></i>Save Query</a>
         -->
-        <a href="#" id="show-help" class="btn" onclick="$('#help-box').show(); $(this).hide(); $('#hide-help').show()">
+        <a href="#" id="show_help" class="btn" onclick="$('#help_box').show(); $(this).hide(); $('#hide_help').show()">
           <i class="icon-arrow-right"></i>Show Help</a>
-        <a href="#" style="display: none;" id="hide-help" class="btn" onclick="$('#help-box').hide(); $(this).hide(); $('#show-help').show()">
+        <a href="#" style="display: none;" id="hide_help" class="btn" onclick="$('#help_box').hide(); $(this).hide(); $('#show_help').show()">
           <i class="icon-arrow-left"></i>Hide Help</a>
       </div>
     </form>
   </div>
-  <div class="span7" id="#help-span">
-    <div id="help-box" style="display: none;">
+  <div class="span7">
+    <div id="help_box" style="display: none;">
       <h2>Query Language Help</h2>
       <ul class="nav nav-tabs">
       <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="find") }}')">Result Type</a>
@@ -70,7 +66,7 @@
       <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="example-datas") }}')">Example Data Query</a>
       <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="example-sets") }}')">Set Query</a>
       </ul>
-      <div id="help-content">
+      <div id="help_content">
       <p>Select a help category above.</p>
       </div>
     </div>
@@ -79,7 +75,7 @@
 <hr />
 <div class="row-fluid">
   <div class="span6">
-    <h2 id="bottom-headline">Query History</h2>
+    <h2 id="bottom_headline">Query History</h2>
   </div>
   <div class="span6">
     <a href="#" id="query_history_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_history()" style="display:none;">
@@ -89,7 +85,7 @@
   </div>
 </div>
 <div class="row-fluid">
-    <div id="bottom-content" class="span12">
+    <div id="bottom_content" class="span12">
       <div id="query_history_content">
         {{ queryhistory_table(query_history) }}
       </div>

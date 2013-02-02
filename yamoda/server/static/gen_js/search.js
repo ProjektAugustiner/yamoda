@@ -28,7 +28,7 @@
   request_help_content = function(url) {
     $.get(url, function(helptext) {
       logg.info("got helptext for", url);
-      $("#help-content").html(helptext);
+      $("#help_content").html(helptext);
     });
   };
 
@@ -39,7 +39,7 @@
     $("#query_results_btn").show();
     $("#query_history_btn").hide();
     $("#action_dropdown").dropdown();
-    $("#bottom-headline").text("Query History");
+    $("#bottom_headline").text("Query History");
     query_results_shown = false;
   };
 
@@ -50,7 +50,7 @@
     $("#query_history_btn").show();
     $("#query_results_btn").hide();
     query_results_shown = true;
-    $("#bottom-headline").text("Query Results");
+    $("#bottom_headline").text("Query Results");
   };
 
   send_query_history_request = function() {
@@ -69,7 +69,7 @@
     logg.info("send query request");
     show_results = $("input[name='show_results']:checked").val();
     logg.info("where to show results:", show_results);
-    $("#bottom-headline").text("Processing...");
+    $("#bottom_headline").text("Processing...");
     return $.ajax({
       type: 'POST',
       url: yamoda.search.search_url,
@@ -85,7 +85,7 @@
         send_query_history_request();
       },
       error: function() {
-        $("#bottom-headline").text("Server Error! Please try again.");
+        $("#bottom_headline").text("Server Error! Please try again.");
       }
     });
   };

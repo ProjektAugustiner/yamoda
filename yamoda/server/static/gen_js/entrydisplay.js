@@ -38,7 +38,7 @@
     plot_and_show = function(entry) {
       yamoda.logg.info("plot_and_show");
       set_plot_area_height();
-      yamoda.entry.show_values(entry, $("#values-display"));
+      yamoda.entry.show_values(entry, $("#values_display"));
       yamoda.entry.plot(entry, $("#plot"));
     };
     yamoda.entry.add(that.ENTRY_URL, that.ENTRY_ID, that.PARAMETER_NAME, that.ENTRY_VALUE);
@@ -50,16 +50,16 @@
 
   hide_values = function() {
     yamoda.logg.debug("Hide values");
-    $("#values-display").text("Values hidden");
-    $("#values-toggle-btn").text("Show values");
+    $("#values_display").text("Values hidden");
+    $("#values_toggle_btn").text("Show values");
   };
 
   show_values = function() {
     yamoda.logg.debug("Show values");
-    $("#values-display").text("Wait...");
+    $("#values_display").text("Wait...");
     yamoda.entry.get(that.ENTRY_URL, function(entry) {
-      yamoda.entry.show_values(entry, $("#values-display"));
-      return $("#values-toggle-btn").text("Hide values");
+      yamoda.entry.show_values(entry, $("#values_display"));
+      return $("#values_toggle_btn").text("Hide values");
     });
   };
 
@@ -67,72 +67,72 @@
     var hide_plot, initial_cb_plot, initial_cb_values, show_plot;
     show_plot = function() {
       yamoda.logg.debug("Show plot");
-      $("#plot-toggle-btn").text("Wait...");
+      $("#plot_toggle_btn").text("Wait...");
       set_plot_area_height();
       yamoda.entry.show_plot($("#plot"));
-      $("#plot-toggle-btn").text("Hide plot");
+      $("#plot_toggle_btn").text("Hide plot");
     };
     hide_plot = function() {
       yamoda.logg.debug("Hide plot");
       yamoda.entry.hide_plot($("#plot"));
       $("#plot>.plot-area").height("auto");
-      $("#plot-toggle-btn").text("Show plot");
+      $("#plot_toggle_btn").text("Show plot");
     };
     initial_cb_plot = function() {
-      $("#plot-toggle-btn").text("Wait...");
+      $("#plot_toggle_btn").text("Wait...");
       yamoda.entry.get(that.ENTRY_URL, function(entry) {
         var values_btn;
         set_plot_area_height();
         yamoda.entry.plot(entry, $('#plot'));
-        $("#plot-toggle-btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial");
+        $("#plot_toggle_btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial");
         $(window).resize(function() {
           yamoda.logg.info("resize!");
           if (!$("#plot>.plot-area").hasClass("placeholder")) {
             set_plot_area_height();
           }
         });
-        values_btn = $("#values-toggle-btn");
+        values_btn = $("#values_toggle_btn");
         if (values_btn.hasClass("initial")) {
           return values_btn.text("Show values").removeClass("initial");
         }
       });
     };
     initial_cb_values = function() {
-      $("#values-toggle-btn").text("Wait...");
+      $("#values_toggle_btn").text("Wait...");
       yamoda.entry.get(that.ENTRY_URL, function(entry) {
         var plot_btn;
-        yamoda.entry.show_values(entry, $("#values-display"));
-        $("#values-toggle-btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial");
-        plot_btn = $("#plot-toggle-btn");
+        yamoda.entry.show_values(entry, $("#values_display"));
+        $("#values_toggle_btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial");
+        plot_btn = $("#plot_toggle_btn");
         if (plot_btn.hasClass("initial")) {
           return plot_btn.text("Show plot").removeClass("initial");
         }
       });
     };
-    $("#plot-toggle-btn").click(initial_cb_plot).text("Request values and plot...");
-    $("#values-toggle-btn").click(initial_cb_values);
+    $("#plot_toggle_btn").click(initial_cb_plot).text("Request values and plot...");
+    $("#values_toggle_btn").click(initial_cb_values);
   };
 
   init_2D_ondemand = function() {
     var hide_image, initial_cb_values, show_image;
     initial_cb_values = function() {
-      $("#values-toggle-btn").text("Wait...");
+      $("#values_toggle_btn").text("Wait...");
       yamoda.entry.get(that.ENTRY_URL, function(entry) {
-        yamoda.entry.show_values(entry, $("#values-display"));
-        return $("#values-toggle-btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial");
+        yamoda.entry.show_values(entry, $("#values_display"));
+        return $("#values_toggle_btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial");
       });
     };
     show_image = function() {
       $("#plot>.plot-area").html('<img src="' + that.ENTRY_URL + '" alt="Plot image cannot be displayed">').removeClass("placeholder");
-      $("#plot-toggle-btn").text("Hide Image");
+      $("#plot_toggle_btn").text("Hide Image");
     };
     hide_image = function() {
       $("#plot>.plot-area").text("Image hidden").addClass("placeholder");
-      $("#plot-toggle-btn").text("Show Image");
+      $("#plot_toggle_btn").text("Show Image");
     };
     $("#static-download-btn").text("Download image");
-    $("#plot-toggle-btn").text("Show image").toggle(show_image, hide_image);
-    $("#values-toggle-btn").click(initial_cb_values);
+    $("#plot_toggle_btn").text("Show image").toggle(show_image, hide_image);
+    $("#values_toggle_btn").click(initial_cb_values);
   };
 
   /*-- READY --

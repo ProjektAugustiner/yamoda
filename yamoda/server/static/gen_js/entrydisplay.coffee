@@ -30,7 +30,7 @@ init_1D = ->
   plot_and_show = (entry) ->
     yamoda.logg.info("plot_and_show")
     set_plot_area_height()
-    yamoda.entry.show_values(entry, $("#values-display"))
+    yamoda.entry.show_values(entry, $("#values_display"))
     yamoda.entry.plot(entry, $("#plot"))
     return
 
@@ -46,17 +46,17 @@ init_1D = ->
 
 hide_values = ->
   yamoda.logg.debug("Hide values")
-  $("#values-display").text("Values hidden")
-  $("#values-toggle-btn").text("Show values")
+  $("#values_display").text("Values hidden")
+  $("#values_toggle_btn").text("Show values")
   return
 
 
 show_values = ->
   yamoda.logg.debug("Show values")
-  $("#values-display").text("Wait...")
+  $("#values_display").text("Wait...")
   yamoda.entry.get(that.ENTRY_URL, (entry) ->
-    yamoda.entry.show_values(entry, $("#values-display"))
-    $("#values-toggle-btn").text("Hide values")
+    yamoda.entry.show_values(entry, $("#values_display"))
+    $("#values_toggle_btn").text("Hide values")
   )
   return
 
@@ -66,32 +66,32 @@ show_values = ->
 init_1D_ondemand = ->
   show_plot = ->
     yamoda.logg.debug("Show plot")
-    $("#plot-toggle-btn").text("Wait...")
+    $("#plot_toggle_btn").text("Wait...")
     set_plot_area_height()
     yamoda.entry.show_plot($("#plot"))
-    $("#plot-toggle-btn").text("Hide plot")
+    $("#plot_toggle_btn").text("Hide plot")
     return
 
   hide_plot = ->
     yamoda.logg.debug("Hide plot")
     yamoda.entry.hide_plot($("#plot"))
     $("#plot>.plot-area").height("auto")
-    $("#plot-toggle-btn").text("Show plot")
+    $("#plot_toggle_btn").text("Show plot")
     return
 
   initial_cb_plot = ->
-    $("#plot-toggle-btn").text("Wait...")
+    $("#plot_toggle_btn").text("Wait...")
     yamoda.entry.get(that.ENTRY_URL, (entry) ->
       # callback: plot entry
       set_plot_area_height()
       yamoda.entry.plot(entry, $('#plot'))
-      $("#plot-toggle-btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial")
+      $("#plot_toggle_btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial")
       $(window).resize ->
         yamoda.logg.info("resize!")
         if not $("#plot>.plot-area").hasClass("placeholder")
           set_plot_area_height()
         return
-      values_btn = $("#values-toggle-btn")
+      values_btn = $("#values_toggle_btn")
       if values_btn.hasClass("initial")
         # other button is still in initial state, change it
         values_btn.text("Show values").removeClass("initial")
@@ -99,19 +99,19 @@ init_1D_ondemand = ->
     return
 
   initial_cb_values = ->
-    $("#values-toggle-btn").text("Wait...")
+    $("#values_toggle_btn").text("Wait...")
     yamoda.entry.get(that.ENTRY_URL, (entry) ->
-      yamoda.entry.show_values(entry, $("#values-display"))
-      $("#values-toggle-btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial")
-      plot_btn = $("#plot-toggle-btn")
+      yamoda.entry.show_values(entry, $("#values_display"))
+      $("#values_toggle_btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial")
+      plot_btn = $("#plot_toggle_btn")
       if plot_btn.hasClass("initial")
         # other button is still in initial state, change it
         plot_btn.text("Show plot").removeClass("initial")
     )
     return
 
-  $("#plot-toggle-btn").click(initial_cb_plot).text("Request values and plot...")
-  $("#values-toggle-btn").click(initial_cb_values)
+  $("#plot_toggle_btn").click(initial_cb_plot).text("Request values and plot...")
+  $("#values_toggle_btn").click(initial_cb_values)
   return
 
 
@@ -119,26 +119,26 @@ init_1D_ondemand = ->
 
 init_2D_ondemand = ->
   initial_cb_values = ->
-    $("#values-toggle-btn").text("Wait...")
+    $("#values_toggle_btn").text("Wait...")
     yamoda.entry.get(that.ENTRY_URL, (entry) ->
-      yamoda.entry.show_values(entry, $("#values-display"))
-      $("#values-toggle-btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial")
+      yamoda.entry.show_values(entry, $("#values_display"))
+      $("#values_toggle_btn").off("click").toggle(hide_values, show_values).text("Hide values").removeClass("initial")
     )
     return
 
   show_image = ->
       $("#plot>.plot-area").html('<img src="' + that.ENTRY_URL + '" alt="Plot image cannot be displayed">').removeClass("placeholder")
-      $("#plot-toggle-btn").text("Hide Image")
+      $("#plot_toggle_btn").text("Hide Image")
       return
 
   hide_image = ->
       $("#plot>.plot-area").text("Image hidden").addClass("placeholder")
-      $("#plot-toggle-btn").text("Show Image")
+      $("#plot_toggle_btn").text("Show Image")
       return
 
   $("#static-download-btn").text("Download image")
-  $("#plot-toggle-btn").text("Show image").toggle(show_image, hide_image)
-  $("#values-toggle-btn").click(initial_cb_values)
+  $("#plot_toggle_btn").text("Show image").toggle(show_image, hide_image)
+  $("#values_toggle_btn").click(initial_cb_values)
   return
 
 ###-- READY --###

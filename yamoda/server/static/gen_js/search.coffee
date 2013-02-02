@@ -19,7 +19,7 @@ request_help_content = (url) ->
   # :param url: GET URL for needed helptext
   $.get(url, (helptext) ->
     logg.info("got helptext for", url)
-    $("#help-content").html(helptext)
+    $("#help_content").html(helptext)
     return
   )
   return
@@ -31,7 +31,7 @@ change_to_query_history = ->
   $("#query_results_btn").show()
   $("#query_history_btn").hide()
   $("#action_dropdown").dropdown()
-  $("#bottom-headline").text("Query History")
+  $("#bottom_headline").text("Query History")
   query_results_shown = false
   return
 
@@ -43,7 +43,7 @@ change_to_query_results = ->
   $("#query_history_btn").show()
   $("#query_results_btn").hide()
   query_results_shown = true
-  $("#bottom-headline").text("Query Results")
+  $("#bottom_headline").text("Query Results")
   return
 
 
@@ -62,7 +62,7 @@ send_query_request = (save_query=true) ->
   logg.info("send query request")
   show_results = $("input[name='show_results']:checked").val()
   logg.info("where to show results:", show_results)
-  $("#bottom-headline").text("Processing...")
+  $("#bottom_headline").text("Processing...")
   $.ajax(
     type: 'POST',
     url: yamoda.search.search_url
@@ -78,7 +78,7 @@ send_query_request = (save_query=true) ->
       send_query_history_request()
       return
     error: () ->
-      $("#bottom-headline").text("Server Error! Please try again.")
+      $("#bottom_headline").text("Server Error! Please try again.")
       return
   )
 

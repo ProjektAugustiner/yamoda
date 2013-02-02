@@ -2,7 +2,7 @@
 {% from "plotting.html" import plotdisplay_includes %}
 
 {% macro entry1D2D(entry, parameter) %}
-<div id="plot-row" class="row-fluid">
+<div class="row-fluid">
   <h2>Entry #{{entry.id}}: {{parameter.name}}({{parameter.unit| unitformat}})</h2>
   <div class="span11" id="plot">
     {% if entry.value.shape|length == 1 %}
@@ -16,11 +16,11 @@
 <div class="row-fluid">
   <div class="span6 small-control-row">
     {% if entry.value|valuecount >= 200 %}
-    <button id="plot-toggle-btn" class="btn btn-primary initial">Show Plot</button>
+    <button id="plot_toggle_btn" class="btn btn-primary initial">Show Plot</button>
     {% endif %}
-    <button id="download-img-btn" class="btn btn-primary">Download</button>
-    <label for="img-type-select">Select Image Type:</label>
-    <select id="img-type-select" class="span4">
+    <button id="download_img_btn" class="btn btn-primary">Download</button>
+    <label for="img_type_select">Select Image Type:</label>
+    <select id="img_type_select" class="span4">
       <option>PNG
       <option>SVG
       <option>PDF
@@ -34,9 +34,9 @@
   <div class="span12" id="data" data-length="{{entry.value|valuecount}}" data-entry-id="{{entry.id}}">
     <h2>Raw Data (count: {{entry.value|valuecount}})</h2>
     {% if entry.value|valuecount >= 200 %}
-      <a id="values-toggle-btn" class="btn btn-primary initial">Request and show values</a>
+      <a id="values_toggle_btn" class="btn btn-primary initial">Request and show values</a>
     {% endif %}
-    <pre id="values-display">No values loaded</pre>
+    <pre id="values_display">No values loaded</pre>
   </div>
 </div>
 {% endmacro %}
@@ -63,7 +63,7 @@ $ ->
   {% if entry.value.shape|length == 2 %}
   # 2D entry
   yamoda.entrydisplay.e2D_ondemand.init()
-  $("#plot-toggle-btn").click()
+  $("#plot_toggle_btn").click()
   {% elif entry.value|valuecount < 200 %}
   # small 1D entry
   # is displayed on page load
@@ -71,11 +71,11 @@ $ ->
   {% else %}
   # large 1D entry is displayed when the user requests it
   yamoda.entrydisplay.e1D_ondemand.init()
-  $("#plot-toggle-btn").click()
+  $("#plot_toggle_btn").click()
   {% endif %}
 
-  $("#download-img-btn").click ->
-    img_type = $("#img-type-select").val()
+  $("#download_img_btn").click ->
+    img_type = $("#img_type_select").val()
     $.getJSON '{{url_for("entry", entry_id=entry.id)}}' + '?img_url_for_type=' + img_type, (json) ->
       window.location.replace(json.img_url)
       return
