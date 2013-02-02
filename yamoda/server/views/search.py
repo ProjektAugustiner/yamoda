@@ -131,7 +131,6 @@ def do_search():
     logg.debug("query dict %s", query_dict)
     result_type, query = convert_dict_query_to_sqla(query_dict)
     logg.debug("result type %s, query %s", result_type, query)
-
     # save query if requested
     logg.info("save query? %s", request.form["save_query"])
     if request.form["save_query"] == "true":

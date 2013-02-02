@@ -85,7 +85,7 @@
         send_query_history_request();
       },
       error: function() {
-        $("#bottom_headline").text("Error!");
+        $("#bottom-headline").text("Server Error! Please try again.");
       }
     });
   };

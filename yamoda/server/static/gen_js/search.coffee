@@ -78,7 +78,7 @@ send_query_request = (save_query=true) ->
       send_query_history_request()
       return
     error: () ->
-      $("#bottom_headline").text("Error!")
+      $("#bottom-headline").text("Server Error! Please try again.")
       return
   )
 

@@ -149,6 +149,13 @@
       run_before_init: run_before_init,
       make_module: make_module
     };
+    $(document).ajaxError(function(event, jqxhr, settings, exception) {
+      logg.warn("AJAX error occured, url", settings.url, "exception:", exception);
+      console.log(event);
+      console.log(jqxhr);
+      console.log(settings);
+      return alert("An internal server error occured. Sorry, please try again :-)\n" + "If the error persists, please contact admin@example.com.");
+    });
     logg.info("yamoda root module loaded");
   });
 

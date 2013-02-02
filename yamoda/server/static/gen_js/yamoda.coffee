@@ -142,6 +142,16 @@ $ ->
     make_module: make_module
   }
 
+  # error logging
+  $(document).ajaxError( (event, jqxhr, settings, exception) ->
+    logg.warn("AJAX error occured, url", settings.url, "exception:", exception)
+    console.log(event)
+    console.log(jqxhr)
+    console.log(settings)
+    alert("An internal server error occured. Sorry, please try again :-)\n" +
+    "If the error persists, please contact admin@example.com.")
+  )
+
   # ok, all done
   logg.info("yamoda root module loaded")
   return
