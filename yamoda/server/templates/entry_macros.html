@@ -3,7 +3,7 @@
 <td>{{ entry.value|dataformat }}</td>
 {% elif entry.value.shape|length == 1 %}
 <td class="valuecolumn">
-  <strong>Max:</strong> {{ entry.value|max|dataformat }}
+  <span><strong>Max:</strong> {{ entry.value|max|dataformat }}</span>
   <span class="sparkline"
     width="{{width}}px"
     values="{{ entry.value|dataformat(width) }}" 
@@ -12,7 +12,7 @@
     normalMax="0">
   Loading...
   </span>
-  <strong>Min:</strong> {{ entry.value|min|dataformat }}
+  <span><strong>Min:</strong> {{ entry.value|min|dataformat }}</span>
 </td>
 {% elif entry.value.shape|length == 2 %}
 <td class="2d-preview">

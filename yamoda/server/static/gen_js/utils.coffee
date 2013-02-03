@@ -11,7 +11,7 @@
 MODULE_NAME = "utils"
 logg = undefined
 that = undefined
-asInitVals = []
+filter_init_vals = []
 
 ###-- module functions --###
 
@@ -36,27 +36,31 @@ setup_datatable = ($table, options) ->
 
 
 setup_column_filter_boxes = ($boxes, dtable) ->
-  $boxes.keyup((i) ->
-    logg.debug("input keyup, index", $boxes.index(this), "value", this.value)
-    dtable.fnFilter(this.value, $boxes.index(this))
+  $boxes.each((i) ->
+    column_num = $(this).data("column_num")
+    filter_init_vals[column_num] = this.value
     return
   )
-  $boxes.each((i) ->
-    asInitVals[i] = this.value
+  $boxes.keyup((i) ->
+    column_num = $(this).data("column_num")
+    logg.debug("input keyup, index", column_num, "value", this.value, i)
+    dtable.fnFilter(this.value, column_num)
     return
   )
   $boxes.focus((i) ->
     logg.debug("input focus")
-    if $boxes.hasClass("search_init")
-      $boxes.removeClass("search_init")
+    $this = $(this)
+    if $this.hasClass("filter-init")
+      $this.removeClass("filter-init")
       this.value = ""
     return
   )
   $boxes.blur((i) ->
+    column_num = $(this).data("column_num")
     logg.debug("input blur")
     if this.value == ""
-      $boxes.addClass("search_init")
-      this.value = asInitVals[$boxes.index(this)]
+      $boxes.addClass("filter-init")
+      this.value = filter_init_vals[column_num]
     return
   )
 

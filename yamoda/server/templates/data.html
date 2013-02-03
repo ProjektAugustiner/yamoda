@@ -4,33 +4,41 @@
 {% block extrahead %}
 <!-- external libs -->
 <script src="{{ url_for('static', filename='js/jquery.sparkline.js') }}"></script>
-<!-- yamoda base module -->
-<script src="{{ url_for('static', filename='gen_js/yamoda.js') }}"></script>
-<script>
-  $(document).ready(function () {
-    yamoda.base_url = "{{ url_for('index') }}";
-    yamoda.logg.info("base url is", yamoda.base_url);
-  })
-</script>
 <!-- yamoda modules -->
 <script src="{{ url_for('static', filename='gen_js/entry.js') }}"></script>
+<script>
+{% coffee "main" %}
+$ ->
+  yamoda.base_url = "{{ url_for('index') }}"
+  yamoda.entry.sparkline_setup($("#entrytable td.valuecolumn .sparkline"))
+  dtable = yamoda.utils.setup_datatable($("#entrytable"),
+    resizable: false
+    aaSorting: [[7, "desc"], [5, "asc"], [1, "asc"]]
+  )
+  yamoda.utils.setup_column_filter_boxes($("#entrytable th.footer input.filter-input"), dtable)
+  # 2D preview image setup
+  yamoda.entry.fetch_2D_preview_images($("#entrytable td.2d-preview"), "35%")
+  $('a[rel=tooltip]').tooltip()
+  return
+{% endcoffee %}
+</script>
 {% endblock %}
 {% block body %}
   <h2>Data: {{ data.name }}
   <small>Created {{ data.created|dtformat }}</small></h2>
   <h3>Entries:</h3>
   <hr>
-  <table id="datatable" class="table table-condensed table-bordered table-striped">
+  <table id="entrytable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
         <th class="hidden"></th>
-        <th class="header colresize">Parameter</th>
-        <th class="header colresize">Value</th>
-        <th class="header colresize">Unit</th>
-        <th class="header colresize">Details</th>
-        <th class="header colresize">Dim</th>
-        <th class="header colresize">Size</th>
-        <th class="header colresize">Visible?</th>
+        <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Parameter</th>
+        <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Value</th>
+        <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Unit</th>
+        <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Details</th>
+        <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Dim</th>
+        <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Size</th>
+        <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Visible?</th>
       </tr>
     </thead>
     <tbody>
@@ -45,7 +53,7 @@
             {{ entry.parameter.name }}
           </a>
         </td>
-        {{ entryvalue(entry, 600) }}
+        {{ entryvalue(entry, 500) }}
         <td>{{ entry.parameter.unit|unitformat }}</td>
         {% if entry.value.shape %}
         <td><a href="{{url_for('entry', entry_id=entry.id)}}">Show...</a></td>
@@ -62,41 +70,16 @@
       </tr>
       {%- endfor %}
     </tbody>
+      <tfoot>
+        <th class="footer"><input type="text" name="filter_param" class="filter-input filter-init input-mini" value="Filter" data-column_num="1" /></th>
+        <th></th>
+        <th class="footer"><input type="text" name="filter_unit" class="filter-input filter-init input-mini" value="Filter" data-column_num="3" /></th>
+        <th></th>
+        <th class="footer"><input type="text" name="filter_dim" class="filter-input filter-init input-mini" value="Filter" data-column_num="5" /></th>
+        <th class="footer"><input type="text" name="filter_size" class="filter-input filter-init input-mini" value="Filter" data-column_num="6" /></th>
+        <th class="footer"><input type="text" name="filter_visible" class="filter-input filter-init input-mini" value="Visible?" data-column_num="7" /></th>
+      </tfoot>
   </table>
-
-<script>
-{% coffee "main" %}
-datatable_setup = () ->
-  $("#datatable").dataTable(
-    bStateSave: false
-    aaSorting: [[7, "desc"], [5, "asc"], [1, "asc"]]
-    #aoColumns: [
-    #  null,
-    #  null,
-    #  null,
-    #  null,
-      #sType:
-      #    "dimension"
-   #   null,
-    #  null,
-    #  null
-    #]
-  )
-  return
-
-
-
-$( () ->
-  #$("#datatable").dataTable()
-  datatable_setup()
-  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn .sparkline"))
-  # 2D preview image setup
-  yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "35%")
-  $('a[rel=tooltip]').tooltip()
-  return
-)
-{% endcoffee %}
-</script>
 {% endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

@@ -4,10 +4,10 @@
   <thead>
     <tr>
       <th>#</th>
-      <th class="header colresize">Name</th>
-      <th class="header colresize">Context</th>
-      <th class="header colresize">Entries</th>
-      <th class="header colresize">Created</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Name</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Context</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Entries</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Created</th>
       {% for p in params %}
       <th class="header colresize" rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
       {% endfor %}
@@ -23,7 +23,7 @@
       <td>{{ data.entries|length }}</td>
       <td>{{ data.created|dtformat }}</td>
       {% for entry in entries[loop.index0] %}
-        {{ entryvalue(entry, 660 / (params|length)) }}
+        {{ entryvalue(entry, 550 / (params|length)) }}
       {% endfor %}
       <td><input type="checkbox" class="datacheck" id="check_{{ data.id }}" value="yes" /></td>
     </tr>
@@ -31,11 +31,11 @@
   {%- endfor %}
   </tbody>
   <tfoot>
-    <th class="footer"><input type="text" name="search_number" class="search-input search_init input-small" value="Filter #" /></th>
-    <th class="footer"><input type="text" name="search_name" class="search-input search_init input-medium" value="Filter names" /></th>
-    <th class="footer"><input type="text" name="search_context" class="search-input search_init input-large" value="Filter contexts" /></th>
-    <th class="footer"><input type="text" name="search_entry_num" class="search-input search_init input-large" value="count" /></th>
-    <th class="footer"><input type="text" name="search_created" class="search-input search_init input-medium" value="Filter dates" /></th>
+    <th class="footer"><input type="text" name="filter_number" class="filter-input filter-init input-small" value="Filter #" /></th>
+    <th class="footer"><input type="text" name="filter_name" class="filter-input filter-init input-medium" value="Filter names" /></th>
+    <th class="footer"><input type="text" name="filter_context" class="filter-input filter-init input-medium" value="Filter contexts" /></th>
+    <th class="footer"><input type="text" name="filter_entry_num" class="filter-input filter-init input-mini" value="count" /></th>
+    <th class="footer"><input type="text" name="filter_created" class="filter-input filter-init input-medium" value="Filter dates" /></th>
     <th></th>
     {%- for _ in params %}
     <th></th>
@@ -61,7 +61,7 @@
 $ ->
   yamoda.entry.sparkline_setup($("td.valuecolumn>.sparkline"))
   dtable = yamoda.utils.setup_datatable($("#datatable"))
-  yamoda.utils.setup_column_filter_boxes($("#datatable th.footer input.search-input"), dtable)
+  yamoda.utils.setup_column_filter_boxes($("#datatable th.footer input.filter-input"), dtable)
 
 {% endcoffee %}
 

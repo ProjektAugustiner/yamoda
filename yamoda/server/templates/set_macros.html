@@ -3,7 +3,7 @@
   {% coffee "main" %}
   $ ->
     dtable = yamoda.utils.setup_datatable($("#settable"))
-    yamoda.utils.setup_column_filter_boxes($("#settable th.footer input.search-input"), dtable)
+    yamoda.utils.setup_column_filter_boxes($("#settable th.footer input.filter-input"), dtable)
   {% endcoffee %}
   </script>
 {% endmacro %}
@@ -13,11 +13,11 @@
 <table id="settable" class="table table-condensed table-bordered table-striped">
   <thead>
     <tr>
-      <th class="header colresize">#</th>
-      <th class="header colresize">Name</th>
-      <th class="header colresize">Subsets</th>
-      <th class="header colresize">Datas</th>
-      <th class="header colresize">Created</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">#</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Name</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Subsets</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Datas</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Created</th>
     </tr>
   </thead>
   <tbody>
@@ -32,11 +32,11 @@
   {%- endfor %}
   </tbody>
   <tfoot>
-    <th class="footer"><input type="text" name="search_number" class="search-input search_init input-small" value="Filter #" /></th>
-    <th class="footer"><input type="text" name="search_name" class="search-input search_init input-large" value="Filter names" /></th>
-    <th class="footer"><input type="text" name="search_entries_count" class="search-input search_init input-small" value="# subsets" /></th>
-    <th class="footer"><input type="text" name="search_datas_count" class="search-input search_init input-small" value="# datas" /></th>
-    <th class="footer"><input type="text" name="search_created" class="search-input search_init input-medium" value="Filter dates" /></th>
+    <th class="footer"><input type="text" name="filter_number" class="filter-input filter-init input-small" value="Filter #" data-column_num="0" /></th>
+    <th class="footer"><input type="text" name="filter_name" class="filter-input filter-init input-large" value="Filter names" data-column_num="1" /></th>
+    <th class="footer"><input type="text" name="filter_entries_count" class="filter-input filter-init input-small" value="# subsets" data-column_num="2" /></th>
+    <th class="footer"><input type="text" name="filter_datas_count" class="filter-input filter-init input-small" value="# datas" data-column_num="3" /></th>
+    <th class="footer"><input type="text" name="filter_created" class="filter-input filter-init input-medium" value="Filter dates" data-column_num="4" /></th>
   </tfoot>
 </table>
 {% endmacro %}

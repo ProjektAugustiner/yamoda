@@ -27,8 +27,16 @@ div.small-control-row label {
 }
 
 hr.small-vertical-margin {
-  margin-top:8px;
-  margin-bottom:4px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.valuecolumn>* {
+  display: block;
+}
+
+input.filter-init {
+  font-style: italic;
 }
 
 /* vim: set filetype=css sw=2 ts=2 sts=2 expandtab: */
