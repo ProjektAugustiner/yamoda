@@ -15,50 +15,15 @@ that = undefined
 
 ###-- module functions --###
 
-setup_datatable = ->
+setup_query_history_table = ->
   # Initialize jquery.dataTables and some helpers for the filter boxes.
-  table = $("#query_history_table")
-  if table.hasClass("initialized")
-    logg.info("table already initialized, doing nothing")
-    return
-  logg.debug("activating dataTable for query_history_table")
-  dtable = table.addClass("initialized").dataTable(
-    bStateSave: true
-    #sDom: "rltpi"
-    sPaginationType: "full_numbers"
-    oLanguage:
-      sSearch: "Search all columns: "
+  $table = $("#query_history_table")
+  dtable = yamoda.utils.setup_datatable($table,
     aoColumnDefs: [
       {asSorting: [], aTargets: [5, 6]}
     ]
-    
   )
-  # helper functions adopted from jquery.datatables example
-  $("tfoot input").keyup((i) ->
-    logg.debug("input keyup")
-    dtable.fnFilter(this.value, $("tfoot input").index(this))
-    return
-  )
-  $("tfoot input").each((i) ->
-    asInitVals[i] = this.value
-    return
-  )
-  $("tfoot input").focus((i) ->
-    logg.debug("input focus")
-    t$ = $(this)
-    if t$.hasClass("search_init")
-      t$.removeClass("search_init")
-      this.value = ""
-    return
-  )
-  $("tfoot input").blur((i) ->
-    logg.debug("input blur")
-    if this.value == ""
-      t$ = $(this)
-      t$.addClass("search_init")
-      this.value = asInitVals[$("tfoot input").index(this)]
-    return
-  )
+  yamoda.utils.setup_column_filter_boxes($("#query_history_table tfoot input"), dtable)
 
   # setup popovers which show the query string in formatted form (newlines).
   query_links = $(".query_popover")
@@ -72,9 +37,6 @@ setup_datatable = ->
       placement: "top"
     }
   )
-  # resizable columns plugin
-  logg.info("colResizable")
-  dtable.colResizable()
   return
 
 
@@ -180,11 +142,11 @@ $ ->
     toggle_all_checkboxes: toggle_all_checkboxes
     del_queries: del_queries
     toggle_favorite_queries: toggle_favorite_queries
-    setup_datatable: setup_datatable
+    setup_query_history_table: setup_query_history_table
   )
   # other stuff to do
   logg = that.logg
-  setup_datatable()
+  setup_query_history_table()
   return
 
 # vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #

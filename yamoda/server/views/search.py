@@ -83,7 +83,7 @@ def _render_search_result(result_type, sqla_query, query_string):
         sets = sqla_query.all_readable()
         logg.info("query returned %s sets", len(sets))
         logg.debug("result sets %s", sets)
-        return render_template('settable.html', sets=sets)
+        return render_template('setresult.html', sets=sets)
 
     elif result_type == "datas":
         # XXX: no accesscontrol for datas
@@ -205,6 +205,7 @@ def search():
     """Display search page with AugQL help and search history
     """
     query_history = HistoricQuery.query.order_by(HistoricQuery.created).limit(100).all()
+    logg.debug("found saved queries: %s", query_history)
     return render_template('search.html', query_history=query_history)
 
 
@@ -220,7 +221,9 @@ def get_query_history():
 @app.route('/searchtest')
 @login_required
 def searchtest():
-    """ just run some test query"""
+    """ just run some test query
+    WARNING: outdated
+    """
     import yamoda.query.test.testqueries as tq
 
     query_string = tq.testquery_sets.string
@@ -229,6 +232,6 @@ def searchtest():
     result = query.all_readable()
 
     if result_type == "sets":
-        return render_template('settable.html', sets=result)
+        return render_template('setresult.html', sets=result)
     else:
-        return render_template('datatable.html', datas=result, params=[], pvalues=[], query=query_string)
+        return render_template('dataresult.html', datas=result, params=[], pvalues=[], query=query_string)

@@ -4,14 +4,14 @@
   <thead>
     <tr>
       <th>#</th>
-      <th>Name</th>
-      <th>Context</th>
-      <th>Entries</th>
-      <th>Created</th>
+      <th class="header colresize">Name</th>
+      <th class="header colresize">Context</th>
+      <th class="header colresize">Entries</th>
+      <th class="header colresize">Created</th>
       {% for p in params %}
-      <th rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
+      <th class="header colresize" rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
       {% endfor %}
-      <th><input type="checkbox" onchange="toggleall(this)" /></th>
+      <th class="header"><input type="checkbox" onchange="toggleall(this)" /></th>
     </tr>
   </thead>
   <tbody>
@@ -30,6 +30,17 @@
 
   {%- endfor %}
   </tbody>
+  <tfoot>
+    <th class="footer"><input type="text" name="search_number" class="search-input search_init input-small" value="Filter #" /></th>
+    <th class="footer"><input type="text" name="search_name" class="search-input search_init input-medium" value="Filter names" /></th>
+    <th class="footer"><input type="text" name="search_context" class="search-input search_init input-large" value="Filter contexts" /></th>
+    <th class="footer"><input type="text" name="search_entry_num" class="search-input search_init input-large" value="count" /></th>
+    <th class="footer"><input type="text" name="search_created" class="search-input search_init input-medium" value="Filter dates" /></th>
+    <th></th>
+    {%- for _ in params %}
+    <th></th>
+    {% endfor %}
+  </tfoot>
 </table>
 <div id="actionbutton" style="float: right">
   <div class="btn-group">
@@ -48,16 +59,20 @@
 {% macro datatable_script() %}
 {% coffee "main" %}
 $ ->
-  yamoda.entry.sparkline_setup($("#datatable td.valuecolumn .sparkline"))
+  yamoda.entry.sparkline_setup($("td.valuecolumn>.sparkline"))
+  dtable = yamoda.utils.setup_datatable($("#datatable"))
+  yamoda.utils.setup_column_filter_boxes($("#datatable th.footer input.search-input"), dtable)
 
 {% endcoffee %}
 
+/*
 $(document).ready(function() {
   $('#datatable').dataTable({
     bLengthChange: true, bPaginate: true, sDom: 'f<"datatoolbar">rtip<"databottombar">'});
   $(".datatoolbar").append($("#newbutton").remove());
   $(".databottombar").append($("#actionbutton").remove());
-});
+  });
+*/
 function toggleall(check) {
   if (check.checked)
     $('.datacheck').attr('checked', 'checked');

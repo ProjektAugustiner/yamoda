@@ -1,0 +1,78 @@
+{% macro settable_script() %}
+  <script>
+  {% coffee "main" %}
+  $ ->
+    dtable = yamoda.utils.setup_datatable($("#settable"))
+    yamoda.utils.setup_column_filter_boxes($("#settable th.footer input.search-input"), dtable)
+  {% endcoffee %}
+  </script>
+{% endmacro %}
+
+{% macro settable(sets) %}
+{# just a table with sets  #}
+<table id="settable" class="table table-condensed table-bordered table-striped">
+  <thead>
+    <tr>
+      <th class="header colresize">#</th>
+      <th class="header colresize">Name</th>
+      <th class="header colresize">Subsets</th>
+      <th class="header colresize">Datas</th>
+      <th class="header colresize">Created</th>
+    </tr>
+  </thead>
+  <tbody>
+  {%- for set in sets %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td><a href="{{ url_for('set', set_id=set.id) }}">{{ set.name }}</a></td>
+      <td>{{ set.children|length }}</td>
+      <td>{{ set.datas|length }}</td>
+      <td>{{ set.created|dtformat }}</td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+  <tfoot>
+    <th class="footer"><input type="text" name="search_number" class="search-input search_init input-small" value="Filter #" /></th>
+    <th class="footer"><input type="text" name="search_name" class="search-input search_init input-large" value="Filter names" /></th>
+    <th class="footer"><input type="text" name="search_entries_count" class="search-input search_init input-small" value="# subsets" /></th>
+    <th class="footer"><input type="text" name="search_datas_count" class="search-input search_init input-small" value="# datas" /></th>
+    <th class="footer"><input type="text" name="search_created" class="search-input search_init input-medium" value="Filter dates" /></th>
+  </tfoot>
+</table>
+{% endmacro %}
+
+{% macro setlist(sets, parent) %}
+{# settable with additional set controls (new set)  #}
+  <div class="new_set_button">
+    <a class="btn" data-toggle="modal"
+      href="#new_set">Create {% if parent %}sub{% endif %}set</a>
+  </div>
+
+  {% if sets %} 
+  {{ settable(sets) }}
+  {% endif %} 
+
+  <div class="modal hide" id="new_set">
+    <form class="modal-form" action="{{ url_for('create_set') }}" method="post">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h3>Create new set</h3>
+        {%- if parent %}
+        <p>(as a child of {{ parent.name }})</p>
+        {%- endif %}
+      </div>
+      <div class="modal-body">
+        <label>Name</label>
+        <input type="text" class="span3" placeholder="Set name…" name="name">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="icon-ok-sign icon-white"></i> Create
+        </button>
+      </div>
+    </form>
+  </div>
+{% endmacro %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

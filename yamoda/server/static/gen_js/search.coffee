@@ -52,7 +52,7 @@ send_query_history_request = ->
   $.get(yamoda.search.query_history_url, (history_content) ->
     logg.info("got history content")
     $("#query_history_content").html(history_content)
-    yamoda.queryhistory.setup_datatable()
+    yamoda.queryhistory.setup_query_history_table()
   )
   return
 

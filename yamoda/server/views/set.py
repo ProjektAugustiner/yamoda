@@ -35,7 +35,7 @@ def _render_set_json(set, **kw):
 
 @app.route('/sets/<int:set_id>')
 @login_required
-@html_json_mimerender("set.html", _render_set_json)
+@html_json_mimerender("setdisplay.html", _render_set_json)
 def set(set_id):
     s = Set.query.get_readable(set_id)
     if not s:
@@ -60,7 +60,7 @@ def _render_sets_json(sets):
 @app.route('/sets')
 @app.route('/sets/<which>')
 @login_required
-@html_json_mimerender("setlist.html", _render_sets_json)
+@html_json_mimerender("setlist_display.html", _render_sets_json)
 def sets(which='mine'):
     if which == 'all':
         setlist = Set.query.all_readable()

@@ -1,0 +1,10 @@
+{# show a set list as separate page #}
+{% from "set_macros.html" import settable %}
+{% extends "layout.html" %}
+{% set title = "Datasets" %}
+{% block body %}
+  <h2>Datasets</h2>
+  {{ setlist(sets, parent) }}
+{% endblock %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}
