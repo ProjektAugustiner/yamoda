@@ -30,16 +30,21 @@ def _make_comparison(args):
         return GreaterThan(number)
 
 
+def _join(seq):
+    return " ".join(seq)
+
+
 def _concat_list(args):
     return list([args[0]] + args[1])
 
 ##### parsers (rules)
 
 # ## names
-context_name = Word(string.letters + string.digits + "_")
-data_name = context_name
-param_name = context_name(desc="param_name")
-user_name = context_name(description="user name")
+identifier = Word(string.letters + string.digits + "_")
+context_name = OneOrMore(identifier)[_join]
+data_name = identifier(description="data_name")
+param_name = identifier(description="param_name")
+user_name = identifier(description="user name")
 
 # ## number literals
 
@@ -85,13 +90,16 @@ date_interval = Expected(Regex(r"\d{1,2} \w+ \d{2,4} to \d\d \w+ \d{2,4}"), "'da
 
 creation_time_spec = (L("created") + ":" + date_interval)[lambda t: TimeInterval(*daterangeparser.parse(t))]
 
+visible_params_spec = (L("visible")) + ":" + OneOrMore(param_name)
+
 query_clause = (context_spec["context_name"]
                 | user_spec["user_name"]
                 | find_spec["find"]
                 | limit_spec["limit"]
                 | filter_spec["param_filter"]
                 | sort_spec["sort"]
-                | creation_time_spec["created"])
+                | creation_time_spec["created"]
+                | visible_params_spec["visible_params"])
 
 # complete AugQL query string
 query = (query_clause + ZeroOrMore(L(",") + query_clause))[_concat_list]

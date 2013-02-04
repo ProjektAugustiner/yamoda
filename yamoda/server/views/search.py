@@ -77,7 +77,7 @@ def _save_query(query_string, query_dict, query_name):
         return ("Query was not saved (duplicate).", "warn")
 
 
-def _render_search_result(result_type, sqla_query, query_string):
+def _render_search_result(result_type, sqla_query, query_string, view_options):
 
     if result_type == "sets":
         sets = sqla_query.all_readable()
@@ -89,15 +89,23 @@ def _render_search_result(result_type, sqla_query, query_string):
         # XXX: no accesscontrol for datas
         datas = sqla_query.all()
         logg.info("query returned %s datas", len(datas))
-        # determine common visible parameters for all rows which will be displayed on the result page
-        all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
-        if datas:
+        if not datas:
+            common_param_set = []
+            entries = []
+        else:
+            if "visible_params" in view_options:
+                # visible params are specified by view options
+                visible_params = view_options["visible_params"]
+                all_param_sets = [{p for p in d.context.parameters if p.name in visible_params} for d in datas]
+            else:
+                # no visible params option found,
+                # determine common visible parameters for all rows which will be displayed on the result page
+                all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
+
             common_param_set = set.intersection(*all_param_sets)
             entries = view_helpers.get_entries(datas, common_param_set)
             logg.info("intersected params %s", common_param_set)
-        else:
-            common_param_set = []
-            entries = []
+
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
         return render_template("dataresult.html", datas=datas, params=common_param_set, entries=entries)
@@ -138,7 +146,7 @@ def do_search():
         flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
         flash(flash_msg, flash_cat)
 
-    return _render_search_result(result_type, query, query_string)
+    return _render_search_result(result_type, query, query_string, query_dict.get("view_options", {}))
 
 
 @app.route("/search/runquery/<int:query_id>", methods=["GET"])
@@ -147,7 +155,7 @@ def run_query(query_id):
     hist_query = HistoricQuery.query.get_or_404(query_id)
     query_dict = from_json(hist_query.query_json)
     result_type, sqla_query = convert_dict_query_to_sqla(query_dict)
-    return _render_search_result(result_type, sqla_query, hist_query.query_string)
+    return _render_search_result(result_type, sqla_query, hist_query.query_string, query_dict.get("view_options", {}))
 
 
 @app.route('/search/toggle_favorite_queries', methods=["POST"])

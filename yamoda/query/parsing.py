@@ -24,8 +24,9 @@ def replace_newline_with_comma(query_str):
 def parse_query_string(query_string):
     """ Parse AugQL query string to intermediate representation.
     :param query_string: AugQL string, clauses separated by comma or newline.
+    :returns: intermediate representation (query dict)
     """
-    query_dict = dict()
+    query_dict = {}
     logg.debug("parsing: '%s'", query_string)
     parsed = query.parse_string(query_string)
     logg.debug("parsing result: %s", parsed)
@@ -51,5 +52,9 @@ def parse_query_string(query_string):
             if param_name in param_filters:
                 raise Exception("duplicate param filter clause for '{}'!".format(param_name))
             param_filters[param_name] = content.param_exprs
+        elif tag in ("visible_params"):
+            check_duplicate(tag)
+            show_options = query_dict.setdefault("view_options", {})
+            show_options["visible_params"] = content
 
     return query_dict

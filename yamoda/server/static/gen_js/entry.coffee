@@ -19,18 +19,17 @@ default_flot_options =
     points:
       show: true
       radius: 0.4
-  xaxis:
-    zoomRange: [2, 100]
-    panRange: [0, 100]
-  yaxis:
-    zoomRange: [0.01, 1]
-    panRange: [0, 1]
   grid:
     clickable: true
     hoverable: true
     autoHighlight: true
   selection:
     mode: "xy"
+  zoom:
+    interactive: true
+  pan:
+    interactive: true
+
 
 ###-- module functions --###
 
@@ -250,6 +249,7 @@ flot_setup = ($plot_div) ->
   # zooming with navigation plugin and mousewheel doesn't work with JQuery 1.7(NaN!!)
   # deactivated zooming for now
   $plot_area.on("plotzoom", (ev, plot) ->
+    logg.info("plotzoom")
     axes = plot.getAxes()
     $plot_message.html("Zooming to x: " + axes.xaxis.min.toFixed(2) + " &ndash; " + axes.xaxis.max.toFixed(2) +
                             " and y; " + axes.yaxis.min.toFixed(2) + " &ndash; " + axes.yaxis.max.toFixed(2)
