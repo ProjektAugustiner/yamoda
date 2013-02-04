@@ -31,7 +31,7 @@ init_1D = ->
     yamoda.logg.info("plot_and_show")
     set_plot_area_height()
     yamoda.entry.show_values(entry, $("#values_display"))
-    yamoda.entry.plot(entry, $("#plot"))
+    yamoda.entry.plot_1D(entry, $("#plot"))
     return
 
   yamoda.entry.add(that.ENTRY_URL, that.ENTRY_ID,that.PARAMETER_NAME, that.ENTRY_VALUE)
@@ -84,7 +84,7 @@ init_1D_ondemand = ->
     yamoda.entry.get(that.ENTRY_URL, (entry) ->
       # callback: plot entry
       set_plot_area_height()
-      yamoda.entry.plot(entry, $('#plot'))
+      yamoda.entry.plot_1D(entry, $('#plot'))
       $("#plot_toggle_btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial")
       $(window).resize ->
         yamoda.logg.info("resize!")

@@ -12,6 +12,25 @@ logg = undefined
 # entry cache
 entries = {}
 
+default_flot_options =
+  series:
+    lines:
+      show: true
+    points:
+      show: true
+      radius: 0.4
+  xaxis:
+    zoomRange: [2, 100]
+    panRange: [0, 100]
+  yaxis:
+    zoomRange: [0.01, 1]
+    panRange: [0, 1]
+  grid:
+    clickable: true
+    hoverable: true
+    autoHighlight: true
+  selection:
+    mode: "xy"
 
 ###-- module functions --###
 
@@ -32,6 +51,15 @@ add = (entry_url, entry_id, parameter_name, entry_value) ->
   return
 
 
+entry_request = (entry_url, success_cb) ->
+  $.ajax(
+    type: "GET"
+    url: entry_url
+    dataType: "json"
+    success: success_cb
+  )
+
+
 get = (entry_url, success_fn) ->
   # Get an entry (maybe from cache) and call a function.
   # :param entry_url: like entries/220
@@ -40,11 +68,7 @@ get = (entry_url, success_fn) ->
   if entry_url not of entries
     logg.debug(entry_url, "unknown, requesting it from server...")
     logg.debug("current entries", entries)
-    $.ajax(
-      type: "GET"
-      url: entry_url
-      dataType: "json"
-      success: (entry) ->
+    entry_request(entry_url, (entry) ->
         entries[entry_url] = entry
         success_fn(entry)
         return
@@ -54,6 +78,26 @@ get = (entry_url, success_fn) ->
     success_fn(entries[entry_url])
   return
         
+
+get_two = (entry_x_url, entry_y_url, success_fn) ->
+  # Get two entries (maybe from cache) and call a function.
+  # :param entry_x_url: like entries/220
+  # :param entry_y_url: like entries/220
+  # :param success_fn: callback which gets entry_x and entry_x as args
+  entry_x = null
+  entry_y = null
+  check_success = (entry_url, entry) ->
+    if entry_url == entry_x_url
+      entry_x = entry
+    else
+      entry_y = entry
+    if entry_x and entry_y
+      success_fn(entry_x, entry_y)
+
+  get(entry_x_url, (entry) -> check_success(entry_x_url, entry))
+  get(entry_y_url, (entry) -> check_success(entry_y_url, entry))
+  return
+
 
 _do_ajax_2D_preview_images = ($target, height) ->
   image_url = $target.children("a").attr("imageUrl")
@@ -78,38 +122,11 @@ setup_2D_preview_images_ondemand = ($target, height) ->
   return
 
 
-plot = (entry, $target) ->
-  # use flot to a create a plot of an entry
-  # :param entry: entry to plot
+plot_series = (series, $target) ->
+  # plot a series with flot
+  # :param entry: series to plot
   # :param $taget: JQuery selector for the node that will display the plot
 
-  logg.info("plotting entry", entry.id, "...")
-  series = {
-    data: ([i, value] for value,i in entry.value)
-    label: "<strong>" + entry.parameter_name + "</strong>"
-    clickable: true
-    hoverable: true
-  }
-  options = {
-    series:
-      lines:
-        show: true
-      points:
-        show: true
-        radius: 0.4
-    xaxis:
-      zoomRange: [2, 100]
-      panRange: [0, 100]
-    yaxis:
-      zoomRange: [0.01, 1]
-      panRange: [0, 1]
-    grid:
-      clickable: true
-      hoverable: true
-      autoHighlight: true
-    selection:
-      mode: "xy"
-  }
   # get old plot and its data if there is one
   $plot_area = $target.children(".plot-area")
   prev_plot = $target.data("plot")
@@ -121,9 +138,41 @@ plot = (entry, $target) ->
     # new plot
     plot_data = [series]
       
-  plot = $.plot($plot_area, plot_data, options)
+  plot = $.plot($plot_area, plot_data, default_flot_options)
   $target.data("plot", plot)
   $plot_area.removeClass("placeholder")
+  return
+
+
+plot_1D = (entry, $target) ->
+  # use flot to a create a plot of an 1D entry
+  # :param entry: entry to plot
+  # :param $taget: JQuery selector for the node that will display the plot
+
+  logg.info("plotting 1D entry", entry.id, "...")
+  series = {
+    data: ([i, value] for value,i in entry.value)
+    label: "<strong>" + entry.parameter_name + "</strong>"
+    clickable: true
+    hoverable: true
+  }
+  plot_series(series, $target)
+  return
+
+
+plot_1D_1D = (entry_x, entry_y, $target) ->
+  # use flot to a create a plot of an 1D entry against another entry
+  # :param entry: entry to plot
+  # :param $taget: JQuery selector for the node that will display the plot
+
+  logg.info("plotting 1D entry", entry_x.id, "against", entry_y.id, "...")
+  series = {
+    data: _.zip(entry_x.value, entry_y.value)
+    label: "<strong>" + entry_x.parameter_name + "</strong>:<strong>" + entry_y.parameter_name + "</strong>"
+    clickable: true
+    hoverable: true
+  }
+  plot_series(series, $target)
   return
 
 
@@ -237,7 +286,9 @@ $ ->
   that = yamoda.entry = yamoda.make_module(MODULE_NAME,
     add: add
     get: get
-    plot: plot
+    get_two: get_two
+    plot_1D: plot_1D
+    plot_1D_1D: plot_1D_1D
     hide_plot: hide_plot
     show_plot: show_plot
     flot_setup: flot_setup
