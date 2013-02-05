@@ -16,6 +16,7 @@
     });
     yamoda.add_module_constants("yamoda.queryhistory", {
       del_queries_url: "{{ url_for('delete_queries') }}",
+      rename_queries_url: "{{ url_for('rename_queries') }}",
       toggle_favorite_queries_url: "{{ url_for('toggle_favorite_queries') }}"
     });
   })

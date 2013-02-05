@@ -149,6 +149,22 @@ def do_search():
     return _render_search_result(result_type, query, query_string, query_dict.get("view_options", {}))
 
 
+@app.route("/search/rename_queries", methods=["POST"])
+def rename_queries():
+    query_id_to_name = json.loads(request.form.get("query_id_to_name"))
+    query_ids = request.form.getlist("query_ids[]")
+    query_names = request.form.getlist("query_names[]")
+    logg.info("renaming %s", query_id_to_name)
+    logg.info("check query_ids %s", query_ids)
+    logg.info("check query_names %s", query_names)
+    for query_id, name in zip(map(int, query_ids), query_names):
+        hist_query = HistoricQuery.query.get(query_id)
+        logg.debug("renaming query from %s to %s", hist_query.name, name)
+        hist_query.name = name
+    db.session.commit()
+    return ""
+
+
 @app.route("/search/runquery/<int:query_id>", methods=["GET"])
 def run_query(query_id):
     logg.info("run query with id: %s", query_id)

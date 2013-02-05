@@ -11,18 +11,80 @@ MODULE_NAME = "yamoda.queryhistory"
 logg = undefined
 asInitVals = []
 that = undefined
+query_rename_template = undefined
 
 
 ###-- module functions --###
 
 setup_query_history_table = ->
   # Initialize jquery.dataTables and some helpers for the filter boxes.
+  logg.info("setup_query_history_table called")
+  # register handlers for selecting
+  $("#query_history_table .querycheck").change( (event) ->
+    event.preventDefault()
+    $this = $(this)
+    $this.prop("checked", yamoda.toggle_bool_prop)
+    return
+  )
+
+  $("#query_history_table>tbody>tr").click ->
+    $this = $(this)
+    $querycheck = $this.find(".querycheck")
+    row_num = $this.data("row_num")
+    logg.info("in row num", row_num)
+    $this.toggleClass("info row-selected")
+    $querycheck.prop("checked", yamoda.toggle_bool_prop)
+    return
+
+  $("#query_checkbox_all").click ->
+    $("#query_history_table tr").click()
+    return
+
+  # actions for selection menu
+
+  $("#delete_query_action").click ->
+    yamoda.queryhistory.del_queries()
+    return
+    
+  $("#toggle_favorite_query_action").click ->
+    yamoda.queryhistory.toggle_favorite_queries()
+    return
+
+  $("#rename_query_action").click ->
+    create_rename_queries_dialog()
+    return
   $table = $("#query_history_table")
   dtable = yamoda.utils.setup_datatable($table,
     aoColumnDefs: [
       {asSorting: [], aTargets: [5, 6]}
     ]
   )
+
+  $("#query_rename_save").click ->
+    query_id_to_name = {}
+    query_ids = []
+    query_names = []
+    $("#query_rename_form .query-name-input").each (i, e) ->
+      $input = $(e)
+      query_id_to_name[$input.data("query_id")] = $input.val()
+      query_ids.push($input.data("query_id"))
+      query_names.push($input.val())
+    logg.info("renaming queries", query_id_to_name)
+    $.ajax(
+      type: 'POST',
+      url: yamoda.queryhistory.rename_queries_url
+      data:
+        query_id_to_name: JSON.stringify(query_id_to_name)
+        query_ids: query_ids
+        query_names: query_names
+      success: ->
+        logg.info("renaming queries finished")
+        send_query_history_request()
+        $("#query_rename_modal").modal("hide")
+        return
+    )
+    return
+
   yamoda.utils.setup_column_filter_boxes($("#query_history_table tfoot input"), dtable)
 
   # setup popovers which show the query string in formatted form (newlines).
@@ -37,6 +99,7 @@ setup_query_history_table = ->
       placement: "top"
     }
   )
+
   return
 
 
@@ -63,26 +126,41 @@ run_query = (row) ->
   return
 
 
-toggle_all_checkboxes = (master_checkbox, slave_checkboxes$) ->
-  # toggle some "slave" checkboxes depending on the state of another
-  # "master" checkbox.
-  # :param master_checkbox: box which determines the toggle state.
-  # :param slave_checkboxes: list of boxes to toggle.
-  logg.debug("called toggle_all_checkboxes")
-  if master_checkbox.checked
-    slave_checkboxes$.attr("checked", "checked")
-  else
-    slave_checkboxes$.removeAttr("checked")
-  return
+get_selected_query_rows = ->
+  $("#query_history_table>tbody>tr.row-selected")
+
+
+get_selected_query_ids = ->
+  get_selected_query_rows().children("td.query-id").map( (i, e) ->
+    $(e).text()).get()
+
+
+get_selected_query_names = ->
+  get_selected_query_rows().children("td.query-name").map( (i, e) ->
+    $(e).text()).get()
+
+
+create_rename_queries_dialog = ->
+  $selected_rows = get_selected_query_rows()
+  ids = get_selected_query_ids()
+  names = get_selected_query_names()
+  logg.info("ids to rename: ", ids)
+  logg.info("old names: ", names)
+  zipped = _.zip(ids, names)
+  console.log(zipped)
+  lines = (query_rename_template({id: p[0], query_name: p[1]}) for p in zipped)
+  console.log(lines)
+  for line in lines
+    console.log("lines", line)
+  html = lines.join(" ")
+  $("#query_rename_form").html(html)
 
 
 del_queries = ->
   # Get checked queries from table and delete them from query history
   # TODO: remove reloading whole page.
   logg.info("called del_queries")
-  ids = $.map($(".querycheck:checked"), (el) ->
-    el.id.substring(6)
-  )
+  ids = get_selected_query_ids()
   logg.info("ids to delete: ", ids)
   if not ids?
     return
@@ -104,16 +182,7 @@ del_queries = ->
   return
 
 
-toggle_favorite_queries = ->
-  # Get checked queries from table and toggle favorite status for each
-  # TODO: remove reloading whole page
-  logg.info("called toggle_favorite_queries")
-  ids = $.map($(".querycheck:checked"), (el) ->
-    el.id.substring(6)
-  )
-  logg.info("ids to toggle favorite state for: ", ids)
-  if not ids?
-    return
+_send_toggle_favorite_queries_request = (ids) ->
   $("actionbutton button").button("loading")
   logg.info("sending request to", that.toggle_favorite_queries_url)
   $.ajax(
@@ -129,8 +198,40 @@ toggle_favorite_queries = ->
       $("actionbutton button").button("reset")
       $("actionerror").text(err).show()
   )
+
+
+toggle_favorite_queries = ->
+  # Get checked queries from table and toggle favorite status for each
+  # TODO: remove reloading whole page
+  logg.info("called toggle_favorite_queries")
+  ids = get_selected_query_ids()
+  if not ids?
+    return
+  names = get_selected_query_names()
+  ids_without_name = []
+  for id, name of _.object(ids, names)
+    if name == ""
+      ids_without_name.push(id)
+
+  logg.info("ids to toggle favorite state for: ", ids)
+  logg.info("ids without names: ", ids_without_name)
+
+  # do it if all names are available. If not, display an alert and do nothin.
+  if ids_without_name.length == 0
+    _send_toggle_favorite_queries_request(ids)
+  else
+    alert("Name missing for some queries: ##{ids_without_name}!\nFavorite queries need a name. Please set them before changing favorite status.")
   return
 
+
+send_query_history_request = ->
+  # AJAX update query history
+  $.get(yamoda.search.query_history_url, (history_content) ->
+    logg.info("got history content")
+    $("#query_history_content").html(history_content)
+    yamoda.queryhistory.setup_query_history_table()
+  )
+  return
 
 ###-- READY --###
 
@@ -139,15 +240,26 @@ $ ->
   that = yamoda.queryhistory = yamoda.make_module(MODULE_NAME,
     insert_query: insert_query
     run_query: run_query
-    toggle_all_checkboxes: toggle_all_checkboxes
     del_queries: del_queries
     toggle_favorite_queries: toggle_favorite_queries
     setup_query_history_table: setup_query_history_table
+    send_query_history_request: send_query_history_request
   )
   # other stuff to do
   logg = that.logg
+  query_rename_template = _.template(
+    '<div class="control-group">' +
+    '<label class="control-label" for="query_rename_<%=id%>">Old: "<%=query_name%>"</label>' +
+    '<div class="controls">' +
+    '<input class="query-name-input input-large" type="text" value="<%=query_name%>" data-query_id="<%=id%>"> #<%=id%>' +
+    '</div>' +
+    '</div>'
+  )
   setup_query_history_table()
+
   return
 
 # vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #
+
+
 

@@ -47,16 +47,6 @@ change_to_query_results = ->
   return
 
 
-send_query_history_request = ->
-  # AJAX update query history
-  $.get(yamoda.search.query_history_url, (history_content) ->
-    logg.info("got history content")
-    $("#query_history_content").html(history_content)
-    yamoda.queryhistory.setup_query_history_table()
-  )
-  return
-
-
 send_query_request = (save_query=true) ->
   # Send query to server and display results below the query box.
   logg.info("send query request")
@@ -75,7 +65,7 @@ send_query_request = (save_query=true) ->
       $("#query_results_content").html(query_result)
       change_to_query_results()
       # refresh history in background
-      send_query_history_request()
+      yamoda.queryhistory.send_query_history_request()
       return
     error: () ->
       $("#bottom_headline").text("Server Error! Please try again.")
@@ -96,7 +86,7 @@ send_query_save_request = ->
       logg.info("received query save request answer")
       $("#main_msg_area").html(msg)
       # refresh history
-      send_query_history_request()
+      yamoda.queryhistory.send_query_history_request()
   )
   return
 

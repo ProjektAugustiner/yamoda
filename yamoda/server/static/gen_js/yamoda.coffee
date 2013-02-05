@@ -111,6 +111,11 @@ make_module = (module_name, attributes) ->
     return module
 
 
+toggle_bool_prop = (i, old_value) ->
+  if old_value == true
+    false
+  else true
+
 ###-- READY --###
 
 $ ->
@@ -137,6 +142,7 @@ $ ->
     is_module_defined: is_module_defined
     add_module_constants: add_module_constants
     apply_module_constants: apply_module_constants
+    toggle_bool_prop: toggle_bool_prop
     before_module_init: before_module_init
     run_before_init: run_before_init
     make_module: make_module
