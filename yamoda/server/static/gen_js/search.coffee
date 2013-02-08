@@ -50,8 +50,7 @@ change_to_query_results = ->
 send_query_request = (save_query=true) ->
   # Send query to server and display results below the query box.
   logg.info("send query request")
-  show_results = $("input[name='show_results']:checked").val()
-  logg.info("where to show results:", show_results)
+  logg.info("save query?", save_query)
   $("#bottom_headline").text("Processing...")
   $.ajax(
     type: 'POST',
@@ -91,6 +90,37 @@ send_query_save_request = ->
   return
 
 
+register_event_handlers = ->
+  $("#submit_button").click ->
+    send_query_request(true)
+
+  $("#show_help").click ->
+    $("#help_box").show()
+    $(this).hide()
+    $('#hide_help').show()
+
+  $("#hide_help").click ->
+    $("#help_box").hide()
+    $(this).hide()
+    $("#show_help").show()
+
+  $("#query_history_btn").click ->
+    change_to_query_history()
+
+  $("#query_results_btn").click ->
+    change_to_query_results()
+
+  $("#reset_button").click ->
+    $("#query_input").val("")
+    $("#query_name_input").prop("value", "")
+
+  $("a.help-link").each (i, e) ->
+    $e = $(e)
+    $e.click ->
+      helptext_url = yamoda.search.helptext_url + $e.data("name")
+      request_help_content(helptext_url)
+  return
+
 ###-- READY --###
 
 $ ->
@@ -101,6 +131,7 @@ $ ->
     change_to_query_results: change_to_query_results
     send_query_request: send_query_request
     send_query_save_request: send_query_save_request
+    register_event_handlers: register_event_handlers
   )
   # other stuff to do
   logg = that.logg

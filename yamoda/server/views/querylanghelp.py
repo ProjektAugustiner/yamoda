@@ -36,7 +36,7 @@ This means that at least one of the conditions must be satisfied to include a da
 <li>Value less than 100: <code>T: &lt; 100</code>
 <li>Value greater than 100: <code>T: &gt; 100</code>
 <li>Value between 100 and 200: <code>T: 100 to 200</code>
-<li>Alternative condition I: <code>T: 100 to 200 or 300 to 400</code>
+<li>Alternative condition I: <code>T: 100 to 200 or 300 to 400</code> 
 <li>Alternative condition II: <code>T: 10 to 50 or &gt; 1.2e6</code>
 </ul>
 """,
@@ -54,6 +54,7 @@ This means that at least one of the conditions must be satisfied to include a da
 "other": """\
 <h3>Other Query Options</h3>
 <ul>
+<li>Only show specified parameters in result: <code>show: T omega</code>
 <li>Limit number of results to 50: <code>limit: 50</code>
 <li>(datas only) Datas must belong to Context "vsm": <code>context: vsm</code>
 <li>(sets only) Set was created by "tim": <code>user: tim</code>
@@ -69,6 +70,7 @@ T: 10 to 300 or > 500
 omega: < 1e6
 sort: omega.desc
 limit: 20
+show: T omega
 </pre>
 """,
 

@@ -230,7 +230,15 @@ def search():
     """
     query_history = HistoricQuery.query.order_by(HistoricQuery.created).limit(100).all()
     logg.debug("found saved queries: %s", query_history)
-    return render_template('search.html', query_history=query_history)
+    query_id = request.args.get("query_id")
+    if query_id:
+        # show a predefined query if requested
+        query = HistoricQuery.query.get(query_id)
+    else:
+        query = None
+    run_query = True if request.args.get("run_query") == "true" else False
+    logg.debug("run_query? %s id %s", run_query, query_id)
+    return render_template('search.html', query_history=query_history, query=query, run_query=run_query)
 
 
 @app.route('/search/queryhistory', methods=["GET"])

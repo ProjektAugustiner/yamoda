@@ -100,7 +100,7 @@ setup_query_history_table = ->
     }
   )
 
-  return
+  return # end of setup_datatable, sorry for the long function (TODO refactor) ;)
 
 
 insert_query = (row) ->
@@ -110,7 +110,6 @@ insert_query = (row) ->
   query_name = $("#query_name_" + row).text()
   $("#query_input").val(query_string)
   $("#query_name_input").val(query_name)
-  $("#favorite_checkbox").removeAttr("checked")
   return
 
 
@@ -121,7 +120,6 @@ run_query = (row) ->
   that.insert_query(row)
   # kill remaining popovers
   $(".popover").remove()
-  $("#save_query_checkbox").removeAttr("checked")
   yamoda.search.send_query_request(false)
   return
 

@@ -1,27 +1,35 @@
 {% extends "layout.html" %}
-{% from "queryhistory.html" import queryhistory_table with context %}
-{% from "queryhistory.html" import queryhistory_includes %}
+{% from "queryhistory.html" import queryhistory_table %}
 {% set title = "Search" %}
-{% block extrahead %}
-{# {{ queryhistory_includes() }} #}
+
+{% block js %}
 <!-- yamoda modules -->
 <script src="{{ url_for('static', filename='gen_js/search.js') }}"></script>
 <script src="{{ url_for('static', filename='gen_js/queryhistory.js') }}"></script>
 <script>
-  $(document).ready( function() {
-    yamoda.add_module_constants("yamoda.search", {
-      search_url: "{{ url_for('do_search') }}",
-      save_query_url: "{{ url_for('save_query') }}",
-      query_history_url: "{{ url_for('get_query_history') }}"
-    });
-    yamoda.add_module_constants("yamoda.queryhistory", {
-      del_queries_url: "{{ url_for('delete_queries') }}",
-      rename_queries_url: "{{ url_for('rename_queries') }}",
-      toggle_favorite_queries_url: "{{ url_for('toggle_favorite_queries') }}"
-    });
-  })
+{% coffee "search" %}
+$ ->
+  yamoda.add_module_constants("yamoda.search",
+    search_url: "{{ url_for('do_search') }}"
+    save_query_url: "{{ url_for('save_query') }}"
+    query_history_url: "{{ url_for('get_query_history') }}"
+    helptext_url: "{{ url_for('get_helptext', name='') }}")
+
+  yamoda.add_module_constants("yamoda.queryhistory",
+    del_queries_url: "{{ url_for('delete_queries') }}"
+    rename_queries_url: "{{ url_for('rename_queries') }}"
+    toggle_favorite_queries_url: "{{ url_for('toggle_favorite_queries') }}")
+
+  yamoda.search.register_event_handlers()
+
+{% if run_query %}
+  yamoda.search.send_query_request(save_query=false)
+{% endif %}
+  return
+
+{% endcoffee %}
 </script>
-{% endblock %}
+{% endblock js %}
 
 {% block body %}
 <div class="row-fluid">
@@ -31,27 +39,18 @@
       <div class="control-group">
         <label class="control-label" for="query">Enter Query:</label>
         <div class="controls">
-            <textarea name="query" id="query_input" class="field span12" rows="6"></textarea>
+          <textarea name="query" id="query_input" class="field span12" rows="6">{{ query.query_string }}</textarea>
         </div>
-        <input type="text" id="query_name_input" name="name"><span class="help-inline">Name of query</span>
-        <!--
-        <label class="checkbox">Save query on run
-          <input type="checkbox" id="save_query_checkbox" name="save_query"></input>
-        </label>
-        -->
+        <input type="text" id="query_name_input" name="name" value="{{ query.name }}"><span class="help-inline">Name of query</span>
       </div>
       <div class="form-actions">
-        <a href="#" id="submit_button" class="btn btn-primary" onclick="yamoda.search.send_query_request()">
+        <a href="#" id="submit_button" class="btn btn-primary">
           <i class="icon-ok-sign icon-white"></i>Run Query</a>
-        <button type="reset" class="btn btn-warning">
+        <a href="#" id="reset_button" class="btn btn-warning">
           <i class="icon-trash icon-white"></i>Clear</button>
-        <!--
-        <a href="#" id="save-query" class="btn" onclick="yamoda.search.send_query_save_request()">
-          <i class="icon-briefcase"></i>Save Query</a>
-        -->
-        <a href="#" id="show_help" class="btn" onclick="$('#help_box').show(); $(this).hide(); $('#hide_help').show()">
+        <a href="#" id="show_help" class="btn">
           <i class="icon-arrow-right"></i>Show Help</a>
-        <a href="#" style="display: none;" id="hide_help" class="btn" onclick="$('#help_box').hide(); $(this).hide(); $('#show_help').show()">
+        <a href="#" style="display: none;" id="hide_help" class="btn">
           <i class="icon-arrow-left"></i>Hide Help</a>
       </div>
     </form>
@@ -60,12 +59,12 @@
     <div id="help_box" style="display: none;">
       <h2>Query Language Help</h2>
       <ul class="nav nav-tabs">
-      <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="find") }}')">Result Type</a>
-      <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="param-filter") }}')">Parameter Filter</a>
-      <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="sort") }}')">Sorting</a>
-      <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="other") }}')">Other</a>
-      <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="example-datas") }}')">Example Data Query</a>
-      <li><a href="#" onclick="yamoda.search.request_help_content('{{ url_for("get_helptext", name="example-sets") }}')">Set Query</a>
+      <li><a class="help-link" data-name="find">Result Type</a>
+      <li><a href="#" class="help-link" data-name="param-filter">Parameter Filter</a>
+      <li><a href="#" class="help-link" data-name="sort">Sorting</a>
+      <li><a href="#" class="help-link" data-name="other">Other</a>
+      <li><a href="#" class="help-link" data-name="example-datas">Example Data Query</a>
+      <li><a href="#" class="help-link" data-name="example-sets">Set Query</a>
       </ul>
       <div id="help_content">
       <p>Select a help category above.</p>
@@ -79,10 +78,8 @@
     <h2 id="bottom_headline">Query History</h2>
   </div>
   <div class="span6">
-    <a href="#" id="query_history_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_history()" style="display:none;">
-      <i class="icon-list"></i>Change To History</a>
-    <a href="#" id="query_results_btn" class="btn btn-large pull-right" onclick="yamoda.search.change_to_query_results()" style="display:none;">
-      <i class="icon-list-alt"></i>Change To Results</a>
+    <a href="#" id="query_history_btn" class="btn btn-large pull-right" style="display:none;"><i class="icon-list"></i>Change To History</a>
+    <a href="#" id="query_results_btn" class="btn btn-large pull-right" style="display:none;"><i class="icon-list-alt"></i>Change To Results</a>
   </div>
 </div>
 <div class="row-fluid">

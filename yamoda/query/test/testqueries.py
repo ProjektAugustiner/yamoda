@@ -35,7 +35,8 @@ testquery_datas2 = QueryPair({
                  "omega": [GreaterThan(1e6)]
                  },
              "sort": [SortParameter("T", "asc"), SortParameter("omega", "desc")],
-             "limit": 10
+             "limit": 10,
+             "view_options": {"visible_params": ["omega", "P"]}
              },
 """
 find: datas
@@ -44,6 +45,7 @@ T: 0 to 400 or 500 to 600
 omega: > 1e6
 sort: T omega.desc
 limit: 10
+visible: omega P
 """
 )
 

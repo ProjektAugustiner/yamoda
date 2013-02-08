@@ -15,7 +15,7 @@ logg.basicConfig(level=logg.INFO)
 from yamoda.server import db, app
 from yamoda.server.database import User, Group, Context, Parameter, \
      Set, Data, Entry
-from dbsettings import DATABASE_URIS
+from yamoda.server.database.dbsettings import DATABASE_URIS
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URIS["sqlite"]
 logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])

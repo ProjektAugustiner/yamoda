@@ -2,7 +2,7 @@
 {% if not entry.value.shape %}
 <td>{{ entry.value|dataformat }}</td>
 {% elif entry.value.shape|length == 1 %}
-<td class="valuecolumn">
+<td class="valuecolumn 1d">
   <span><strong>Max:</strong> {{ entry.value|max|dataformat }}</span>
   <span class="sparkline"
     width="{{width}}px"
