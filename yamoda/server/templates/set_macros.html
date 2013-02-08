@@ -1,11 +1,9 @@
 {% macro settable_script() %}
-  <script>
-  {% coffee "main" %}
-  $ ->
-    dtable = yamoda.utils.setup_datatable($("#settable"))
-    yamoda.utils.setup_column_filter_boxes($("#settable th.footer input.filter-input"), dtable)
-  {% endcoffee %}
-  </script>
+{% coffee "main" %}
+$ ->
+  dtable = yamoda.utils.setup_datatable($("#settable"))
+  yamoda.utils.setup_column_filter_boxes($("#settable th.footer input.filter-input"), dtable)
+{% endcoffee %}
 {% endmacro %}
 
 {% macro settable(sets) %}
@@ -43,12 +41,18 @@
 
 {% macro setlist(sets, parent) %}
 {# settable with additional set controls (new set)  #}
-  <div class="new_set_button">
+  <div id="new_set">
     <a class="btn" data-toggle="modal"
       href="#new_set">Create {% if parent %}sub{% endif %}set</a>
   </div>
 
   {% if sets %} 
+  <script>
+  {% coffee "settable" %}
+  $ ->
+    $("#settable_wrapper .datatables-top-left-bar").append($("#new_set").remove())
+  {% endcoffee %}
+  </script>
   {{ settable(sets) }}
   {% endif %} 
 

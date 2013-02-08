@@ -42,7 +42,7 @@
     {% endfor %}
   </tfoot>
 </table>
-<div id="actionbutton" style="float: right">
+<div id="data_action">
   <div class="btn-group">
     <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown" data-loading-text="Executing...">
       With selected
@@ -55,24 +55,15 @@
   <div class="alert alert-error hide" id="actionerror"></div>
 </div>
 {% endmacro %}
-
 {% macro datatable_script() %}
-{% coffee "main" %}
+{% coffee "datatable" %}
 $ ->
   yamoda.entry.sparkline_setup($("td.valuecolumn>.sparkline"))
   dtable = yamoda.utils.setup_datatable($("#datatable"))
+  $("#datatable_wrapper .datatables-bottom-right-bar").append($("#data_action").remove())
   yamoda.utils.setup_column_filter_boxes($("#datatable th.footer input.filter-input"), dtable)
-
 {% endcoffee %}
 
-/*
-$(document).ready(function() {
-  $('#datatable').dataTable({
-    bLengthChange: true, bPaginate: true, sDom: 'f<"datatoolbar">rtip<"databottombar">'});
-  $(".datatoolbar").append($("#newbutton").remove());
-  $(".databottombar").append($("#actionbutton").remove());
-  });
-*/
 function toggleall(check) {
   if (check.checked)
     $('.datacheck').attr('checked', 'checked');
@@ -82,12 +73,12 @@ function toggleall(check) {
 function deletedatas() {
   var ids = $.map($('.datacheck:checked'), function(el) { return el.id.substr(6); });
   if (!ids) return;
-  $("#actionbutton button").button("loading");
+  $("#data_action button").button("loading");
   $.ajax({url: "{{ url_for('datadelete') }}",
           type: "POST",
           data: {"ids": ids},
           success: function(data, st, xhr) { window.location.reload(); },
-          error: function(xhr, st, err) { $("#actionbutton button").button("reset");
+          error: function(xhr, st, err) { $("#data_action button").button("reset");
                                           $("#actionerror").text(err).show(); }
           });
   return false;

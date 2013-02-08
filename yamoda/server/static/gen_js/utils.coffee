@@ -19,9 +19,9 @@ setup_datatable = ($table, options) ->
   if $table.hasClass("initialized")
     logg.info("table already initialized, doing nothing")
     return
-  logg.debug("activating dataTable for query_history_table")
+  logg.debug("activating dataTable")
   default_options =
-    #sDom: "rltpi"
+    sDom: '<"datatables-top-left-bar">lfrt<"datatables-bottom-left-bar">i<"datatables-bottom-right-bar">p'
     bStateSave: false
     sPaginationType: "full_numbers"
     oLanguage:

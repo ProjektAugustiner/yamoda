@@ -85,6 +85,9 @@ setup_query_history_table = ->
     )
     return
 
+  # move action button to right table toolbar
+  $("#query_history_table_wrapper .datatables-bottom-right-bar").append($("#query_action").remove())
+
   yamoda.utils.setup_column_filter_boxes($("#query_history_table tfoot input"), dtable)
 
   # setup popovers which show the query string in formatted form (newlines).
@@ -100,7 +103,7 @@ setup_query_history_table = ->
     }
   )
 
-  return # end of setup_datatable, sorry for the long function (TODO refactor) ;)
+  return # end of setup_query_history_table, sorry for the long function (TODO refactor) ;)
 
 
 insert_query = (row) ->

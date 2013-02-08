@@ -3,6 +3,7 @@
 div.dataTables_length label {
     float: left;
     text-align: left;
+    margin-bottom: 2px;
 }
 
 div.dataTables_length select {
@@ -11,16 +12,27 @@ div.dataTables_length select {
 
 div.dataTables_filter {
     float: right;
+    margin-bottom: 2px;
 }
 
 div.dataTables_info {
-    padding-top: 8px;
     float: left;
+    padding: 3px;
 }
 
 div.dataTables_paginate {
     float: right;
     margin: 0;
+}
+
+div.datatables-bottom-left-bar, div.datatables-top-left-bar {
+    float: left;
+    margin-right: 5px;
+}
+
+div.datatables-bottom-right-bar, div.datatables-top-right-bar {
+    float: right;
+    margin-left: 5px;
 }
 
 table.table {
