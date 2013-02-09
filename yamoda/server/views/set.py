@@ -1,8 +1,6 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
-from yamoda.server.mimerender import html_json_mimerender
-from werkzeug.exceptions import NotFound
 
 """
 Data set related views.
@@ -10,25 +8,31 @@ set: render a data set (HTML or JSON)
 sets: show a list of all sets 
 """
 
+import logging
 import os
 import tempfile
 
 from flask import render_template, request, flash, redirect, url_for, jsonify
 from flask.ext.login import login_required, current_user
+from werkzeug.exceptions import NotFound
 
 from yamoda.server import app, db, view_helpers
 from yamoda.server.database import Set, Context
 from yamoda.importer import list_importers, load_importer
 from yamoda.importer.base import MissingInfo, ImporterError
+from yamoda.server.mimerender import html_json_mimerender
 
+
+logg = logging.getLogger(__name__)
 
 #### set
 
-def _render_set_json(set, **kw):
+
+def _render_set_json(sett, **kw):
     data_uris = [url_for("data", data_id=d.id) for d in set.datas]
     child_uris = [url_for("set", set_id=c.id) for c in set.children]
     return jsonify(id=set.id,
-            name=set.name,
+            name=sett.name,
             data_uris=data_uris,
             child_uris=child_uris)
 
@@ -146,10 +150,11 @@ def setimport_do(set_id):
 def create_set():
     name = request.form['name']
     s = Set(name=name, user=current_user, group=current_user.primary_group)
-    parent_set_id = request.form.get("parent_set")
+    parent_set_id = request.form.get("parent_set_id")
+    logg.info("creating new set with name '%s', parent is '%s'", name, parent_set_id)
     if parent_set_id is not None:
         parent_set = Set.query.get(parent_set_id)
-        parent_set.set.children.append(s)
+        parent_set.children.append(s)
 
     db.session.add(s)
     db.session.commit()

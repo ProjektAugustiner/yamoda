@@ -41,7 +41,7 @@ $ ->
 
 {% macro setlist(sets, parent) %}
 {# settable with additional set controls (new set)  #}
-  <div id="new_set">
+  <div id="new_set_action">
     <a class="btn" data-toggle="modal"
       href="#new_set">Create {% if parent %}sub{% endif %}set</a>
   </div>
@@ -50,7 +50,7 @@ $ ->
   <script>
   {% coffee "settable" %}
   $ ->
-    $("#settable_wrapper .datatables-top-left-bar").append($("#new_set").remove())
+    $("#settable_wrapper .datatables-top-left-bar").append($("#new_set_action").remove())
   {% endcoffee %}
   </script>
   {{ settable(sets) }}
@@ -68,6 +68,7 @@ $ ->
       <div class="modal-body">
         <label>Name</label>
         <input type="text" class="span3" placeholder="Set name…" name="name">
+        <input type="hidden" name="parent_set_id" value="{{ parent.id }}">
       </div>
       <div class="modal-footer">
         <button type="button" class="btn" data-dismiss="modal">Cancel</button>

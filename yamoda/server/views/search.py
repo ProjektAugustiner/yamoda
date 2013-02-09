@@ -16,7 +16,7 @@ search   -- display search page
 searchtest   -- test searching
 '''
 
-import logging as logg
+import logging
 import pprint
 import time
 import json
@@ -34,6 +34,7 @@ from yamoda.server.database import HistoricQuery
 from yamoda.query.serialization import to_json, from_json
 from flask_login import AnonymousUser
 
+logg = logging.getLogger(__name__)
 
 assert isinstance(db, SQLAlchemy)
 

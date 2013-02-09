@@ -22,7 +22,7 @@ div.dataTables_info {
 
 div.dataTables_paginate {
     float: right;
-    margin: 0;
+    margin-top: 2px;
 }
 
 div.datatables-bottom-left-bar, div.datatables-top-left-bar {
@@ -61,8 +61,8 @@ table.dataTable th:active {
 }
 
 th.header.colresize { 
-  border-right: 1px solid #aaaaaa; 
-  border-left: 1px solid #aaaaaa; 
+  /*border-right: 0px solid #aaaaaa; 
+  border-left: 0px solid #aaaaaa;*/
 }
 
 th.footer { 
