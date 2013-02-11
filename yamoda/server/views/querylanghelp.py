@@ -54,7 +54,7 @@ This means that at least one of the conditions must be satisfied to include a da
 "other": """\
 <h3>Other Query Options</h3>
 <ul>
-<li>Only show specified parameters in result: <code>show: T omega</code>
+<li>Only show specified parameters in result: <code>visible: T omega</code>
 <li>Limit number of results to 50: <code>limit: 50</code>
 <li>(datas only) Datas must belong to Context "vsm": <code>context: vsm</code>
 <li>(sets only) Set was created by "tim": <code>user: tim</code>
