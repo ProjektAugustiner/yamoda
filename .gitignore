@@ -9,5 +9,4 @@ localsettings.py
 *.swn
 yamoda.egg-info/
 *.pdf
-*.png
 *.svg
