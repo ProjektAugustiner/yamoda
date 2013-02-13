@@ -60,6 +60,8 @@
 $ ->
   yamoda.entry.sparkline_setup($("td.valuecolumn>.sparkline"))
   dtable = yamoda.utils.setup_datatable($("#datatable"))
+  yamoda.logg.info("setting up 2d preview")
+  yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "100%")
   $("#datatable_wrapper .datatables-bottom-right-bar").append($("#data_action").remove())
   yamoda.utils.setup_column_filter_boxes($("#datatable th.footer input.filter-input"), dtable)
 {% endcoffee %}

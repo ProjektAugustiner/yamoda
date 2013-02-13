@@ -144,8 +144,8 @@ def do_search():
     logg.info("save query? %s", request.form["save_query"])
     if request.form["save_query"] == "true":
         query_name = request.form["name"]
-        flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
-        flash(flash_msg, flash_cat)
+        # flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
+        # flash(flash_msg, flash_cat)
 
     return _render_search_result(result_type, query, query_string, query_dict.get("view_options", {}))
 
