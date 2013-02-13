@@ -70,7 +70,7 @@ T: 10 to 300 or > 500
 omega: < 1e6
 sort: omega.desc
 limit: 20
-show: T omega
+visible: T omega
 </pre>
 """,
 
