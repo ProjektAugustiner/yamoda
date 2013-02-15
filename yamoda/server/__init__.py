@@ -34,11 +34,13 @@ app = Flask('yamoda.server')
 app.jinja_env.add_extension("yamoda.server.coffeeforjinja.CoffeeExtension")
 
 app.config.from_object(__name__)
-app.config.from_envvar('YAMODA_SETTINGS', silent=True)
 app.config["GENERATED_DIR"] = os.path.join(os.getcwd(), "yamoda", "server", "generated")
 
-# database
-db = SQLAlchemy(app)
+# Flask-Sqlalchemy object.
+#
+# This is not yet bound to the flask application, must be done in the
+# application factory function.
+db = SQLAlchemy()
 
 
 class MimeLoginManager(LoginManager):
