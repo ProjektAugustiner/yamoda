@@ -19,6 +19,13 @@ import os
 try:
     import matplotlib
     matplotlib.use('agg')
+
+    font = {
+        'family': 'normal',
+        'weight': 'bold',
+        'size': 14
+    }
+    matplotlib.rc('font', **font)
 except ImportError:
     pass
 
@@ -37,7 +44,6 @@ app.config.from_object(__name__)
 app.config["GENERATED_DIR"] = os.path.join(os.getcwd(), "yamoda", "server", "generated")
 
 # Flask-Sqlalchemy object.
-#
 # This is not yet bound to the flask application, must be done in the
 # application factory function.
 db = SQLAlchemy()
