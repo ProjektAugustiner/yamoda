@@ -1,5 +1,5 @@
 {% macro settable_script() %}
-{% coffee "main" %}
+{% coffee "settable" %}
 $ ->
   dtable = yamoda.utils.setup_datatable($("#settable"))
   yamoda.utils.setup_column_filter_boxes($("#settable th.footer input.filter-input"), dtable)

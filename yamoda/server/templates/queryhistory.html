@@ -22,13 +22,13 @@
 <table id="query_history_table" class="table table-condensed table-bordered table-striped table-hover">
   <thead>
     <tr>
-      <th class="header colresize">#</th>
-      <th class="header colresize">Created</th>
-      <th class="header colresize">Name</th>
-      <th class="header colresize">Query String</th>
-      <th class="header colresize">Favorite?</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">#</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Created</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Name</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Query String</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Favorite?</th>
       <th class="header">Edit</th>
-      <th><input type="checkbox" id="query_checkbox_all" /></th>
+      <th><input class="select-invert" type="checkbox" rel="tooltip" title="Click to invert row selection" /></th>
     </tr>
   </thead>
   <tbody>
@@ -42,7 +42,7 @@
       </td>
       <td id="query_favorite_{{ loop.index0 }}">{{query.favorite|yesnoformat }}</td>
       <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Edit</a></td>
-      <td><input type="checkbox" class="querycheck" /></td>
+      <td><input type="checkbox" class="select-row" /></td>
     </tr>
     {%- endfor %}
   </tbody>

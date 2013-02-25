@@ -20,25 +20,8 @@ setup_query_history_table = ->
   # Initialize jquery.dataTables and some helpers for the filter boxes.
   logg.info("setup_query_history_table called")
   # register handlers for selecting
-  $("#query_history_table .querycheck").change( (event) ->
-    event.preventDefault()
-    $this = $(this)
-    $this.prop("checked", yamoda.toggle_bool_prop)
-    return
-  )
 
-  $("#query_history_table>tbody>tr").click ->
-    $this = $(this)
-    $querycheck = $this.find(".querycheck")
-    row_num = $this.data("row_num")
-    logg.info("in row num", row_num)
-    $this.toggleClass("info row-selected")
-    $querycheck.prop("checked", yamoda.toggle_bool_prop)
-    return
-
-  $("#query_checkbox_all").click ->
-    $("#query_history_table tr").click()
-    return
+  yamoda.utils.setup_datatable_selection($("#query_history_table"))
 
   # actions for selection menu
 
@@ -258,6 +241,7 @@ $ ->
   )
   setup_query_history_table()
 
+  $('a[rel=tooltip]').tooltip()
   return
 
 # vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #

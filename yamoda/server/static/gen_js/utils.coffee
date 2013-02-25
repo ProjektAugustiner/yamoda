@@ -26,7 +26,7 @@ setup_datatable = ($table, options) ->
     sPaginationType: "full_numbers"
     oLanguage:
       sSearch: "Search all columns: "
-    resizable: true
+    resizable: false
   merged_options = $.extend(default_options, options)
   dtable = $table.addClass("initialized").dataTable(merged_options)
   if merged_options.resizable
@@ -65,6 +65,27 @@ setup_column_filter_boxes = ($boxes, dtable) ->
   )
 
 
+setup_datatable_selection = ($table) ->
+  # register handlers for selecting
+  rows = $table.find("tr")
+  rows.click (ev) ->
+    if $(ev.target).is("a")
+      logg.info("link, ignore tr click")
+      return
+    $this = $(this)
+    $checkboxes = $this.find(".select-row")
+    row_num = $this.data("row_num")
+    logg.info("in row num", row_num)
+    $this.toggleClass("info row-selected")
+    if not $(ev.target).is("input")
+      $checkboxes.prop("checked", yamoda.toggle_bool_prop)
+    return
+
+  $table.find(".select-invert").click ->
+    rows.click()
+    return
+
+
 ###-- READY --###
 
 $ ->
@@ -72,6 +93,7 @@ $ ->
   that = yamoda.utils = yamoda.make_module(MODULE_NAME,
     setup_datatable: setup_datatable
     setup_column_filter_boxes: setup_column_filter_boxes
+    setup_datatable_selection: setup_datatable_selection
   )
   # other stuff to do
   logg = that.logg

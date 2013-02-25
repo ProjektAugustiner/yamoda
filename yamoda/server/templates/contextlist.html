@@ -1,8 +1,16 @@
 {% extends "layout.html" %}
 {% set title = "Contexts" %}
 {% block body %}
+<script>
+  {% coffee "contextlist" %}
+  $ ->
+    dtable = yamoda.utils.setup_datatable($("#contexttable"))
+    yamoda.utils.setup_column_filter_boxes($("#contexttable th.footer input.filter-input"), dtable)
+    $("#contexttable_wrapper .datatables-top-left-bar").append($("#new_context_action").remove())
+  {% endcoffee %}
+</script>
   <h2>Data contexts</h2>
-  <div class="newbutton"><a class="btn" data-toggle="modal" href="#new_context">New Context</a></div>
+  <div id="new_context_action"><a class="btn" data-toggle="modal" href="#new_context">New Context</a></div>
   <table id="contexttable" class="table table-condensed table-bordered table-striped">
     <thead>
       <tr>
@@ -42,12 +50,6 @@
       </div>
     </form>
   </div>
-  <script>
-    $(document).ready(function() {
-      $('#contexttable').dataTable({
-        bLengthChange: false, bPaginate: false, sDom: 'f<"datatoolbar">rtip'});
-      // move button into the <div> of dataTable
-      $(".datatoolbar").append($(".newbutton").remove());
-    });
-  </script>
 {% endblock %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

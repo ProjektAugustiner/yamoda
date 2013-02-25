@@ -32,7 +32,8 @@ class CoffeeExtension(Extension):
         out, err = coffee.communicate(input=body + "\n")
         # TODO: Handle returned error code from compiler properly...
         if err:
-            raise Exception("compilation of coffee code failed in block name '{}', error was:\n {}".format(name, err))
+            body_with_numbers = "\n".join("{}: {}".format(number, line) for number, line in enumerate(body.split("\n")))
+            raise Exception("compilation of coffee code failed in block name '{}', error was:\n {}\n code {}".format(name, err, body_with_numbers))
         logg.debug("coffee compile succeeded for %s", name)
         return out
 
