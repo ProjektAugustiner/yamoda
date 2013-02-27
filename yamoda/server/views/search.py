@@ -66,15 +66,16 @@ def _save_query(query_string, query_dict, query_name):
     logg.info("saving query '%s' to DB, name is %s", query_string, query_name)
     # don't save query if we have an identical query in the DB
     duplicate = HistoricQuery.query.filter_by(name=query_name).filter_by(query_string=query_string).all()
-    logg.info("found duplicate in DB: %s", duplicate)
     if not duplicate:
         hist_query = HistoricQuery(query_string=query_string, query_json=to_json(query_dict),
                                    name=query_name, favorite=True if query_name else False,
                                    user=current_user, group=current_user.primary_group)
         db.session.add(hist_query)
         db.session.commit()
+        logg.info("saved query")
         return ("Query saved.", "info")
     else:
+        logg.info("found duplicate in DB: %s", duplicate)
         return ("Query was not saved (duplicate).", "warn")
 
 
@@ -144,7 +145,7 @@ def do_search():
     logg.info("save query? %s", request.form["save_query"])
     if request.form["save_query"] == "true":
         query_name = request.form["name"]
-        # flash_msg, flash_cat = _save_query(query_string, query_dict, query_name)
+        _save_query(query_string, query_dict, query_name)
         # flash(flash_msg, flash_cat)
 
     return _render_search_result(result_type, query, query_string, query_dict.get("view_options", {}))
