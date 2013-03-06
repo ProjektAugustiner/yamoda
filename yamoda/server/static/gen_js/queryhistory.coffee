@@ -25,17 +25,6 @@ setup_query_history_table = ->
 
   # actions for selection menu
 
-  $("#delete_query_action").click ->
-    yamoda.queryhistory.del_queries()
-    return
-    
-  $("#toggle_favorite_query_action").click ->
-    yamoda.queryhistory.toggle_favorite_queries()
-    return
-
-  $("#rename_query_action").click ->
-    create_rename_queries_dialog()
-    return
   $table = $("#query_history_table")
   dtable = yamoda.utils.setup_datatable($table,
     aoColumnDefs: [
@@ -85,6 +74,19 @@ setup_query_history_table = ->
       placement: "top"
     }
   )
+
+  $("#delete_query_action").click ->
+    logg.info("delete query click")
+    del_queries()
+    return
+    
+  $("#toggle_favorite_query_action").click ->
+    toggle_favorite_queries()
+    return
+
+  $("#rename_query_action").click ->
+    create_rename_queries_dialog()
+    return
 
   return # end of setup_query_history_table, sorry for the long function (TODO refactor) ;)
 
