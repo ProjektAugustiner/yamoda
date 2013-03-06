@@ -18,8 +18,8 @@
   {%- for data in datas %}
     <tr data-row_num="{{ loop.index0 }}">
       <td class="data-id">{{ data.id }}</td>
-      <td><a href="{{ url_for('data', data_id=data.id) }}">{{ data.name }}</a></td>
-      <td><a href="{{ url_for('context', context_name=data.context.name) }}">{{ data.context.name }}</a></td>
+      <td><a href="{{ url_for('data', data_id=data.id) }}" rel="tooltip" title="Show contained entries">{{ data.name }} <span class="detail-marker"> &gt;&gt; </span></a></td>
+      <td><a href="{{ url_for('context', context_name=data.context.name) }}" rel="tooltip" title="Show context details">{{ data.context.name }}</a></td>
       <td>{{ data.entries|length }}</td>
       <td>{{ data.created|dtformat }}</td>
       {% for entry in entries[loop.index0] %}

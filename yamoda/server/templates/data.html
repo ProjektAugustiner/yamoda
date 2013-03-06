@@ -54,7 +54,7 @@
           {{ entryvalue(entry, 500) }}
           <td>{{ entry.parameter.unit|unitformat }}</td>
           {% if entry.value.shape %}
-          <td class="url-column"><a id="entry_url_{{loop.index0}}" href="{{url_for('entry', entry_id=entry.id)}}">Show...</a></td>
+          <td class="url-column"><a id="entry_url_{{loop.index0}}" href="{{url_for('entry', entry_id=entry.id)}}">Show<span class="detail-marker">&nbsp;&gt;&gt;</span><a></td>
           {% else %}
           <td>-</td>
           {% endif %}

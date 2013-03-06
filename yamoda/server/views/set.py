@@ -39,7 +39,7 @@ def _render_set_json(sett, **kw):
 
 @app.route('/sets/<int:set_id>')
 @login_required
-@html_json_mimerender("setdisplay.html", _render_set_json)
+@html_json_mimerender("set.html", _render_set_json)
 def set(set_id):
     s = Set.query.get_readable(set_id)
     if not s:

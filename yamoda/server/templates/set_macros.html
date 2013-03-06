@@ -11,7 +11,7 @@ $ ->
 <table id="settable" class="table table-condensed table-bordered table-striped">
   <thead>
     <tr>
-      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">#</th>
+      <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Set #</th>
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Name</th>
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Subsets</th>
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Datas</th>
@@ -22,7 +22,7 @@ $ ->
   {%- for set in sets %}
     <tr>
       <td>{{ loop.index }}</td>
-      <td><a href="{{ url_for('set', set_id=set.id) }}">{{ set.name }}</a></td>
+      <td><a href="{{ url_for('set', set_id=set.id) }}" rel="tooltip" title="show contained subsets and data">{{ set.name }}<span class="detail-marker">&nbsp;&gt;&gt;</span></a></td>
       <td>{{ set.children|length }}</td>
       <td>{{ set.datas|length }}</td>
       <td>{{ set.created|dtformat }}</td>

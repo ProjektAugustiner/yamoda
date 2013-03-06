@@ -10,3 +10,4 @@ localsettings.py
 yamoda.egg-info/
 *.pdf
 *.svg
+.session.vim

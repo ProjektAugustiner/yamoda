@@ -132,11 +132,14 @@ plot_series = (series, $target) ->
   if prev_plot
     logg.debug("previous plot exists")
     plot_data = prev_plot.getData()
+    series.color = plot_data.length
     plot_data.push(series)
   else
     # new plot
+    series.color = 0
     plot_data = [series]
       
+  logg.info("color", series.color)
   plot = $.plot($plot_area, plot_data, default_flot_options)
   $target.data("plot", plot)
   $plot_area.removeClass("placeholder")

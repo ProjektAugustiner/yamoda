@@ -74,9 +74,9 @@ setup_query_history_table = ->
   yamoda.utils.setup_column_filter_boxes($("#query_history_table tfoot input"), dtable)
 
   # setup popovers which show the query string in formatted form (newlines).
-  query_links = $(".query_popover")
-  query_links.each((index, link) ->
-    text = link.text.replace(/,/g, "<br>")
+  query_texts = $(".query-text")
+  query_texts.each((index, query) ->
+    text = $(query).text().replace(/,/g, "<br>")
     $("#query_" + index).popover {
       content: text
       title: "Query #" + (index + 1) + " (click to run)"

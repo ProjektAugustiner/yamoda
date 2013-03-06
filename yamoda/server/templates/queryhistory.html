@@ -38,7 +38,9 @@
       <td>{{ query.created|dtformat }}</td>
       <td class="query-name" id="query_name_{{ loop.index0 }}">{{ query.name }}</td>
       <td>
-        <a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}');" id="query_{{ loop.index0 }}" class="query_popover">{{- query.query_string -}}</a>
+        <a href="#" onclick="yamoda.queryhistory.run_query('{{ loop.index0 }}');" class="query_popover"><span class="query-text" id="query_{{ loop.index0 }}">{{- query.query_string -}}</span>
+          <span class="detail-marker">&nbsp;&gt;&gt;</span>
+        </a>
       </td>
       <td id="query_favorite_{{ loop.index0 }}">{{query.favorite|yesnoformat }}</td>
       <td><a href="#" onclick="yamoda.queryhistory.insert_query('{{ loop.index0 }}');">Edit</a></td>

@@ -2,11 +2,12 @@
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
 '''
-Created on 05.11.2012
-@author: dpausp (Tobias Stenzel)
+.. moduleauthor:: dpausp (Tobias Stenzel)
 
-adapted from tgext.coffeescript for flask
-https://bitbucket.org/clsdaniel/tgext.coffeescript/
+* Created on 05.11.2012
+* adapted from tgext.coffeescript for flask
+
+  * https://bitbucket.org/clsdaniel/tgext.coffeescript/
 '''
 import logging
 import subprocess

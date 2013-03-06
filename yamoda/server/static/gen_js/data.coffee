@@ -1,6 +1,6 @@
 ###
-# <modulename>.coffee
-# <description>
+# data.coffee
+# 
 #
 # @author dpausp (Tobias Stenzel)
 #
@@ -49,10 +49,12 @@ $ ->
   # 2D preview image setup
   yamoda.entry.fetch_2D_preview_images($("#entrytable td.2d-preview"), "35%")
   yamoda.entry.flot_setup($("#plot"))
-  $('a[rel=tooltip]').tooltip()
+  #$('a[rel=tooltip]').tooltip()
 
   $("#plot_btn").click(plot_current_selection)
 
+  # row (entry) selection logic. 
+  # The first selected entry will be used as data source for the x-axis, the second for y
   $("#entrytable tr").click ->
     $this = $(this)
     url = $this.find(".url-column>a").attr("href")

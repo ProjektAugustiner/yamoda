@@ -143,8 +143,9 @@ def markdown(value):
 
 def shape(value):
     """Shape.
+    
     :param value: float, int or ndarray are recognized
-    :returns: string "scalar" or numpy shape, like "100, 100"
+    :returns: string "scalar" or numpy shape, like '100, 100'
     """
     if isinstance(value, float) or isinstance(value, int):
         return "scalar"
