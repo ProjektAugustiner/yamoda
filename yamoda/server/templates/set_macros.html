@@ -1,14 +1,14 @@
-{% macro settable_script() %}
-{% coffee "settable" %}
+{% macro setlist_script() %}
+{% coffee "setlist" %}
 $ ->
-  dtable = yamoda.utils.setup_datatable($("#settable"))
-  yamoda.utils.setup_column_filter_boxes($("#settable th.footer input.filter-input"), dtable)
+  dtable = yamoda.utils.setup_datatable($("#setlist_table"))
+  yamoda.utils.setup_column_filter_boxes($("#setlist_table th.footer input.filter-input"), dtable)
 {% endcoffee %}
 {% endmacro %}
 
-{% macro settable(sets) %}
+{% macro setlist(sets) %}
 {# just a table with sets  #}
-<table id="settable" class="table table-condensed table-bordered table-striped">
+<table id="setlist_table" class="table table-condensed table-bordered table-striped">
   <thead>
     <tr>
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Set #</th>
@@ -39,8 +39,8 @@ $ ->
 </table>
 {% endmacro %}
 
-{% macro setlist(sets, parent) %}
-{# settable with additional set controls (new set)  #}
+{% macro setlist_with_controls(sets, parent) %}
+{# setlist with additional set controls (new set)  #}
   <div id="new_set_action">
     <a class="btn" data-toggle="modal"
       href="#new_set">Create {% if parent %}sub{% endif %}set</a>
@@ -48,12 +48,12 @@ $ ->
 
   {% if sets %} 
   <script>
-  {% coffee "settable" %}
+  {% coffee "setlist_controls" %}
   $ ->
-    $("#settable_wrapper .datatables-top-left-bar").append($("#new_set_action").remove())
+    $("#setlist_table_wrapper .datatables-top-left-bar").append($("#new_set_action").remove())
   {% endcoffee %}
   </script>
-  {{ settable(sets) }}
+  {{ setlist(sets) }}
   {% endif %} 
 
   <div class="modal hide" id="new_set">

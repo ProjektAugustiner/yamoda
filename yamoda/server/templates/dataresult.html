@@ -1,4 +1,4 @@
-{% from "data_macros.html" import datatable, datatable_script %}
+{% from "data_macros.html" import datalist, datalist_script %}
 <!-- external libs -->
 <script src="{{ url_for('static', filename='js/jquery.sparkline.js') }}"></script>
 <!-- yamoda modules -->
@@ -10,8 +10,8 @@ $ ->
   yamoda.entry.fetch_2D_preview_images($("#datatable td.2d-preview"), "100%")
   return
 {% endcoffee %}
-{{ datatable_script() }}
+{{ datalist_script() }}
 </script>
-{{ datatable(datas, params, entries) }}
+{{ datalist(datas, params, entries) }}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

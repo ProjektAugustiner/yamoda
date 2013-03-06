@@ -1,5 +1,5 @@
 {% from "entry_macros.html" import entryvalue %}
-{% macro datatable(datas, params, entries) %}
+{% macro datalist(datas, params, entries) %}
 <table id="data_list_table" class="table table-condensed table-bordered table-striped">
   <thead>
     <tr>
@@ -55,8 +55,8 @@
   <div class="alert alert-error hide" id="actionerror"></div>
 </div>
 {% endmacro %}
-{% macro datatable_script() %}
-{% coffee "datatable" %}
+{% macro datalist_script() %}
+{% coffee "datalist" %}
 $ ->
   yamoda.add_module_constants("yamoda.datalist",
     delete_url: "{{ url_for('datadelete') }}"

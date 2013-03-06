@@ -1,7 +1,7 @@
 {# display contents of a set (datas and subsets)  #}
 {% extends "layout.html" %}
-{% from "set_macros.html" import setlist, settable_script %}
-{% from "data_macros.html" import datatable, datatable_script %}
+{% from "set_macros.html" import setlist_with_controls, setlist_script %}
+{% from "data_macros.html" import datalist, datalist_script %}
 {% block extrahead %}
 <!-- external libs -->
 <script src="{{ url_for('static', filename='js/jquery.sparkline.js') }}"></script>
@@ -9,8 +9,8 @@
 <script src="{{ url_for('static', filename='gen_js/entry.js') }}"></script>
 <script src="{{ url_for('static', filename='gen_js/datalist.js') }}"></script>
 <script type="text/javascript">
-{{ settable_script() }}
-{{ datatable_script() }}
+{{ setlist_script() }}
+{{ datalist_script() }}
 </script>
 {% endblock %}
 
@@ -19,7 +19,7 @@
 {% block body %}
   <h2>Dataset: {{ set.name }}</h2>
   <h3>Subsets</h3>
-  {{ setlist(set.children, set) }}
+  {{ setlist_with_controls(set.children, set) }}
   <br />
   <hr />
   <h3>Data in this Set</h3>
@@ -31,7 +31,7 @@
     $("#datatable_wrapper .datatables-top-left-bar").append($("#data_import_btn").remove())
   {% endcoffee %}
   </script>
-  {{ datatable(set.datas, params, entries) }}
+  {{ datalist(set.datas, params, entries) }}
 
   {% else %}
   <hr />

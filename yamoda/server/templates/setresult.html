@@ -1,8 +1,8 @@
 {# used to display results for set searches #}
-{% from "set_macros.html" import settable, settable_script %}
+{% from "set_macros.html" import setlist, setlist_script %}
 <script>
-  {{ settable_script() }}
+  {{ setlist_script() }}
 </script>
-{{ settable(sets) }}
+{{ setlist(sets) }}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}
