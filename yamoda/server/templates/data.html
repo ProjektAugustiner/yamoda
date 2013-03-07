@@ -22,10 +22,50 @@
 <div class="row-fluid">
   <div class="span12">
     <hr class="small-vertical-margin">
-    <a id="plot_btn" class="btn btn-primary" href="#">Plot Selection</a>
+    <a id="plot_btn" class="btn" href="#" rel="tooltip" title="plot selected 1D entries, x (first selection) vs. y (second selection)">Plot Selection</a>
+    {# Display data navigation buttons. 
+      Buttons are disabled if there is no previous resp. next data.
+    #}
+    {% if previous_data %}
+    <a id="previous_data_btn" class="btn" href="{{url_for('data', data_id=previous_data.id)}}" rel="tooltip" title="Go to previous data">
+      <i class="icon-backward"></i>
+      Previous Data #{{ previous_data.id }}
+    </a>
+    {% else %}
+    <a id="previous_data_btn" class="btn disabled" href="#" rel="tooltip" title="no previous data">
+      <i class="icon-backward"></i>
+      Previous Data
+    </a>
+    {% endif %}
+
+    {% if from_set %}
+    <a id="back_to_set_btn" class="btn" href="{{url_for('set', set_id=from_set.id)}}">
+      <i class="icon-chevron-up"></i>
+      Back to Set #{{ from_set.id }}
+    </a>
+    {% else %}
+    <a id="back_to_set_btn" class="btn disabled" href="#" rel="tooltip" title="unavailable">
+      <i class="icon-chevron-up"></i>
+      Back to Set
+    </a>
+    {% endif %}
+
+    {% if next_data %}
+    <a id="next_data_btn" class="btn" href="{{url_for('data', data_id=next_data.id)}}" rel="tooltip" title="Go to next data">
+      Next Data #{{ next_data.id }}
+      <i class="icon-forward"></i>
+    </a>
+    {% else %}
+    <a id="next_data_btn" class="btn disabled" href="#" rel="tooltip" title="no next data">
+      <i class="icon-forward"></i>
+      Next Data
+    </a>
+    {% endif %}
     <hr class="small-vertical-margin">
-    <h2>Data: {{ data.name }}
+    <h2>Data: {{ data.name }} 
+    <small>(#{{ data.id }})</small>
     <small>Created {{ data.created|dtformat }}</small></h2>
+    {# entry display table starts here #}
     <table id="entrytable" class="table table-condensed table-bordered table-striped">
       <thead>
         <tr>

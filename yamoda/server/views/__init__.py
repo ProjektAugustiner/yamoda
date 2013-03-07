@@ -35,6 +35,6 @@ def generated(filename):
 def cookietest():
     from flask import request
     from urllib import unquote
-    data_ids = [int(id_str) for id_str in unquote(request.cookies.get("data-ids")).split(",")]
+    data_ids = [int(id_str) for id_str in unquote(request.cookies.get("data_order")).split(",")]
     print(data_ids)
     return str(data_ids)

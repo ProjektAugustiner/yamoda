@@ -20,6 +20,7 @@ setup_datatable = ($table, options) ->
     logg.info("table already initialized, doing nothing")
     return
   logg.debug("activating dataTable")
+  logg.debug("additional options", options)
   default_options =
     sDom: '<"datatables-top-left-bar">lfrt<"datatables-bottom-left-bar">i<"datatables-bottom-right-bar">p'
     bStateSave: false

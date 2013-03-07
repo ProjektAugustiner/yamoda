@@ -10,19 +10,22 @@
 <script src="{{ url_for('static', filename='gen_js/datalist.js') }}"></script>
 <script type="text/javascript">
 {{ setlist_script() }}
-{{ datalist_script() }}
+{{ datalist_script(set) }}
 </script>
 {% endblock %}
 
 {% set title = "Dataset" %}
 
 {% block body %}
-  <h2>Dataset: {{ set.name }}</h2>
+  <h2>Dataset: {{ set.name }}
+    <small>(#{{ set.id }})</small>
+    <small>Created {{ set.created|dtformat }}</small>
+  </h2>
   <h3>Subsets</h3>
   {{ setlist_with_controls(set.children, set) }}
   <br />
   <hr />
-  <h3>Data in this Set</h3>
+  <h3>Data in Set</h3>
   <a id="data_import_btn" class="btn" href="{{ url_for('setimport', set_id=set.id) }}">Import data</a>
   {% if set.datas %}
   <script>

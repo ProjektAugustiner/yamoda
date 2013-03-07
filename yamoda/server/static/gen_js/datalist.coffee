@@ -14,18 +14,10 @@ that = undefined
 
 ###-- module functions --###
 
-
-setup_datalist = ->
-  yamoda.entry.sparkline_setup($("td.valuecolumn>.sparkline"))
-  $table = $("#datalist_table")
-  dtable = yamoda.utils.setup_datatable($table)
-  logg.info("setting up 2d preview")
-  yamoda.entry.fetch_2D_preview_images($("#datalist_table td.2d-preview"), "100%")
-  $("#datalist_table_wrapper .datatables-bottom-right-bar").append($("#data_action").remove())
-  yamoda.utils.setup_column_filter_boxes($("#datalist_table th.footer input.filter-input"), dtable)
-  yamoda.utils.setup_datatable_selection($table)
-  $('a[rel=tooltip]').tooltip()
-
+setup_delete_data_action_handler = ->
+  logg.debug("setup_delete_data_action_handler")
+  #: Register delete action handler which sends a delete command 
+  #: to the server for selected data rows.
   get_selected_data_rows = ->
     $("#datalist_table>tbody>tr.row-selected")
 
@@ -51,6 +43,38 @@ setup_datalist = ->
         $("#data_action button").button("reset")
         $("#actionerror").text(err).show()
     )
+  return
+
+
+setup_data_click_handler = ->
+  logg.debug("setup_data_click_handler")
+  #: Save current data sort order as session cookie,
+  #: used for previous / next buttons on server side.
+  $(".data-link").click ->
+    dtable_f = $.fn.dataTable.settings.filter (s) -> s.nTable.id == "datalist_table"
+    dtable = dtable_f[0].oInstance
+    data_order = dtable.$(".data-id").map( (i, e) ->
+      $(e).text()).get()
+    $.cookie("data_order", data_order, path: "/")
+    $.cookie("from_set", that.from_set, path: "/")
+    logg.debug("saved cookie data:", $.cookie("data_order"), $.cookie("from_set"))
+    return
+  return
+
+
+setup_datalist = ->
+  logg.debug("setup_datalist")
+  #: Misc setup needed for the datalist.
+  yamoda.entry.sparkline_setup($("td.valuecolumn>.sparkline"))
+  $table = $("#datalist_table")
+  dtable = yamoda.utils.setup_datatable($table, bStateSave: true)
+  logg.info("setting up 2d preview")
+  yamoda.entry.fetch_2D_preview_images($("#datalist_table td.2d-preview"), "100%")
+  $("#datalist_table_wrapper .datatables-bottom-right-bar").append($("#data_action").remove())
+  yamoda.utils.setup_column_filter_boxes($("#datalist_table th.footer input.filter-input"), dtable)
+  yamoda.utils.setup_datatable_selection($table)
+  #$('a[rel=tooltip]').tooltip()
+  return
 
 ###-- READY --###
 
@@ -62,6 +86,8 @@ $ ->
   # other stuff to do
   logg = that.logg
   setup_datalist()
+  setup_delete_data_action_handler()
+  setup_data_click_handler()
   return
 
 # vim: set filetype=coffee sw=2 ts=2 sts=2 expandtab: #

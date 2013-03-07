@@ -1,9 +1,9 @@
 {% from "entry_macros.html" import entryvalue %}
 {% macro datalist(datas, params, entries) %}
-<table id="data_list_table" class="table table-condensed table-bordered table-striped">
+<table id="datalist_table" class="table table-condensed table-bordered table-striped">
   <thead>
     <tr>
-      <th>#</th>
+      <th>Data #</th>
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Name</th>
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Context</th>
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Entries</th>
@@ -18,7 +18,11 @@
   {%- for data in datas %}
     <tr data-row_num="{{ loop.index0 }}">
       <td class="data-id">{{ data.id }}</td>
-      <td><a href="{{ url_for('data', data_id=data.id) }}" rel="tooltip" title="Show contained entries">{{ data.name }} <span class="detail-marker"> &gt;&gt; </span></a></td>
+      <td>
+        <a class="data-link" href="{{ url_for('data', data_id=data.id) }}" rel="tooltip" title="Show contained entries">{{ data.name }}
+          <span class="detail-marker">&nbsp;&gt;&gt;</span>
+        </a>
+      </td>
       <td><a href="{{ url_for('context', context_name=data.context.name) }}" rel="tooltip" title="Show context details">{{ data.context.name }}</a></td>
       <td>{{ data.entries|length }}</td>
       <td>{{ data.created|dtformat }}</td>
@@ -55,11 +59,12 @@
   <div class="alert alert-error hide" id="actionerror"></div>
 </div>
 {% endmacro %}
-{% macro datalist_script() %}
+{% macro datalist_script(from_set=None) %}
 {% coffee "datalist" %}
 $ ->
   yamoda.add_module_constants("yamoda.datalist",
-    delete_url: "{{ url_for('datadelete') }}"
+    delete_url: "{{ url_for('datadelete') }}",
+    from_set: "{{ from_set.id if from_set else 0 }}"
   )
 {% endcoffee %}
 {% endmacro %}

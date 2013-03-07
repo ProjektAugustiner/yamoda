@@ -31,7 +31,9 @@ with yamoda; see the file COPYING.
 Installing via zc.buildout + virtualenv
 ---------------------------------------
 
-Install Python 2.7 and virtualenv on your machine.
+Recommended install method.
+First, install Python 2.7 and virtualenv on your machine. Everything else will be fetched by zc.buildout.
+We use zc.buildout 2.0.
 
 Create virtualenv:
 
@@ -40,7 +42,7 @@ Create virtualenv:
     
 Get bootstrap.py and buildout.cfg from yamoda <branch>:
 
-    wget http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
+    wget http://downloads.buildout.org/2/bootstrap.py
     wget https://github.com/ProjektAugustiner/yamoda/raw/<branch>/buildout.cfg
 
 
