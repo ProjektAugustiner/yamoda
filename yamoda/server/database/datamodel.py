@@ -131,7 +131,7 @@ class Parameter(db.Model, DescriptionMixin):
     unit = db.Column(db.String(60))  # TODO: decide on a Unit table
 
     def __repr__(self):
-        return '<Parameter({0})>'.format(self.name)
+        return '<Parameter({})>'.format(self.name)
 
 
 class HistoricQuery(AccessControl, db.Model, TimeStamp):
@@ -144,4 +144,16 @@ class HistoricQuery(AccessControl, db.Model, TimeStamp):
     favorite = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return '<HistoricQuery({0})>'.format(self.name)
+        return '<HistoricQuery({})>'.format(self.name)
+
+
+class Comment(db.Model, TimeStamp):
+    """A Comment.
+    Can be added to various entities like set or data"""
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.relationship("User")
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    text = db.Column(db.String)
+
+    def __repr__(self):
+        return '<Comment({})>'.format(self.id)

@@ -13,7 +13,8 @@ from flask import render_template, redirect, url_for
 from yamoda.server import app
 
 # import other modules with views
-from yamoda.server.views import user, context, set, data, entry, search, querylanghelp, datadisplaytest, parameter
+from yamoda.server.views import user, context, set, data, entry, search, querylanghelp, \
+    datadisplaytest, parameter, commenttest
 
 
 @app.route('/')
@@ -29,12 +30,3 @@ def generated(filename):
     """
     directory = app.config["GENERATED_DIR"]
     return send_from_directory(directory=directory, filename=filename, as_attachment=True)
-
-
-@app.route("/cookietest")
-def cookietest():
-    from flask import request
-    from urllib import unquote
-    data_ids = [int(id_str) for id_str in unquote(request.cookies.get("data_order")).split(",")]
-    print(data_ids)
-    return str(data_ids)
