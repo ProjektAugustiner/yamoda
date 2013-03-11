@@ -2,7 +2,7 @@
 {% extends "layout.html" %}
 {% from "set_macros.html" import setlist_with_controls, setlist_script %}
 {% from "data_macros.html" import datalist, datalist_script %}
-{% from "comment_macros.html" import comment_section %}
+{% from "comment_macros.html" import comment_table, new_comment, comment_toggle_script %}
 {% block extrahead %}
 <!-- external libs -->
 <script src="{{ url_for('static', filename='js/jquery.sparkline.js') }}"></script>
@@ -12,6 +12,7 @@
 <script type="text/javascript">
 {{ setlist_script() }}
 {{ datalist_script(set) }}
+{{ comment_toggle_script() }}
 </script>
 {% endblock %}
 
@@ -26,7 +27,7 @@
   {{ setlist_with_controls(set.children, set) }}
   <br />
   <hr />
-  <h3>Data in Set</h3>
+  <h3>Data in Set:</h3>
   <a id="data_import_btn" class="btn" href="{{ url_for('setimport', set_id=set.id) }}">Import data</a>
   {% if set.datas %}
   <script>
@@ -42,8 +43,20 @@
   <p>There is no data in this set.</p>
   <hr />
   {%- endif %}
-  <h2>Comments for this Set:</h2>
-  {{ comment_section(set.comments) }}
+  <br>
+  <hr>
+  <a href="#" id="show_comments_btn" class="btn btn-large"><i class="icon-list"></i>Show Comments ({{ set.comments|length }})</a>
+  <div id="comment_section" style="display:none;">
+    <a href="#" id="hide_comments_btn" class="btn"><i class="icon-list"></i>Hide Comments</a>
+    <h3>Comments for this Set:</h3>
+    {% if set.comments %}
+    {{ comment_table(set.comments) }}
+    {% else %}
+    <p>No comments yet.</p>
+    {% endif %}
+    <br>
+    {{ new_comment(url_for("post_set_comment", set_id=set.id)) }}
+  </div>
 {% endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

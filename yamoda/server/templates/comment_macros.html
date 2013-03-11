@@ -1,6 +1,16 @@
-{% macro comment_section(comments, commented_type, commented_id) %}
+{% macro comment_table(comments) %}
+<script>
+{% coffee "comment_section" %}
+$ ->
+  dtable = yamoda.utils.setup_datatable($("#comment_table"),
+    aoColumnDefs: [{asSorting: [], aTargets: [4]}]
+  )
+  yamoda.utils.setup_column_filter_boxes($("#comment_table th.footer input.filter-input"), dtable)
+  yamoda.utils.setup_datatable_selection($("#comment_table"))
+  return
+{% endcoffee %}
+</script>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/yamoda-datatable.css') }}" />
-<h2>Comments</h2>
 <div class="row-fluid">
   <div class="span12">
     <table id="comment_table" class="table table-condensed table-bordered table-striped table-hover">
@@ -10,7 +20,6 @@
           <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Text</th>
           <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Author</th>
           <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Created</th>
-          <th class="header">Edit</th>
           <th><input class="select-invert" type="checkbox" rel="tooltip" title="Click to invert row selection" /></th>
         </tr>
       </thead>
@@ -21,7 +30,6 @@
           <td>{{ comment.text|safe }}</td>
           <td>{{ comment.author.name }}</td>
           <td>{{ comment.created|dtformat }}</td>
-          <td><a href="#">Edit</a></td>
           <td><input type="checkbox" class="select-row" /></td>
         </tr>
         {%- endfor %}
@@ -32,15 +40,18 @@
           <th class="footer"><input type="text" name="search_name" class="filter-input filter-init input-xlarge" value="Filter text" /></th>
           <th class="footer"><input type="text" name="search_favorite" class="filter-input filter-init input-medium" value="Filter author" /></th>
           <th class="footer"><input type="text" name="search_created" class="filter-input filter-init input-medium" value="Filter dates" /></th>
-          <th class="footer" colspan="2" style="overflow: visible;">
+          <th class="footer" style="overflow: visible;">
         </tr>
       </tfoot>
     </table>
   </div>
 </div>
+{% endmacro %}
+
+{% macro new_comment(post_new_comment_url) %}
 <div class="row-fluid">
   <div class="span6">
-    <form action="{{ url_for('comments', commented_type=commented_type, commented_id=commented_id) }}" method="post" class="form-vertical" id="query_form">
+    <form action="{{ post_new_comment_url }}" method="post" class="form-vertical" id="query_form">
       <div class="control-group">
         <label class="control-label" for="query">New Comment:</label>
         <div class="controls">
@@ -54,6 +65,23 @@
     </form>
   </div>
 </div>
+{% endmacro %}
+
+{% macro comment_toggle_script() %}
+{% coffee "comment_toggle_script" %}
+$ ->
+  $("#show_comments_btn").click ->
+    $("#show_comments_btn").hide()
+    $("#comment_section").show()
+    return
+
+  $("#hide_comments_btn").click ->
+    $("#comment_section").hide()
+    $("#show_comments_btn").show()
+    return
+
+  return
+{% endcoffee %}
 {% endmacro %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

@@ -17,14 +17,14 @@ from yamoda.query.test import db_setup
 logg = logging.getLogger(__name__)
 
 
-# setup = db_setup.create_complete_env
-# teardown = db_setup.drop_schema
+setup = db_setup.create_complete_env
+teardown = db_setup.drop_schema
 
 
-def setup_module(module):
-    db_setup.create_complete_env()
-
-
+# def setup_module(module):
+#     db_setup.create_complete_env()
+#
+#
 # def teardown_module(module):
 #     db_setup.drop_schema()
 

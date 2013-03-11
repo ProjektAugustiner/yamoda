@@ -39,21 +39,17 @@ class Comment(db.Model, TimeStamp):
     author = db.relationship("User")
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     text = db.Column(db.String)
-    commentable_id = db.Column(db.Integer, db.ForeignKey("commentable.id"))
 
     def __repr__(self):
         return '<Comment({})>'.format(self.id)
 
 
-class Commentable(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    comments = db.relationship("Comment", backref="commentable")
-    type = db.Column(db.String)
+class SetComment(Comment):
+    set_id = db.Column(db.Integer, db.ForeignKey("set.id"))
 
-    __mapper_args__ = {
-        "polymorphic_identity": "commentable",
-        "polymorphic_on": type
-    }
+
+class DataComment(Comment):
+    data_id = db.Column(db.Integer, db.ForeignKey("data.id"))
 
 
 _set_to_data = db.Table('set_to_data', db.Model.metadata,
@@ -66,32 +62,38 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
     db.Column('parent_id', db.Integer, db.ForeignKey('set.id'), primary_key=True))
 
 
-class Set(AccessControl, TimeStamp, Commentable):
+class Set(AccessControl, TimeStamp, db.Model):
     """The Set class is used to group Datas and other Sets"""
-    id = db.Column(db.Integer, db.ForeignKey("commentable.id"), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     datas = db.relationship('Data', secondary=_set_to_data, backref='sets')
     children = db.relationship('Set', secondary=_set_to_set,
                                primaryjoin=id == _set_to_set.c.child_id,
                                secondaryjoin=id == _set_to_set.c.parent_id)
-
-    __mapper_args__ = {
-        "polymorphic_identity": "set"
-    }
+    comments = db.relationship("SetComment")
 
     def __repr__(self):
         return '<DataSet({0})>'.format(self.id)
 
 
-class Entry(Commentable, TimeStamp):
+class Data(db.Model, TimeStamp):
+    """A Data is a collection of Entries"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60), nullable=False)
+    entries = db.relationship('Entry', backref='data')
+    context_id = db.Column(db.Integer, db.ForeignKey('context.id'), nullable=False)
+    context = db.relationship('Context')
+    comments = db.relationship("DataComment")
+
+    def __repr__(self):
+        return '<Data({0})>'.format(self.id)
+
+
+class Entry(db.Model, TimeStamp):
     """And Entry is a single bit of information (scalar or array) in a Data"""
-    id = db.Column(db.Integer, db.ForeignKey("commentable"), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))
     parameter_id = db.Column(db.Integer, db.ForeignKey('parameter.id'), nullable=False)
-
-    __mapper_args__ = {
-        "polymorphic_identity": "entry"
-    }
 
     @hybrid_property
     def value(self):
@@ -119,21 +121,6 @@ class Entry(Commentable, TimeStamp):
                                                  self.value)
         return '<Entry({0},{1},{2!r})>'.format(self.id, self.parameter.name,
                                                self.value_complex)
-
-class Data(Commentable, TimeStamp):
-    """A Data is a collection of Entries"""
-    id = db.Column(db.Integer, db.ForeignKey("commentable"), primary_key=True)
-    name = db.Column(db.String(60), nullable=False)
-    entries = db.relationship('Entry', backref='data', primaryjoin=id == Entry.data_id)
-    context_id = db.Column(db.Integer, db.ForeignKey('context.id'), nullable=False)
-    context = db.relationship('Context')
-
-    __mapper_args__ = {
-        "polymorphic_identity": "data"
-    }
-
-    def __repr__(self):
-        return '<Data({0})>'.format(self.id)
 
 
 class DescriptionMixin(object):

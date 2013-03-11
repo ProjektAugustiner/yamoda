@@ -67,7 +67,10 @@ setup_datalist = ->
   #: Misc setup needed for the datalist.
   yamoda.entry.sparkline_setup($("td.valuecolumn>.sparkline"))
   $table = $("#datalist_table")
-  dtable = yamoda.utils.setup_datatable($table, bStateSave: true)
+  dtable = yamoda.utils.setup_datatable($table,
+    bStateSave: true
+    aoColumnDefs: [{asSorting: [], aTargets: [7]}]
+  )
   logg.info("setting up 2d preview")
   yamoda.entry.fetch_2D_preview_images($("#datalist_table td.2d-preview"), "100%")
   $("#datalist_table_wrapper .datatables-bottom-right-bar").append($("#data_action").remove())

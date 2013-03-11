@@ -14,7 +14,7 @@ from yamoda.server import app
 
 # import other modules with views
 from yamoda.server.views import user, context, set, data, entry, search, querylanghelp, \
-    datadisplaytest, parameter, commenttest
+    datadisplaytest, parameter, commenttest, comment
 
 
 @app.route('/')
