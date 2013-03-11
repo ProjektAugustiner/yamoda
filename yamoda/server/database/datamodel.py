@@ -83,27 +83,15 @@ class Set(AccessControl, TimeStamp, Commentable):
         return '<DataSet({0})>'.format(self.id)
 
 
-class Data(Commentable, TimeStamp):
-    """A Data is a collection of Entries"""
-    id = db.Column(db.Integer, db.ForeignKey("commentable"), primary_key=True)
-    name = db.Column(db.String(60), nullable=False)
-    entries = db.relationship('Entry', backref='data')
-    context_id = db.Column(db.Integer, db.ForeignKey('context.id'), nullable=False)
-    context = db.relationship('Context')
-
-    __mapper_args__ = {
-        "polymorphic_identity": "data"
-    }
-
-    def __repr__(self):
-        return '<Data({0})>'.format(self.id)
-
-
 class Entry(Commentable, TimeStamp):
     """And Entry is a single bit of information (scalar or array) in a Data"""
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("commentable"), primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))
     parameter_id = db.Column(db.Integer, db.ForeignKey('parameter.id'), nullable=False)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "entry"
+    }
 
     @hybrid_property
     def value(self):
@@ -131,6 +119,21 @@ class Entry(Commentable, TimeStamp):
                                                  self.value)
         return '<Entry({0},{1},{2!r})>'.format(self.id, self.parameter.name,
                                                self.value_complex)
+
+class Data(Commentable, TimeStamp):
+    """A Data is a collection of Entries"""
+    id = db.Column(db.Integer, db.ForeignKey("commentable"), primary_key=True)
+    name = db.Column(db.String(60), nullable=False)
+    entries = db.relationship('Entry', backref='data', primaryjoin=id == Entry.data_id)
+    context_id = db.Column(db.Integer, db.ForeignKey('context.id'), nullable=False)
+    context = db.relationship('Context')
+
+    __mapper_args__ = {
+        "polymorphic_identity": "data"
+    }
+
+    def __repr__(self):
+        return '<Data({0})>'.format(self.id)
 
 
 class DescriptionMixin(object):
