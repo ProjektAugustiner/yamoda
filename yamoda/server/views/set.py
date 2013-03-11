@@ -1,6 +1,7 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
+from yamoda.server.database.datamodel import Data
 
 """
 Data set related views.
@@ -155,7 +156,11 @@ def create_set():
     if parent_set_id is not None:
         parent_set = Set.query.get(parent_set_id)
         parent_set.children.append(s)
-
+    data_ids = request.form.getlist("data_ids[]", [], int)
+    datas = []
+    for data_id in data_ids:
+        datas.append(Data.query.get(data_id))
+    s.datas = datas
     db.session.add(s)
     db.session.commit()
     flash('New dataset successfully created.', 'success')
