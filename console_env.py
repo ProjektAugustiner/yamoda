@@ -10,13 +10,18 @@ from yamoda.server.database import *
 import yamoda.query.alchemy as alchemy
 import yamoda.query.test.testqueries as tq
 
-from dbsettings import DATABASE_URIS
+from yamoda.server.database.dbsettings import DATABASE_URIS
 
 q = db.session.query
 rollback = db.session.rollback
 
-DATABASE = "postgres"
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URIS[DATABASE]
+available_dbs = DATABASE_URIS.iterkeys()
+default_db = next(DATABASE_URIS.iterkeys())
+database = raw_input("database connector ({}, default {}): ".format("|".join(available_dbs), default_db))
+if not database.strip():
+    database = default_db
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URIS[database]
 
 logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])
 

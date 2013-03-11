@@ -12,7 +12,7 @@ from __future__ import division, absolute_import
 import logging as logg
 from sqlalchemy.sql import and_, or_
 from sqlalchemy.orm import aliased
-from .representation import Interval, LessThan, GreaterThan
+from yamoda.query.representation import Interval, LessThan, GreaterThan
 from yamoda.server.database import Set, Entry, Parameter, Data, Context, User, db
 
 

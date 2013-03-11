@@ -2,6 +2,7 @@
 {% extends "layout.html" %}
 {% from "set_macros.html" import setlist_with_controls, setlist_script %}
 {% from "data_macros.html" import datalist, datalist_script %}
+{% from "comment_macros.html" import comment_section %}
 {% block extrahead %}
 <!-- external libs -->
 <script src="{{ url_for('static', filename='js/jquery.sparkline.js') }}"></script>
@@ -41,6 +42,8 @@
   <p>There is no data in this set.</p>
   <hr />
   {%- endif %}
+  <h2>Comments for this Set:</h2>
+  {{ comment_section(set.comments) }}
 {% endblock %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

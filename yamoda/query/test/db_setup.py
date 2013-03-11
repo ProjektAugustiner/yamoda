@@ -8,22 +8,21 @@ Created on 06.09.2012
 '''
 from __future__ import division, absolute_import
 from random import random
-import logging as logg
+import logging
+from collections import OrderedDict
 import datetime
-logg.basicConfig(level=logg.INFO)
 
 from yamoda.server import db, app
 from yamoda.server.database import User, Group, Context, Parameter, \
      Set, Data, Entry
 from yamoda.server.database.dbsettings import DATABASE_URIS
 
+logg = logging.getLogger(__name__)
+# logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URIS["sqlite"]
 logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])
 
-users = []
-groups = []
-contexts = []
-context_params = {}
 sets = []
 data_testcases = {}
 set_testcases = {}
@@ -38,24 +37,21 @@ def drop_schema():
 def create_schema():
     logg.info("create schema...")
     db.create_all()
+    db.session.commit()
 
 
 def add_users():
-    db.create_all()
     logg.info("creating groups admins and users")
     admin_group = Group(name='admins')
     user_group = Group(name='users')
     db.session.add(admin_group)
     db.session.add(user_group)
-    groups.append(admin_group)
-    groups.append(user_group)
     logg.info("creating users admin and user")
     admin = User(name='admin', password='admin', primary_group=admin_group)
     user = User(name='user', password='user', primary_group=user_group)
     db.session.add(admin)
     db.session.add(user)
-    users.append(admin)
-    users.append(user)
+    db.session.commit()
 
 
 def add_context0():
@@ -73,7 +69,6 @@ consequat.
     logg.info("creating context TestContext")
     ctx = Context(name='TestContext', brief=brief, description=desc)
     db.session.add(ctx)
-    contexts.append(ctx)
 
     par_T = Parameter(
         name='T', brief='Temperature',
@@ -86,7 +81,9 @@ consequat.
 
     db.session.add(par_T)
     db.session.add(par_om)
-    context_params[ctx] = {"T": par_T, "omega": par_om}
+    db.session.commit()
+    logg.info("created params %s and %s", id(par_T), id(par_om))
+    logg.info("names %s and %s", par_T.name, par_om.name)
 
 
 def add_context1():
@@ -95,7 +92,6 @@ def add_context1():
     logg.info("creating context SomeContext")
     ctx = Context(name='SomeContext', brief=brief, description=desc)
     db.session.add(ctx)
-    contexts.append(ctx)
 
     par_T = Parameter(
         name='T', brief='temp',
@@ -108,7 +104,9 @@ def add_context1():
 
     db.session.add(par_T)
     db.session.add(par_p)
-    context_params[ctx] = {"T": par_T, "p": par_p}
+    db.session.commit()
+    logg.info("created params %s and %s", id(par_T), id(par_p))
+    logg.info("names %s and %s", par_T.name, par_p.name)
 
 
 def add_contexts():
@@ -117,58 +115,68 @@ def add_contexts():
 
 
 def add_set0():
-    pos = 0
     logg.info("creating set0")
     creation_dt = datetime.datetime(year=2011, month=6, day=10, hour=13, minute=37)
-    st = Set(created=creation_dt, name="set0", user=users[pos], group=groups[pos])
-    ctx = contexts[pos]
-    params = context_params[ctx]
+    st = Set(created=creation_dt, name="set0",
+             user=User.query.filter_by(name="admin").one(), group=Group.query.filter_by(name="admins").one())
+    ctx = Context.query.filter_by(name="TestContext").one()
+    params = dict((p.name, p) for p in ctx.parameters)
+    logg.info("params from db %s", params)
     datas = []
     for j in xrange(5):
-        entry_T = Entry(value=j * 100.0, parameter=params["T"])
         entry_om = Entry(value=(5 - j) * 1000.0, parameter=params["omega"])
-        data = Data(name="data{}/{}".format(pos, j), entries=[entry_T, entry_om], context=ctx)
+        entry_T = Entry(value=j * 100.0, parameter=params["T"])
+        data = Data(name="data{}/{}".format("set0", j), entries=[entry_T, entry_om], context=ctx)
+        db.session.add(data)
+        db.session.commit()
         datas.append(data)
 
     st.datas = datas
     db.session.add(st)
-    sets.append(st)
+    db.session.commit()
+    return st
 
 
 def add_set1():
-    pos = 1
     logg.info("creating set1")
     creation_dt = datetime.datetime(year=2012, month=4, day=12, hour=13, minute=37)
-    st = Set(created=creation_dt, name="set1", user=users[pos], group=groups[pos])
-    ctx = contexts[pos]
-    params = context_params[ctx]
+    st = Set(created=creation_dt, name="set1",
+             user=User.query.filter_by(name="user").one(), group=Group.query.filter_by(name="users").one())
+    ctx = Context.query.filter_by(name="SomeContext").one()
+    params = dict((p.name, p) for p in ctx.parameters)
     datas = []
     for j in xrange(5):
-        entry_T = Entry(value=100 + j * 50.0, parameter=params["T"])
         entry_p = Entry(value=10.0 * j, parameter=params["p"])
-        data = Data(name="data{}/{}".format(pos, j), entries=[entry_T, entry_p], context=ctx)
+        entry_T = Entry(value=100 + j * 50.0, parameter=params["T"])
+        data = Data(name="data{}/{}".format("set1", j), entries=[entry_T, entry_p], context=ctx)
+        db.session.add(data)
+        db.session.commit()
         datas.append(data)
 
     st.datas = datas
     db.session.add(st)
-    sets.append(st)
+    db.session.commit()
+    return st
 
 
 def add_sets():
-    add_set0()
-    add_set1()
+    return add_set0(), add_set1()
 
 
-def create_data_cases():
-    d0 = sets[0].datas
-    d1 = sets[1].datas
-    data_testcases["find:datas, T: > 210"] = sorted(d0[3:] + d1[3:])
-    data_testcases["find:datas, T: < 210"] = sorted(d0[:3] + d1[:3])
+def create_data_cases(set0, set1):
+    def cmp_data(d0, d1):
+        return cmp(d0.id, d1.id)
+
+    d0 = sorted(set0.datas, cmp_data)
+    logg.info("datas %s", d0)
+    d1 = sorted(set1.datas, cmp_data)
+    data_testcases["find:datas, T: > 210"] = d0[3:] + d1[3:]
+    data_testcases["find:datas, T: < 210"] = d0[:3] + d1[:3]
     data_testcases["find:datas, T: < 0"] = []
     data_testcases["find:datas, context: NotExisting"] = []
-    data_testcases["find:datas, context: TestContext, T: < 210"] = sorted(d0[:3])
-    data_testcases["find:datas, context: TestContext, T: 60 to 210"] = sorted(d0[1:3])
-    data_testcases["find:datas, context: TestContext, T: 60 to 210 or > 380"] = sorted(d0[1:3] + [d0[4]])
+    data_testcases["find:datas, context: TestContext, T: < 210"] = d0[:3]
+    data_testcases["find:datas, context: TestContext, T: 60 to 210"] = d0[1:3]
+    data_testcases["find:datas, context: TestContext, T: 60 to 210 or > 380"] = d0[1:3] + [d0[4]]
     data_testcases["find:datas, context: TestContext, sort: omega.desc"] = d0
     data_testcases["find:datas, context: TestContext, sort: T.asc"] = d0
     data_testcases["find:datas, context: TestContext, sort: T.desc"] = d0[::-1]
@@ -176,9 +184,7 @@ def create_data_cases():
     data_testcases["find:datas, context: TestContext, sort: omega.desc, limit: 2"] = d0[:2]
 
 
-def create_set_cases():
-    s0 = sets[0]
-    s1 = sets[1]
+def create_set_cases(s0, s1):
     set_testcases["find: sets, user: admin"] = [s0]
     set_testcases["find: sets, user: user"] = [s1]
     set_testcases["find: sets, created: 9 June 2011 to 11 August 2011 "] = [s0]
@@ -189,11 +195,14 @@ def create_set_cases():
 
 
 def create_complete_env():
-    drop_schema()
-    create_schema()
-    add_users()
-    add_contexts()
-    add_sets()
-    create_data_cases()
-    create_set_cases()
-    db.session.commit()
+    try:
+        drop_schema()
+        create_schema()
+        add_users()
+        add_contexts()
+        set0, set1 = add_sets()
+        create_data_cases(set0, set1)
+        create_set_cases(set0, set1)
+        db.session.commit()
+    finally:
+        db.session.rollback()
