@@ -1,0 +1,60 @@
+{% macro comment_section(comments, commented_type, commented_id) %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/yamoda-datatable.css') }}" />
+<h2>Comments</h2>
+<div class="row-fluid">
+  <div class="span12">
+    <table id="comment_table" class="table table-condensed table-bordered table-striped table-hover">
+      <thead>
+        <tr>
+          <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">#</th>
+          <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Text</th>
+          <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Author</th>
+          <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Created</th>
+          <th class="header">Edit</th>
+          <th><input class="select-invert" type="checkbox" rel="tooltip" title="Click to invert row selection" /></th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for comment in comments %}
+        <tr data-row_num="{{ loop.index0 }}">
+          <td class="comment-id">{{ loop.index }}</td>
+          <td>{{ comment.text|safe }}</td>
+          <td>{{ comment.author.name }}</td>
+          <td>{{ comment.created|dtformat }}</td>
+          <td><a href="#">Edit</a></td>
+          <td><input type="checkbox" class="select-row" /></td>
+        </tr>
+        {%- endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th class="footer"><input type="text" name="search_number" class="filter-input filter-init input-small" value="Filter #" /></th>
+          <th class="footer"><input type="text" name="search_name" class="filter-input filter-init input-xlarge" value="Filter text" /></th>
+          <th class="footer"><input type="text" name="search_favorite" class="filter-input filter-init input-medium" value="Filter author" /></th>
+          <th class="footer"><input type="text" name="search_created" class="filter-input filter-init input-medium" value="Filter dates" /></th>
+          <th class="footer" colspan="2" style="overflow: visible;">
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+<div class="row-fluid">
+  <div class="span6">
+    <form action="{{ url_for('comments', commented_type=commented_type, commented_id=commented_id) }}" method="post" class="form-vertical" id="query_form">
+      <div class="control-group">
+        <label class="control-label" for="query">New Comment:</label>
+        <div class="controls">
+          <textarea name="text" id="text_input" class="field span12" rows="6"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" id="submit_button" class="btn btn-primary">
+          <i class="icon-ok-sign icon-white"></i>Submit Comment</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endmacro %}
+
+{# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}
+

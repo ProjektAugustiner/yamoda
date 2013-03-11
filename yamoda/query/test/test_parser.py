@@ -6,14 +6,15 @@ Created on 06.09.2012
 @author: dpausp (Tobias Stenzel)
 '''
 from __future__ import division, absolute_import
-import logging as logg
+import logging
+logging.basicConfig(level=logging.INFO)
 from nose.tools import raises
 from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
 import yamoda.query.test.testqueries as tq
 from pprint import pformat
 from parcon import ParseException
 
-logg.basicConfig(level=logg.DEBUG)
+logg = logging.getLogger(__name__)
 
 
 def compare_dict_items(left, right):

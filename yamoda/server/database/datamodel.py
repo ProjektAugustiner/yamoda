@@ -32,6 +32,30 @@ class TimeStamp(object):
         return db.Column(db.DateTime, default=func.now(), nullable=False)
 
 
+class Comment(db.Model, TimeStamp):
+    """A Comment.
+    Can be added to various entities like set or data"""
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.relationship("User")
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    text = db.Column(db.String)
+    commentable_id = db.Column(db.Integer, db.ForeignKey("commentable.id"))
+
+    def __repr__(self):
+        return '<Comment({})>'.format(self.id)
+
+
+class Commentable(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    comments = db.relationship("Comment", backref="commentable")
+    type = db.Column(db.String)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "commentable",
+        "polymorphic_on": type
+    }
+
+
 _set_to_data = db.Table('set_to_data', db.Model.metadata,
     db.Column('set_id', db.Integer, db.ForeignKey('set.id')),
     db.Column('data_id', db.Integer, db.ForeignKey('data.id')))
@@ -42,32 +66,40 @@ _set_to_set = db.Table('set_to_set', db.Model.metadata,
     db.Column('parent_id', db.Integer, db.ForeignKey('set.id'), primary_key=True))
 
 
-class Set(AccessControl, TimeStamp, db.Model):
+class Set(AccessControl, TimeStamp, Commentable):
     """The Set class is used to group Datas and other Sets"""
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("commentable.id"), primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     datas = db.relationship('Data', secondary=_set_to_data, backref='sets')
     children = db.relationship('Set', secondary=_set_to_set,
                                primaryjoin=id == _set_to_set.c.child_id,
                                secondaryjoin=id == _set_to_set.c.parent_id)
 
+    __mapper_args__ = {
+        "polymorphic_identity": "set"
+    }
+
     def __repr__(self):
         return '<DataSet({0})>'.format(self.id)
 
 
-class Data(db.Model, TimeStamp):
+class Data(Commentable, TimeStamp):
     """A Data is a collection of Entries"""
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("commentable"), primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     entries = db.relationship('Entry', backref='data')
     context_id = db.Column(db.Integer, db.ForeignKey('context.id'), nullable=False)
     context = db.relationship('Context')
 
+    __mapper_args__ = {
+        "polymorphic_identity": "data"
+    }
+
     def __repr__(self):
         return '<Data({0})>'.format(self.id)
 
 
-class Entry(db.Model, TimeStamp):
+class Entry(Commentable, TimeStamp):
     """And Entry is a single bit of information (scalar or array) in a Data"""
     id = db.Column(db.Integer, primary_key=True)
     data_id = db.Column(db.Integer, db.ForeignKey('data.id'))
@@ -146,14 +178,3 @@ class HistoricQuery(AccessControl, db.Model, TimeStamp):
     def __repr__(self):
         return '<HistoricQuery({})>'.format(self.name)
 
-
-class Comment(db.Model, TimeStamp):
-    """A Comment.
-    Can be added to various entities like set or data"""
-    id = db.Column(db.Integer, primary_key=True)
-    author = db.relationship("User")
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    text = db.Column(db.String)
-
-    def __repr__(self):
-        return '<Comment({})>'.format(self.id)
