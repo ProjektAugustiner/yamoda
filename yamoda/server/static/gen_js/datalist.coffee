@@ -69,7 +69,6 @@ setup_datalist = ->
   $table = $("#datalist_table")
   dtable = yamoda.utils.setup_datatable($table,
     bStateSave: true
-    aoColumnDefs: [{asSorting: [], aTargets: [7]}]
   )
   logg.info("setting up 2d preview")
   yamoda.entry.fetch_2D_preview_images($("#datalist_table td.2d-preview"), "100%")
