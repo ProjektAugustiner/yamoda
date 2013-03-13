@@ -1,6 +1,7 @@
 {# display contents of a set (datas and subsets)  #}
 {% extends "layout.html" %}
-{% from "set_macros.html" import setlist_with_controls, setlist_script %}
+{% from "set_macros.html" import setlist_script %}
+{% from "set_macros.html" import setlist_with_controls with context %}
 {% from "data_macros.html" import datalist, datalist_script %}
 {% from "comment_macros.html" import comment_table, new_comment, comment_toggle_script %}
 {% block extrahead %}
@@ -36,7 +37,7 @@
     $("#datatable_wrapper .datatables-top-left-bar").append($("#data_import_btn").remove())
   {% endcoffee %}
   </script>
-  {{ datalist(set.datas, params, entries) }}
+  {{ datalist(set.datas, params, entries, set) }}
 
   {% else %}
   <hr />

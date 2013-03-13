@@ -14,17 +14,17 @@ that = undefined
 
 ###-- module functions --###
 
+get_selected_data_rows = ->
+  $("#datalist_table>tbody>tr.row-selected")
+
+
+get_selected_data_ids = ->
+  get_selected_data_rows().children("td.data-id").map( (i, e) ->
+    $(e).text()).get()
+
+
 setup_delete_data_action_handler = ->
-  logg.debug("setup_delete_data_action_handler")
-  #: Register delete action handler which sends a delete command 
-  #: to the server for selected data rows.
-  get_selected_data_rows = ->
-    $("#datalist_table>tbody>tr.row-selected")
-
-  get_selected_data_ids = ->
-    get_selected_data_rows().children("td.data-id").map( (i, e) ->
-      $(e).text()).get()
-
+  logg.debug("adding handler to delete action")
   $("#delete_data_action").click ->
     ids = get_selected_data_ids()
     logg.info("selected ids:", ids)
@@ -43,6 +43,20 @@ setup_delete_data_action_handler = ->
         $("#data_action button").button("reset")
         $("#actionerror").text(err).show()
     )
+  return
+
+
+setup_create_set_from_data_action_handler = ->
+  logg.debug("adding handler to create set from data action")
+  $("#create_set_from_data_action").click ->
+    ids = get_selected_data_ids()
+    logg.info("selected ids", ids)
+    if not ids
+      logg.debug("nothing selected, doing nothing")
+      return
+    $("#create_set_for_data_modal input[name=data_ids]").val(ids)
+    $("#create_set_for_data_modal p.data-ids").text("Data # to add: " + ids).show()
+    return
   return
 
 
@@ -89,6 +103,7 @@ $ ->
   logg = that.logg
   setup_datalist()
   setup_delete_data_action_handler()
+  setup_create_set_from_data_action_handler()
   setup_data_click_handler()
   return
 

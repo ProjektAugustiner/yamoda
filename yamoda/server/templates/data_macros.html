@@ -1,5 +1,6 @@
 {% from "entry_macros.html" import entryvalue %}
-{% macro datalist(datas, params, entries) %}
+{% from "set_macros.html" import create_set_modal %}
+{% macro datalist(datas, params, entries, parent_set=None) %}
 <table id="datalist_table" class="table table-condensed table-bordered table-striped">
   <thead>
     <tr>
@@ -54,10 +55,12 @@
     </button>
     <ul class="dropdown-menu">
       <li><a id="delete_data_action" href="#">Delete</a></li>
+      <li><a id="create_set_from_data_action" data-toggle="modal" href="#create_set_for_data_modal">Create Set from Data</a></li>
     </ul>
   </div>
   <div class="alert alert-error hide" id="actionerror"></div>
 </div>
+{{ create_set_modal(parent_set, "create_set_for_data_modal") }}
 {% endmacro %}
 {% macro datalist_script(from_set=None) %}
 {% coffee "datalist" %}
