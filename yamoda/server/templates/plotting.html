@@ -1,26 +1,51 @@
 {% macro plotdisplay_includes() %}
 <script src="{{ url_for('static', filename='js/jquery.flot.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery.flot.navigate.js') }}"></script>
-<script src="{{ url_for('static', filename='js/jquery.flot.resize.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-ui-1.10.1.custom.js') }}"></script>
+<script src="{{ url_for('static', filename='gen_js/flotresize.js') }}"></script>
 {% endmacro %}
-{% macro plotdisplay1D() %}
+{% macro plotdisplay1D(plot_container_selector) %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
+<script>
+{% coffee "plotdisplay1D" %}
+$ ->
+  $plot_area = $("{{ plot_container_selector }}").find(".plot-area")
+  $plot_area.resizable(
+    minHeight: 300
+    maxHeight: 800
+    minWidth: 600
+    maxWidth: 1200
+  ).height(500).width(800).resize()
+  yamoda.logg.info("size of placeholder is now x ", $plot_area.width(), "y ", $plot_area.height())
+  return
+{% endcoffee %}
+</script>
 <style>
-  .plot-area {
-    height: auto;
-    margin-bottom: 10px;
-  }
-  div.placeholder {
+  .plot-area, .plot-sidebar {
     border: 1px solid #aaaaaa; 
+    margin-bottom: 10px;
+    padding-left: 8px;
   }
 </style>
-<div class="plot-area placeholder">No content to display</div>
-<input class="plot-enable-tooltip" type="checkbox">Enable value tooltip
-<div class="plot-clickmessage">... or click a data point to display its value</div>
-<div class="plot-message">&nbsp;</div>
+<div class="row-fluid" style="height: 80%;">
+  <div class="plot-area placeholder span9" style="height:100%;">No content to display</div>
+  <div class="span3 plot-sidebar" style="height:100%; margin-left: 6px;">
+    <h4>Plot Control</h4>
+    <ol class="sidebar-legend">
+    </ol>
+  </div>
+</div>
+<div class="row-fluid">
+  <div class="span6">
+    <input class="plot-enable-tooltip" type="checkbox">Enable value tooltip
+    <div class="plot-clickmessage">... or click a data point to display its value</div>
+    <div class="plot-message">&nbsp;</div>
+  </div>
+</div>
 {% endmacro %}
 
 {# TODO this is just a static matplotlib image display #}
-{% macro plotdisplay2D() %}
+{% macro plotdisplay2D(plot_container_selector) %}
 <style>
   .plot-area { 
     margin-bottom: 10px;
@@ -29,7 +54,9 @@
     border: 1px solid #aaaaaa; 
   }
 </style>
-<div class="plot-area placeholder">No content to display</div>
+<div class="row-fluid">
+  <div class="plot-area placeholder span12">No content to display</div>
+</div>
 {% endmacro %}
 
 {# vim: set filetype=htmljinja sw=2 ts=2 sts=2 expandtab: #}

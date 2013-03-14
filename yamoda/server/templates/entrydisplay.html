@@ -4,11 +4,11 @@
 {% macro entry1D2D(entry, parameter) %}
 <div class="row-fluid">
   <h2>Entry #{{entry.id}}: {{parameter.name}}({{parameter.unit| unitformat}})</h2>
-  <div class="span11" id="plot">
+  <div class="span12 plotdisplay-container" id="plot" style="height:100%">
     {% if entry.value.shape|length == 1 %}
-      {{ plotdisplay1D() }}
+      {{ plotdisplay1D("#plot") }}
     {% else %}
-      {{ plotdisplay2D() }}
+      {{ plotdisplay2D("#plot") }}
     {% endif %}
   </div>
 </div>
@@ -51,7 +51,7 @@
 <script src="{{ url_for('static', filename='gen_js/entrydisplay.js') }}"></script>
 
 <script>
-{% coffee "main" %}
+{% coffee "entrydisplay" %}
 $ ->
   yamoda.add_module_constants("yamoda.entrydisplay",
     ENTRY_URL: "{{url_for('entry', entry_id=entry.id)}}"
@@ -82,6 +82,7 @@ $ ->
     return
 
   yamoda.entry.flot_setup($("#plot"))
+
 {% endcoffee %}
 </script>
 {% endblock %}

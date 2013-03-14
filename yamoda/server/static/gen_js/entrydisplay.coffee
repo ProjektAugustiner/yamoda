@@ -18,9 +18,9 @@ that = undefined
 
 set_plot_area_height = ->
   # some hack, maybe this can be improved...
-  height = $(window).height() * 0.45
-  yamoda.logg.info("new height of plot", height)
-  $("#plot>.plot-area").height(height)
+  #height = $(window).height() * 0.45
+  #yamoda.logg.info("new height of plot", height)
+  #$("#plot .plot-area").height(height)
   return
 
 
@@ -75,7 +75,7 @@ init_1D_ondemand = ->
   hide_plot = ->
     yamoda.logg.debug("Hide plot")
     yamoda.entry.hide_plot($("#plot"))
-    $("#plot>.plot-area").height("auto")
+    $("#plot .plot-area").height("auto")
     $("#plot_toggle_btn").text("Show plot")
     return
 
@@ -88,7 +88,7 @@ init_1D_ondemand = ->
       $("#plot_toggle_btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial")
       $(window).resize ->
         yamoda.logg.info("resize!")
-        if not $("#plot>.plot-area").hasClass("placeholder")
+        if not $("#plot .plot-area").hasClass("placeholder")
           set_plot_area_height()
         return
       values_btn = $("#values_toggle_btn")
@@ -127,12 +127,12 @@ init_2D_ondemand = ->
     return
 
   show_image = ->
-      $("#plot>.plot-area").html('<img src="' + that.ENTRY_URL + '" alt="Plot image cannot be displayed">').removeClass("placeholder")
+      $("#plot .plot-area").html('<img src="' + that.ENTRY_URL + '" alt="Plot image cannot be displayed">').removeClass("placeholder")
       $("#plot_toggle_btn").text("Hide Image")
       return
 
   hide_image = ->
-      $("#plot>.plot-area").text("Image hidden").addClass("placeholder")
+      $("#plot .plot-area").text("Image hidden").addClass("placeholder")
       $("#plot_toggle_btn").text("Show Image")
       return
 

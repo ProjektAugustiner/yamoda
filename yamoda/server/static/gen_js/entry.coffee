@@ -12,6 +12,8 @@ logg = undefined
 # entry cache
 entries = {}
 
+used_plot_ids = []
+
 default_flot_options =
   series:
     lines:
@@ -121,28 +123,87 @@ setup_2D_preview_images_ondemand = ($target, height) ->
   return
 
 
+_find_next_free_plot_id = ->
+  ii = 0
+  while true
+    if ii not in used_plot_ids
+      used_plot_ids.push(ii)
+      return ii
+    ii += 1
+
+
+_remove_plot_id = (plot_id) ->
+  index = _.indexOf(used_plot_ids, plot_id)
+  used_plot_ids.splice(index, 1)
+
+
+_remove_series = (plot_data, series_to_remove) ->
+  index = 0
+  for series in plot_data
+    if series.yamoda_plot_id == series_to_remove.yamoda_plot_id
+      plot_data.splice(index, 1)
+      _remove_plot_id(series.yamoda_plot_id)
+      return plot_data
+    index += 1
+
+
 plot_series = (series, $target) ->
   # plot a series with flot
   # :param entry: series to plot
   # :param $taget: JQuery selector for the node that will display the plot
 
   # get old plot and its data if there is one
-  $plot_area = $target.children(".plot-area")
+  $plot_area = $target.find(".plot-area")
+  $sidebar = $target.find(".plot-sidebar")
   prev_plot = $target.data("plot")
+  series.yamoda_plot_id = series.color = _find_next_free_plot_id()
   if prev_plot
     logg.debug("previous plot exists")
     plot_data = prev_plot.getData()
-    series.color = plot_data.length
     plot_data.push(series)
   else
     # new plot
-    series.color = 0
+    logg.debug("first series to plot")
     plot_data = [series]
-      
-  logg.info("color", series.color)
+  
+  # plot area changes
+  if $plot_area.hasClass("placeholder")
+    $plot_area.removeClass("placeholder").text("")
+  logg.debug("color", series.color)
   plot = $.plot($plot_area, plot_data, default_flot_options)
   $target.data("plot", plot)
-  $plot_area.removeClass("placeholder")
+  logg.debug("color ", series.color)
+  # sidebar changes
+  # find legend / plot color
+  # depends on flot internals, may change in later versions
+  label = $(series.label).text()
+  selector = ".legendLabel:contains('#{label}')"
+  $color_marker = $plot_area.find(selector).parent().children(".legendColorBox").children().children()
+  $legend = $sidebar.children(".sidebar-legend")
+  color = $color_marker.css("border-left-color")
+  # create new legend entry
+  $list_elem = $("<li data-label='#{label}'>")
+  $color_span = $("<span>&nbsp;&nbsp;&nbsp;</span>").css("background-color", color)
+  $list_elem.append($color_span)
+  $button = $('<a class="btn btn-mini" href="#">Delete Plot</a>').css("border-color", color)
+  $button.click ->
+    logg.debug("delete clicked for ", label)
+    $list_elem.remove()
+    plot_data = $target.data("plot").getData()
+    console.log("plot_data", plot_data)
+    console.log("series", series)
+    remaining_series = _remove_series(plot_data, series)
+    if remaining_series.length == 0
+      logg.debug("no remaining series")
+      $plot_area.addClass("placeholder").text("No content to display")
+    else
+      logg.debug(remaining_series.length, " series remain")
+      plot = $.plot($plot_area, remaining_series, default_flot_options)
+      $target.data("plot", plot)
+    return
+
+  $list_elem.append("&nbsp;&nbsp;" + series.label + '&nbsp;&nbsp;').append($button)
+  $legend.append($list_elem)
   return
 
 
@@ -181,16 +242,16 @@ plot_1D_1D = (entry_x, entry_y, $target) ->
 show_plot = ($target) ->
   # Show plot which was hidden previously. 
   # To draw a plot for the first time, use plot function.
-  $plot_area = $target.children(".plot-area")
-  prev_plot = $target.data("plot")
+  $plot_area = $target.find(".plot-area")
+  prev_plot = $target.find("plot")
   plot = $.plot($plot_area, prev_plot.getData(), prev_plot.getOptions())
   $plot_area.data("plot", plot).removeClass("placeholder")
   return
 
 
 hide_plot = ($target) ->
-  $plot_area = $target.children(".plot-area")
-  $plot_area.replaceWith('<div class="plot-area placeholder">Plot hidden</div>')
+  $plot_area = $target.find(".plot-area")
+  $plot_area.addClass("placeholder").text("Plot hidden")
   return
 
 
@@ -220,10 +281,10 @@ flot_setup = ($plot_div) ->
   # click support (display value and parameter name)
   # :param $plot_div: div which contains plotting stuff
   logg.debug("flot setup for", $plot_div.length)
-  $plot_area = $plot_div.children(".plot-area")
-  $plot_message = $plot_div.children(".plot-message")
-  $plot_clickmessage = $plot_div.children(".plot-clickmessage")
-  $plot_enable_tooltip = $plot_div.children(".plot-enable-tooltip")
+  $plot_area = $plot_div.find(".plot-area")
+  $plot_message = $plot_div.find(".plot-message")
+  $plot_clickmessage = $plot_div.find(".plot-clickmessage")
+  $plot_enable_tooltip = $plot_div.find(".plot-enable-tooltip")
 
   $plot_area.on("plotclick", (ev, pos, item) ->
     if item
@@ -234,7 +295,7 @@ flot_setup = ($plot_div) ->
   # click support (display value and parameter name in a hovering tooltip)
   $plot_area.on("plothover", (ev, pos, item) ->
     if $plot_enable_tooltip.attr("checked") == "checked"
-      $plot_tooltip = $plot_div.children(".plot-tooltip")
+      $plot_tooltip = $plot_div.find(".plot-tooltip")
       if item
         if $plot_area.data("previous_hover_point") != item.dataIndex
           $plot_area.data("previous_hover_point", item.dataIndex)
