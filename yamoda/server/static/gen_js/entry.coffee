@@ -315,6 +315,8 @@ flot_setup = ($plot_div) ->
   # click support (display value and parameter name)
   # :param $plot_div: div which contains plotting stuff
   logg.debug("flot setup for", $plot_div.length)
+  $sidebar = $plot_div.find(".plot-sidebar")
+  $sidebar.resizable()
   $plot_area = $plot_div.find(".plot-area")
   $plot_message = $plot_div.find(".plot-message")
   $plot_clickmessage = $plot_div.find(".plot-clickmessage")
