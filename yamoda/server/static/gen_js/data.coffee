@@ -18,17 +18,16 @@ selected_rows = []
 ###-- module functions --###
 
 plot_current_selection = ->
-  if _.size(selected_rows) == 2
-    entry_x_url = $(selected_rows[0]).find(".url-column>a").attr("href")
-    entry_y_url = $(selected_rows[1]).find(".url-column>a").attr("href")
-    height = $(window).height() * 0.45
-    yamoda.logg.info("new height of plot", height)
-    $("#plot .plot-area").height(height)
-    yamoda.entry.get_two(entry_x_url, entry_y_url, (ex, ey) ->
-      yamoda.entry.plot_1D_1D(ex, ey, $("#plot"))
-      selected_rows = []
-      $("#entrytable tr").removeClass("info").removeClass("row-selected")
-    )
+  entry_x_url = $(selected_rows[0]).find(".url-column>a").attr("href")
+  entry_y_url = $(selected_rows[1]).find(".url-column>a").attr("href")
+  height = $(window).height() * 0.45
+  yamoda.logg.info("new height of plot", height)
+  $("#plot .plot-area").height(height)
+  yamoda.entry.get_two(entry_x_url, entry_y_url, (ex, ey) ->
+    yamoda.entry.plot_1D_1D(ex, ey, $("#plot"))
+    selected_rows = []
+    $("#entrytable tr").removeClass("info").removeClass("warning").removeClass("row-selected")
+  )
   return
 
 
@@ -62,18 +61,24 @@ $ ->
       return
     if $this.hasClass("row-selected")
       yamoda.logg.info("unselected", url)
+      $this.removeClass("row-selected info warning")
       selected_rows = _.without(selected_rows, this)
     else
       yamoda.logg.info("selected", url)
+      $this.addClass("row-selected")
       if _.size(selected_rows) == 2
+        $(selected_rows[0]).removeClass("row-selected info warning")
         selected_rows = _.tail(selected_rows)
       selected_rows.push(this)
-    $this.toggleClass("row-selected")
-    $this.toggleClass("info")
-    if _.size(selected_rows) < 2
+    if selected_rows.length == 0
       $("#plot_btn").addClass("disabled")
-    else
+    else if selected_rows.length == 1
+      $("#plot_btn").addClass("disabled")
+      $(selected_rows[0]).removeClass("info").addClass("warning")
+    else if selected_rows.length == 2
       $("#plot_btn").removeClass("disabled")
+      $(selected_rows[0]).removeClass("info").addClass("warning")
+      $(selected_rows[1]).removeClass("warning").addClass("info")
     return
   return
 
