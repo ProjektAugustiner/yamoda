@@ -84,5 +84,13 @@ To select the DB backend (default is SQLite):
     python run_server.py --database sqlite | postgres | mysql
 
 
+Running all tests
+-----------------
+
+Run:
+
+    bin/nosetests
+
+
 Testing importers
 -----------------

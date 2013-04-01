@@ -1,21 +1,23 @@
 {% from "plotting.html" import plotdisplay1D, plotdisplay2D %}
 {% from "plotting.html" import plotdisplay_includes %}
+{% set small_entry_thresh =  50 %}
+
 
 {% macro entry1D2D(entry, parameter) %}
 <div class="row-fluid">
   <h2>Entry #{{entry.id}}: {{parameter.name}}({{parameter.unit| unitformat}})</h2>
-  <div class="span12 plotdisplay-container" id="plot" style="height:100%">
+  <div class="span12" style="height:100%">
     {% if entry.value.shape|length == 1 %}
-      {{ plotdisplay1D("#plot") }}
+      {{ plotdisplay1D("plot") }}
     {% else %}
-      {{ plotdisplay2D("#plot") }}
+      {{ plotdisplay2D("plot") }}
     {% endif %}
   </div>
 </div>
 
 <div class="row-fluid">
-  <div class="span6 small-control-row">
-    {% if entry.value|valuecount >= 200 %}
+  <div class="span7 small-control-row">
+    {% if entry.value|valuecount >= small_entry_thresh %}
     <button id="plot_toggle_btn" class="btn btn-primary initial">Show Plot</button>
     {% endif %}
     <button id="download_img_btn" class="btn btn-primary">Download</button>
@@ -33,7 +35,7 @@
 <div class="row-fluid">
   <div class="span12" id="data" data-length="{{entry.value|valuecount}}" data-entry-id="{{entry.id}}">
     <h2>Raw Data (count: {{entry.value|valuecount}})</h2>
-    {% if entry.value|valuecount >= 200 %}
+    {% if entry.value|valuecount >= small_entry_thresh %}
       <a id="values_toggle_btn" class="btn btn-primary initial">Request and show values</a>
     {% endif %}
     <pre id="values_display">No values loaded</pre>
@@ -64,14 +66,16 @@ $ ->
   # 2D entry
   yamoda.entrydisplay.e2D_ondemand.init()
   $("#plot_toggle_btn").click()
-  {% elif entry.value|valuecount < 200 %}
+  {% elif entry.value|valuecount < small_entry_thresh %}
   # small 1D entry
   # is displayed on page load
+  yamoda.entry.flot_setup($("#plot"))
   yamoda.entrydisplay.e1D.init()
   {% else %}
   # large 1D entry is displayed when the user requests it
+  yamoda.entry.flot_setup($("#plot"))
   yamoda.entrydisplay.e1D_ondemand.init()
-  $("#plot_toggle_btn").click()
+  #$("#plot_toggle_btn").click()
   {% endif %}
 
   $("#download_img_btn").click ->
@@ -80,8 +84,6 @@ $ ->
       window.location.replace(json.img_url)
       return
     return
-
-  yamoda.entry.flot_setup($("#plot"))
 
 {% endcoffee %}
 </script>

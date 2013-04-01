@@ -4,32 +4,40 @@
 <script src="{{ url_for('static', filename='js/jquery-ui-1.10.1.custom.js') }}"></script>
 <script src="{{ url_for('static', filename='gen_js/flotresize.js') }}"></script>
 {% endmacro %}
-{% macro plotdisplay1D(plot_container_selector) %}
+{% macro plotdisplay1D(plotdisplay_id) %}
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
 <script>
 {% coffee "plotdisplay1D" %}
 $ ->
-  $plot_area = $("{{ plot_container_selector }}").find(".plot-area")
-  $plot_area.resizable(
-    minHeight: 300
+  $plot_container = $('#{{ plotdisplay_id }}>.plot-container')
+  $plot_container.resizable(
+    minHeight: 20
     maxHeight: 800
-    minWidth: 600
+    minWidth: 300
     maxWidth: 1200
-  ).height(500).width(800).resize()
-  yamoda.logg.info("size of placeholder is now x ", $plot_area.width(), "y ", $plot_area.height())
+  ).resize()
+  yamoda.logg.info("size of placeholder is x ", $plot_container.width(), "y ", $plot_container.height())
   return
 {% endcoffee %}
 </script>
 <style>
-  .plot-area, .plot-sidebar {
+  .plot-container, .plot-sidebar {
     border: 1px solid #aaaaaa; 
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    margin-right: 6px;
     padding-left: 8px;
+    padding-right: 9px;
+    padding-bottom: 4px;
+  }
+  .plot-area {
+    height: 20px;
   }
 </style>
-<div class="row-fluid" style="height: 80%;">
-  <div class="plot-area placeholder span9" style="height:100%;">No content to display</div>
-  <div class="span3 plot-sidebar" style="height:100%; margin-left: 6px;">
+<div class="row-fluid" id="{{plotdisplay_id}}" style="height: 80%;">
+  <div class="plot-container span9" style="height: 100%;">
+    <div class="plot-area placeholder">No content to display</div>
+  </div>
+  <div class="span3 plot-sidebar" style="height:100%; margin-left: 0px;">
     <h4>Plot Control</h4>
     <ol class="sidebar-legend">
     </ol>
@@ -45,7 +53,7 @@ $ ->
 {% endmacro %}
 
 {# TODO this is just a static matplotlib image display #}
-{% macro plotdisplay2D(plot_container_selector) %}
+{% macro plotdisplay2D(plotdisplay_id) %}
 <style>
   .plot-area { 
     margin-bottom: 10px;
@@ -54,7 +62,7 @@ $ ->
     border: 1px solid #aaaaaa; 
   }
 </style>
-<div class="row-fluid">
+<div class="row-fluid plot-container" id={{ plotdisplay_id }}>
   <div class="plot-area placeholder span12">No content to display</div>
 </div>
 {% endmacro %}

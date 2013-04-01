@@ -16,29 +16,17 @@ that = undefined
 
 ###-- module functions --###
 
-set_plot_area_height = ->
-  # some hack, maybe this can be improved...
-  #height = $(window).height() * 0.45
-  #yamoda.logg.info("new height of plot", height)
-  #$("#plot .plot-area").height(height)
-  return
-
-
 ## 1D functions
 
 init_1D = ->
   plot_and_show = (entry) ->
     yamoda.logg.info("plot_and_show")
-    set_plot_area_height()
     yamoda.entry.show_values(entry, $("#values_display"))
     yamoda.entry.plot_1D(entry, $("#plot"))
     return
 
   yamoda.entry.add(that.ENTRY_URL, that.ENTRY_ID,that.PARAMETER_NAME, that.ENTRY_VALUE)
   yamoda.entry.get(that.ENTRY_URL, plot_and_show)
-  $(window).resize ->
-    set_plot_area_height()
-    return
   return
 
 
@@ -67,7 +55,6 @@ init_1D_ondemand = ->
   show_plot = ->
     yamoda.logg.debug("Show plot")
     $("#plot_toggle_btn").text("Wait...")
-    set_plot_area_height()
     yamoda.entry.show_plot($("#plot"))
     $("#plot_toggle_btn").text("Hide plot")
     return
@@ -83,14 +70,8 @@ init_1D_ondemand = ->
     $("#plot_toggle_btn").text("Wait...")
     yamoda.entry.get(that.ENTRY_URL, (entry) ->
       # callback: plot entry
-      set_plot_area_height()
       yamoda.entry.plot_1D(entry, $('#plot'))
       $("#plot_toggle_btn").off("click").toggle(hide_plot, show_plot).text("Hide plot").removeClass("initial")
-      $(window).resize ->
-        yamoda.logg.info("resize!")
-        if not $("#plot .plot-area").hasClass("placeholder")
-          set_plot_area_height()
-        return
       values_btn = $("#values_toggle_btn")
       if values_btn.hasClass("initial")
         # other button is still in initial state, change it
@@ -112,6 +93,7 @@ init_1D_ondemand = ->
 
   $("#plot_toggle_btn").click(initial_cb_plot).text("Request values and plot...")
   $("#values_toggle_btn").click(initial_cb_values)
+  $(".plot-sidebar").hide()
   return
 
 

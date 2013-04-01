@@ -3,6 +3,9 @@ options = { } # no options
 init = (plot) ->
   on_resize = ->
     placeholder = plot.getPlaceholder()
+    parent = plot.getPlaceholder().parent()
+    placeholder.width(parent.width())
+    placeholder.height(parent.height())
     yamoda.logg.info("resizing plot to x", placeholder.width(), "y ", placeholder.height())
     # somebody might have hidden us and we can't plot
     # when we don't have the dimensions
@@ -15,18 +18,18 @@ init = (plot) ->
     return
   
   bindEvents = (plot, eventHolder) ->
-    placeholder = $(plot.getPlaceholder())
-    yamoda.logg.debug("plotdisplay container: ", placeholder[0].id)
-    yamoda.logg.info($._data(placeholder[0], "events"))
-    placeholder.resize(on_resize)
-    yamoda.logg.info($._data(placeholder[0], "events"))
+    resizable_div = $(plot.getPlaceholder().parent())
+    yamoda.logg.debug("plotdisplay container: ", resizable_div[0].id)
+    yamoda.logg.info($._data(resizable_div[0], "events"))
+    resizable_div.resize(on_resize)
+    yamoda.logg.info($._data(resizable_div[0], "events"))
     return
   
 
   shutdown = (plot, eventHolder) ->
-    placeholder = $(plot.getPlaceholder())
-    yamoda.logg.debug("unbinding from ", placeholder[0].id)
-    placeholder.unbind("resize", on_resize)
+    resizable_div = $(plot.getPlaceholder().parent())
+    yamoda.logg.debug("unbinding from ", resizable_div[0].id)
+    resizable_div.unbind("resize", on_resize)
     return
   
   

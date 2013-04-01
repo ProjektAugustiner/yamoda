@@ -32,6 +32,8 @@ default_flot_options =
   pan:
     interactive: true
 
+# restore plot size after hiding and showing again
+last_plot_height = undefined
 
 ###-- module functions --###
 
@@ -147,6 +149,15 @@ _remove_series = (plot_data, series_to_remove) ->
     index += 1
 
 
+_set_placeholder = ($plot_area, text="No content to display") ->
+  # remember old container size and shrink it
+  last_plot_height = $plot_area.parent().height()
+  $plot_area.parent().height(20).resize().resizable("disable")
+  $plot_area.children(".legend").hide()
+  $plot_area.addClass("placeholder").text(text)
+  return
+
+
 plot_series = (series, $target) ->
   # plot a series with flot
   # :param entry: series to plot
@@ -168,7 +179,11 @@ plot_series = (series, $target) ->
   
   # plot area changes
   if $plot_area.hasClass("placeholder")
+    height = $(window).height() * 0.45
     $plot_area.removeClass("placeholder").text("")
+    $plot_area.parent().height(height)
+    logg.debug("new height of plot", height)
+
   logg.debug("color", series.color)
   plot = $.plot($plot_area, plot_data, default_flot_options)
   $target.data("plot", plot)
@@ -195,12 +210,16 @@ plot_series = (series, $target) ->
     remaining_series = _remove_series(plot_data, series)
     if remaining_series.length == 0
       logg.debug("no remaining series")
-      $plot_area.addClass("placeholder").text("No content to display")
+      _set_placeholder($plot_area)
     else
       logg.debug(remaining_series.length, " series remain")
       plot = $.plot($plot_area, remaining_series, default_flot_options)
       $target.data("plot", plot)
     return
+  
+  # XXX: sometimes, the plot is not sized properly. 
+  # Invoking the resize logic fixes that, so we throw a resize event here...
+  $plot_area.parent().resize()
 
   $list_elem.append("&nbsp;&nbsp;" + series.label + '&nbsp;&nbsp;').append($button)
   $legend.append($list_elem)
@@ -243,15 +262,27 @@ show_plot = ($target) ->
   # Show plot which was hidden previously. 
   # To draw a plot for the first time, use plot function.
   $plot_area = $target.find(".plot-area")
-  prev_plot = $target.find("plot")
+  $plot_area.parent().height(last_plot_height).resizable("enable")
+  prev_plot = $target.data("plot")
+  # remove placeholder text node
   plot = $.plot($plot_area, prev_plot.getData(), prev_plot.getOptions())
+  $plot_area.contents().first().remove()
+  # XXX: sometimes, the plot is not sized properly. 
+  # Invoking the resize logic fixes that, so we throw a resize event here...
+  $plot_area.parent().resize()
   $plot_area.data("plot", plot).removeClass("placeholder")
+  $sidebar = $target.find(".plot-sidebar")
+  # sidebar not useful atm
+  #$sidebar.show()
   return
 
 
 hide_plot = ($target) ->
   $plot_area = $target.find(".plot-area")
-  $plot_area.addClass("placeholder").text("Plot hidden")
+  $sidebar = $target.find(".plot-sidebar")
+  # sidebar is always hidden atm, no need to hide ;)
+  #$sidebar.hide()
+  _set_placeholder($plot_area, "plot hidden")
   return
 
 
