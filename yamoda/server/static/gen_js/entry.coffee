@@ -179,9 +179,12 @@ plot_series = (series, $target) ->
   
   # plot area changes
   if $plot_area.hasClass("placeholder")
-    height = $(window).height() * 0.45
+    if last_plot_height
+      height = last_plot_height
+    else
+      height = $(window).height() * 0.45
     $plot_area.removeClass("placeholder").text("")
-    $plot_area.parent().height(height)
+    $plot_area.parent().height(height).resizable("enable")
     logg.debug("new height of plot", height)
 
   logg.debug("color", series.color)
@@ -271,8 +274,8 @@ show_plot = ($target) ->
   # Invoking the resize logic fixes that, so we throw a resize event here...
   $plot_area.parent().resize()
   $plot_area.data("plot", plot).removeClass("placeholder")
-  $sidebar = $target.find(".plot-sidebar")
   # sidebar not useful atm
+  #$sidebar = $target.find(".plot-sidebar")
   #$sidebar.show()
   return
 

@@ -70,6 +70,10 @@ $ ->
       selected_rows.push(this)
     $this.toggleClass("row-selected")
     $this.toggleClass("info")
+    if _.size(selected_rows) < 2
+      $("#plot_btn").addClass("disabled")
+    else
+      $("#plot_btn").removeClass("disabled")
     return
   return
 

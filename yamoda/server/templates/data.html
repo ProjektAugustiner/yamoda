@@ -26,12 +26,16 @@
 <div class="row-fluid">
   <div class="span12">
     <hr class="small-vertical-margin">
-    <a id="plot_btn" class="btn" href="#" rel="tooltip" title="plot selected 1D entries, x (first selection) vs. y (second selection)">Plot Selection</a>
+    <a id="plot_btn" class="btn disabled" href="#" rel="tooltip" 
+      title="plot selected 1D entries, x (first selection) vs. y (second selection)">
+      Plot Selection
+    </a>
     {# Display data navigation buttons. 
       Buttons are disabled if there is no previous resp. next data.
     #}
     {% if previous_data %}
-    <a id="previous_data_btn" class="btn" href="{{url_for('data', data_id=previous_data.id)}}" rel="tooltip" title="Go to previous data">
+    <a id="previous_data_btn" class="btn" href="{{url_for('data', data_id=previous_data.id)}}" 
+      rel="tooltip" title="Go to previous data">
       <i class="icon-backward"></i>
       Previous Data #{{ previous_data.id }}
     </a>
@@ -98,7 +102,9 @@
           {{ entryvalue(entry, 500) }}
           <td>{{ entry.parameter.unit|unitformat }}</td>
           {% if entry.value.shape %}
-          <td class="url-column"><a id="entry_url_{{loop.index0}}" href="{{url_for('entry', entry_id=entry.id)}}">Show<span class="detail-marker">&nbsp;&gt;&gt;</span><a></td>
+          <td class="url-column"><a id="entry_url_{{loop.index0}}" href="{{url_for('entry', entry_id=entry.id)}}">
+              Show<span class="detail-marker">&nbsp;&gt;&gt;</span><a>
+          </td>
           {% else %}
           <td>-</td>
           {% endif %}
@@ -113,13 +119,18 @@
         {%- endfor %}
       </tbody>
         <tfoot>
-          <th class="footer"><input type="text" name="filter_param" class="filter-input filter-init input-mini" value="Filter" data-column_num="1" /></th>
+          <th class="footer"><input type="text" name="filter_param" class="filter-input filter-init input-mini" 
+            value="Filter" data-column_num="1" /></th>
           <th></th>
-          <th class="footer"><input type="text" name="filter_unit" class="filter-input filter-init input-mini" value="Filter" data-column_num="3" /></th>
+          <th class="footer"><input type="text" name="filter_unit" class="filter-input filter-init input-mini" 
+            value="Filter" data-column_num="3" /></th>
           <th></th>
-          <th class="footer"><input type="text" name="filter_dim" class="filter-input filter-init input-mini" value="Filter" data-column_num="5" /></th>
-          <th class="footer"><input type="text" name="filter_size" class="filter-input filter-init input-mini" value="Filter" data-column_num="6" /></th>
-          <th class="footer"><input type="text" name="filter_visible" class="filter-input filter-init input-mini" value="Visible?" data-column_num="7" /></th>
+          <th class="footer"><input type="text" name="filter_dim" class="filter-input filter-init input-mini"
+            value="Filter" data-column_num="5" /></th>
+          <th class="footer"><input type="text" name="filter_size" class="filter-input filter-init input-mini"
+            value="Filter" data-column_num="6" /></th>
+          <th class="footer"><input type="text" name="filter_visible" class="filter-input filter-init input-mini" 
+            value="Visible?" data-column_num="7" /></th>
         </tfoot>
     </table>
   </div>
