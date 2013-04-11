@@ -12,10 +12,13 @@ import logging
 from collections import OrderedDict
 import datetime
 
-from yamoda.server import db, app
+
+from yamoda.server import make_app
+app = make_app(DEBUG=True)
+from yamoda.server import db
 from yamoda.server.database import User, Group, Context, Parameter, \
      Set, Data, Entry
-from yamoda.server.database.dbsettings import DATABASE_URIS
+from yamoda.server.example_dbsettings import DATABASE_URIS
 
 logg = logging.getLogger(__name__)
 # logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)

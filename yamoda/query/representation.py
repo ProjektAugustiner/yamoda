@@ -70,6 +70,22 @@ class TimeInterval(object):
         return self.start == other.start and self.end == other.end
 
 
+class CalculatedParam(object):
+    def __init__(self, name, expr_str, expr_ast):
+        self.name = name
+        self.expr_str = expr_str
+        self.expr_ast = expr_ast
+
+    def __eq__(self, other):
+        ''' Equal when name and expr_str are the same.
+        TODO: compare ASTs
+        '''
+        return (self.name == other.name and self.expr_str == other.expr_str)
+
+    def __repr__(self):
+        return "CalculatedParam: {} = {}".format(self.name, self.expr_str)
+
+
 class SimpleValue(object):
     def __init__(self, value):
         self.value = value

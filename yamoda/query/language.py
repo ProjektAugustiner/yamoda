@@ -12,8 +12,9 @@ from __future__ import absolute_import
 import string
 from parcon import *
 from .representation import GreaterThan, LessThan, SortParameter, Interval, \
-    ContextRepr, Find, ParamFilter, UserRepr, TimeInterval, Limit
+    ContextRepr, Find, ParamFilter, UserRepr, TimeInterval, Limit, CalculatedParam
 import daterangeparser
+from .pythonexpr import PythonExpr
 
 # just to save some keystrokes ;-)
 L = Literal
@@ -36,6 +37,12 @@ def _join(seq):
 
 def _concat_list(args):
     return list([args[0]] + args[1])
+
+
+def _make_calculated_param(args):
+    param_name = args[0]
+    expr_str, expr_ast = args[1:]
+    return CalculatedParam(param_name, expr_str, expr_ast)
 
 ##### parsers (rules)
 
@@ -92,6 +99,9 @@ creation_time_spec = (L("created") + ":" + date_interval)[lambda t: TimeInterval
 
 visible_params_spec = (L("visible")) + ":" + OneOrMore(param_name)
 
+# python expression
+calculated_param_spec = L("calculate") + ":" + (param_name + "=" + PythonExpr())[_make_calculated_param]
+
 query_clause = (context_spec["context_name"]
                 | user_spec["user_name"]
                 | find_spec["find"]
@@ -99,7 +109,8 @@ query_clause = (context_spec["context_name"]
                 | filter_spec["param_filter"]
                 | sort_spec["sort"]
                 | creation_time_spec["created"]
-                | visible_params_spec["visible_params"])
+                | visible_params_spec["visible_params"]
+                | calculated_param_spec["calculated_param"])
 
 # complete AugQL query string
 query = (query_clause + ZeroOrMore(L(",") + query_clause))[_concat_list]

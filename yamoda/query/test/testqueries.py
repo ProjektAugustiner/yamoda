@@ -5,11 +5,12 @@ Created on 21.08.2012
 @author: tobixx0
 '''
 from __future__ import division, absolute_import, print_function
+import ast
 from collections import namedtuple
 import daterangeparser
 parse_daterange = daterangeparser.parse
 from yamoda.query.representation import Interval, GreaterThan, SortParameter, TimeInterval, \
-    LessThan
+    LessThan, CalculatedParam
 
 QueryPair = namedtuple("QueryPair", ["dict", "string"])
 
@@ -27,6 +28,11 @@ sort: omega P.desc
 """
 )
 
+expr_1_datas2 = "omega * P"
+calc_param_1_datas2 = CalculatedParam("X", expr_1_datas2, ast.parse(expr_1_datas2))
+expr_2_datas2 = "exp(omega + P)"
+calc_param_2_datas2 = CalculatedParam("Y", expr_2_datas2, ast.parse(expr_2_datas2))
+
 testquery_datas2 = QueryPair({
              "context_name": "TestContext",
              "find": "datas",
@@ -36,7 +42,10 @@ testquery_datas2 = QueryPair({
                  },
              "sort": [SortParameter("T", "asc"), SortParameter("omega", "desc")],
              "limit": 10,
-             "view_options": {"visible_params": ["omega", "P"]}
+             "view_options": {
+                "visible_params": ["omega", "P"],
+                "calculated_params": [calc_param_1_datas2]
+                }
              },
 """
 find: datas
@@ -45,7 +54,9 @@ T: 0 to 400 or 500 to 600
 omega: > 1e6
 sort: T omega.desc
 limit: 10
-visible: omega P
+visible: omega
+visible: P
+calculate:  X = omega * P
 """
 )
 

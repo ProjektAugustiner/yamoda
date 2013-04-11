@@ -9,6 +9,7 @@ Created on 22.08.2012
 AugQL parsing, see parse_query_string.
 '''
 from __future__ import absolute_import, print_function
+import ast
 import logging as logg
 from .language import query
 
@@ -53,8 +54,14 @@ def parse_query_string(query_string):
                 raise Exception("duplicate param filter clause for '{}'!".format(param_name))
             param_filters[param_name] = content.param_exprs
         elif tag in ("visible_params"):
-            check_duplicate(tag)
-            show_options = query_dict.setdefault("view_options", {})
-            show_options["visible_params"] = content
+            view_options = query_dict.setdefault("view_options", {})
+            visible_params = view_options.setdefault("visible_params", [])
+            visible_params += content
+        elif tag in ("calculated_params"):
+            view_options = query_dict.setdefault("view_options", {})
+            calculated_params = view_options.setdefault("calculated_params", [])
+            calculated_params.append(content)
+        else:
+            raise Exception("internal parser error: something went wrong parsing the query!")
 
     return query_dict
