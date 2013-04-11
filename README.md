@@ -18,7 +18,7 @@ Dependencies
 * mimerender
 * Coffeescript compiler (on node.js)
 * nose (only for unit tests)
-* psycopg2 (for PostgresQL backend)
+* psycopg2 (for PostgresQL backend, can be disabled)
 
 Licensing
 ---------
@@ -44,7 +44,9 @@ Get bootstrap.py and buildout.cfg from yamoda <branch>:
 
     wget http://downloads.buildout.org/2/bootstrap.py
     wget https://github.com/ProjektAugustiner/yamoda/raw/<branch>/buildout.cfg
+    wget https://github.com/ProjektAugustiner/yamoda/raw/<branch>/database.cfg
 
+(optional) Customize database eggs: Edit database.cfg and comment out unwanted database eggs
 
 Install numpy:
 
@@ -68,24 +70,59 @@ Executable scripts are installed in bin/, see below for help
 Creating Test Data
 ------------------
 
+from zc.buildout toplevel dir.
+
 Create test data in selected DB (default is SQLite):
 
-    python init_db.py --database sqlite | postgres | mysql
+    bin/init_db --database sqlite | postgres | mysql
 
-Running The Server
-------------------
+
+Running The Development Server
+------------------------------
+
+from zc.buildout toplevel dir.
 
 Start it with:
 
-    python run_server.py [--debug True]
+     bin/run_server [--debug True]
     
 To select the DB backend (default is SQLite):
 
-    python run_server.py --database sqlite | postgres | mysql
+    bin/run_server --database sqlite | postgres | mysql
+
+To set server listening socket:
+
+    bin/run_server --host 0.0.0.0 --port 5555
 
 
-Running all tests
------------------
+Starting IPython Environment For Testing
+----------------------------------------
+
+from zc.buildout toplevel dir.
+
+Start with:
+
+    bin/ipython
+
+and select a database engine.
+
+
+Running With GUnicorn
+---------------------
+
+from zc.buildout toplevel dir.
+
+gUnicorn can be installed in the virtualenv:
+
+    bin/pip install gunicorn
+
+Use the intepreter 'py' created by zc.buildout to run the gunicorn start script, for example:
+
+    bin/py bin/gunicorn -b "127.0.0.1:5000" 'yamoda.server:make_app(ADDITIONAL_FLASK_SETTING="bla", SETTING=True)' 
+
+
+Running all nose tests
+----------------------
 
 Run:
 
@@ -94,3 +131,7 @@ Run:
 
 Testing importers
 -----------------
+
+TODO
+
+    

@@ -4,17 +4,21 @@
 
 import logging
 import json
+import os
+from pprint import pformat
 from flask import Flask, request, flash, redirect, current_app, jsonify, make_response
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager, user_unauthorized, login_url
 from numpy import ndarray, std, average
 
 from jinja2 import Markup
 from werkzeug.exceptions import Unauthorized
 from mimeparse import best_match
 import markdown2
+
 from yamoda.server.mimerender import mimerender
-import os
+from . import jinja_filters
+from . import default_settings
+from .login import MimeLoginManager
 
 try:
     import matplotlib
@@ -23,172 +27,64 @@ except ImportError:
     pass
 
 
-logg = logging.getLogger("yamoda.server")
-
-# configuration
-DEBUG = True
-SECRET_KEY = 'development key'
-
-# create application
-app = Flask('yamoda.server')
-app.jinja_env.add_extension("yamoda.server.coffeeforjinja.CoffeeExtension")
-
-app.config.from_object(__name__)
-app.config.from_envvar('YAMODA_SETTINGS', silent=True)
-app.config["GENERATED_DIR"] = os.path.join(os.getcwd(), "yamoda", "server", "generated")
-
-# database
-db = SQLAlchemy(app)
+logg = logging.getLogger(__name__)
 
 
-class MimeLoginManager(LoginManager):
-    @mimerender(
-        html=lambda login_uri: redirect(login_uri),
-        json=lambda login_uri: make_response(json.dumps(dict(login_uri=login_uri, msg="not logged in")), 401)
-        )
-    def unauthorized(self):
-        """This is called when the user is required to log in.
-        adapted from LoginManager.unauthorized
-        """
-        logg.debug("called unauthorized")
-        user_unauthorized.send(current_app)
-        if self.login_message:
-            flash(self.login_message)
-        return dict(login_uri=login_url(self.login_view, request.url))
-
-# login
-login_manager = MimeLoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
+# globally used flask application objects, set via make_app
+app = None
+db = None
+login_manager = None
 
 
-def datetimeformat(value, format='%Y-%m-%d %H:%M'):
-    return value.strftime(format)
+def _add_jinja_filters_from_module(app, filter_module):
+    '''Add all functions from a module as jinja2 template filters.
+    Functions starting with a _ are ignored.
+    :param app: Flask App to add filters to.
+    :param filter_module: module which contains filter functions at module level.
+    '''
+    for key in dir(filter_module):
+        if not key.startswith("_"):
+            val = getattr(filter_module, key)
+            if callable(val):
+                app.jinja_env.filters[key] = val
 
 
-def dataformat(value, maxlen=None):
-    """Format data for HTML display
-    The returned value is compatible with JQuery.sparkline
-    """
-    if value is None:
-        return ''
-    elif isinstance(value, float):
-        fmt = '%.5g' % value
-        if 'e' in fmt:
-            fmt = Markup(fmt.replace('e', ' &times; 10<sup>') + '</sup>')
-        return fmt
-    elif isinstance(value, ndarray):
-        # return arrays as 1, 2, 3, 4 ... for use with jquery.sparkline
-        if maxlen is not None:
-            # if array is too long: shorten array by sampling it
-            step = max(len(value) // maxlen, 1)
-            value = value[::step]
-            if step > 1:
-                # if we omit values we must send matching xvalues so that sparkline knows what to do
-                return ", ".join(["{}:{:.8f}".format(i * step, v) for i, v in enumerate(value)])
-        # just send yvalues
-        logg.debug("type %s, values: %s", type(value), value)
-        return ", ".join("{:.8f}".format(v) for v in value.ravel())
-    return str(value)
+def make_app(**app_options):
+    '''Create YAMODA flask app.
+    :param app_options: dict-like object which contains additonal settings, for example cmd line options.
+    These settings override all other configuration settings.
+    :returns: flask app object ready for use
+    '''
+    global app, db, login_manager
+    # XXX: just for development, change to better logging configuration later!
+    logging.basicConfig(level=logging.DEBUG)
+    logg.info("creating flask app %s", __name__)
+    app = Flask(__name__)
+    # add our own extension to compile coffeescript code snippets in jinja2 templates
+    app.jinja_env.add_extension("yamoda.server.coffeeforjinja.CoffeeExtension")
 
-
-def count_formatted(value, maxlen=None):
-    """Return count of values as returned by dataformat with same maxlen argument"""
-    if maxlen is None:
-        return valuecount(value)
-    else:
-        # if array is too long: shorten array by sampling it
-        step = max(len(value) // maxlen, 1)
-        return valuecount(value[::step])
-
-
-def normal_min(value):
-    return average(value) - std(value)
-
-
-def normal_max(value):
-    return average(value) + std(value)
-
-
-def jsonformat(value):
-    return json.dumps(value)
-
-
-def unitformat(value):
-    if value is None:
-        return ''
-    return value
-
-
-def yesnoformat(truth_value):
-    if truth_value:
-        return "yes"
-    else:
-        return "no"
-
-
-md = markdown2.Markdown(safe_mode='escape')
-
-
-def valuecount(value):
-    if isinstance(value, ndarray):
-        return len(value.ravel())
-    else:
-        return len(value)
-
-
-def markdown(value):
-    return Markup(md.convert(value))
-
-
-def shape(value):
-    """Shape.
-    
-    :param value: float, int or ndarray are recognized
-    :returns: string "scalar" or numpy shape, like '100, 100'
-    """
-    if isinstance(value, float) or isinstance(value, int):
-        return "scalar"
-    if isinstance(value, ndarray):
-        shapestr = str(value.shape).strip("(),")
-        return shapestr
-    else:
-        return "unknown"
-
-
-def dimension(value):
-    if isinstance(value, float) or isinstance(value, int):
-        return 0
-    if isinstance(value, ndarray):
-        return len(value.shape)
-    else:
-        return "unknown"
-
-# matplot setup
-
-font = {'family': 'normal',
-        'weight': 'bold',
-        'size': 14}
-
-matplotlib.rc('font', **font)
-
-
-# add all jinja filters used in the project below
-
-app.jinja_env.filters['dtformat'] = datetimeformat
-app.jinja_env.filters['dataformat'] = dataformat
-app.jinja_env.filters['unitformat'] = unitformat
-app.jinja_env.filters['markdown'] = markdown
-app.jinja_env.filters['yesnoformat'] = yesnoformat
-app.jinja_env.filters['average'] = average
-app.jinja_env.filters['normal_min'] = normal_min
-app.jinja_env.filters['normal_max'] = normal_max
-app.jinja_env.filters['min'] = min
-app.jinja_env.filters['max'] = max
-app.jinja_env.filters['valuecount'] = valuecount
-app.jinja_env.filters['count_formatted'] = count_formatted
-app.jinja_env.filters['shape'] = shape
-app.jinja_env.filters['dimension'] = dimension
-
-import yamoda.server.views
-import yamoda.server.database
+    app.config.from_object(default_settings)
+    configfile_present = app.config.from_envvar('YAMODA_SETTINGS', silent=True)
+    if configfile_present:
+        logg.info("using config file ($YAMODA_SETTINGS) @ %s", os.environ["YAMODA_SETTINGS"])
+    if app_options:
+        app.config.update(app_options)
+    logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])
+    logg.debug("config is %s", pformat(dict(app.config)))
+    # create generated content dir if not present
+    generated_dir = app.config["GENERATED_DIR"]
+    if not os.path.exists(generated_dir):
+        os.mkdir(generated_dir)
+    # login settings
+    login_manager = MimeLoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = "login"
+    # database
+    db = SQLAlchemy(app)
+    # jinja filters
+    _add_jinja_filters_from_module(app, jinja_filters)
+    # matplot setup
+    matplotlib.rc('font', **app.config["MATPLOTLIB_FONT"])
+    from . import views
+    from . import database
+    return app

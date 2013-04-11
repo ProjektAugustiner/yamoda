@@ -4,6 +4,8 @@
 import optparse
 import sys
 
+from yamoda.server import make_app
+app = make_app()
 from yamoda.server import db
 from yamoda.server.database import User, Group, Context, Set
 

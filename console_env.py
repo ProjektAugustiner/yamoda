@@ -4,13 +4,17 @@ import logging as logg
 logg.basicConfig(level=logg.INFO)
 logg.getLogger("sqlalchemy.engine").setLevel(logg.INFO)
 
-from yamoda.server import app, db
+from yamoda.server import make_app
+
+app = make_app()
+
+from yamoda.server import db
 from yamoda.server.database import *
 
 import yamoda.query.alchemy as alchemy
 import yamoda.query.test.testqueries as tq
 
-from yamoda.server.database.dbsettings import DATABASE_URIS
+from yamoda.server.example_dbsettings import DATABASE_URIS
 
 q = db.session.query
 rollback = db.session.rollback

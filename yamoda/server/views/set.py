@@ -156,7 +156,8 @@ def create_set():
     if parent_set_id is not None:
         parent_set = Set.query.get(parent_set_id)
         parent_set.children.append(s)
-    data_ids = [int(i) for i in request.form.get("data_ids").split(",")]
+    data_ids_str = request.form.get("data_ids")
+    data_ids = [int(i) for i in data_ids_str.split(",")] if data_ids_str.strip() else []
     logg.debug("data_ids to add %s", data_ids)
     datas = []
     for data_id in data_ids:

@@ -30,7 +30,8 @@ from flask.ext.login import UserMixin, current_user
 from flask.ext.sqlalchemy import BaseQuery
 import bcrypt
 
-from yamoda.server import db, login_manager
+from yamoda.server import db
+from yamoda.server import login_manager
 
 
 class PermissionError(Exception):
@@ -44,10 +45,10 @@ class PermissionError(Exception):
 
 def _bit_property(bit, name='permission'):
     """creates hybrid property to set and get a *name* col."""
-    #: Helper fn to bypass Accesscontrol.__getattribute__
+    # : Helper fn to bypass Accesscontrol.__getattribute__
     attr = lambda self: object.__getattribute__(self, name)
 
-    #: Helper fn to bypass Accesscontrol.__setattr__
+    # : Helper fn to bypass Accesscontrol.__setattr__
     set_attr = lambda self, value: object.__setattr__(self, name, value)
 
     def _get(self):
@@ -170,7 +171,7 @@ class AccessControl(object):
     guaranteed that the __init__ method is called.
 
     """
-    #: Custom query class, allowing access control filtered queries.
+    # : Custom query class, allowing access control filtered queries.
     query_class = AccessControlledQuery
 
     def __init__(self, *args, **kw):
@@ -288,26 +289,26 @@ class AccessControl(object):
                 raise PermissionError('write access denied: {0}'.format(name))
         object.__setattr__(self, name, value)
 
-    #: Hybrid property, wrapping the user_readable bit.
+    # : Hybrid property, wrapping the user_readable bit.
     user_readable = _bit_property(0)
 
-    #: Hybrid property, wrapping the group_readable bit.
+    # : Hybrid property, wrapping the group_readable bit.
     group_readable = _bit_property(1)
 
-    #: Hybrid property, wrapping the all_readable bit.
+    # : Hybrid property, wrapping the all_readable bit.
     all_readable = _bit_property(2)
 
-    #: Hybrid property, wrapping the user_writeable bit.
+    # : Hybrid property, wrapping the user_writeable bit.
     user_writeable = _bit_property(3)
 
-    #: Hybrid property, wrapping the user_writeable bit.
+    # : Hybrid property, wrapping the user_writeable bit.
     group_writeable = _bit_property(4)
 
-    #: Hybrid property, wrapping the all_writeable bit.
+    # : Hybrid property, wrapping the all_writeable bit.
     all_writeable = _bit_property(5)
 
 
-#: Helper table, neccessary for User-Group relationship.
+# : Helper table, neccessary for User-Group relationship.
 _usergroup_table = db.Table('usergroup_table', db.metadata,
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('group_id', db.Integer, db.ForeignKey('group.id')))
