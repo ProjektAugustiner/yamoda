@@ -10,11 +10,11 @@ The AugQL query language written as parcon parsers.
 '''
 from __future__ import absolute_import
 import string
-from parcon import *
+from parcon import Expected, Literal, SignificantLiteral, ZeroOrMore, OneOrMore, Word, Regex
 from .representation import GreaterThan, LessThan, SortParameter, Interval, \
     ContextRepr, Find, ParamFilter, UserRepr, TimeInterval, Limit, CalculatedParam
 import daterangeparser
-from .pythonexpr import PythonExpr
+from .pythonexprparse import PythonExpr
 
 # just to save some keystrokes ;-)
 L = Literal
@@ -41,8 +41,8 @@ def _concat_list(args):
 
 def _make_calculated_param(args):
     param_name = args[0]
-    _, expr_ast = args[1:]
-    return CalculatedParam(param_name, expr_ast)
+    expr_str, expr_ast = args[1:]
+    return CalculatedParam(param_name, expr_str, expr_ast)
 
 ##### parsers (rules)
 

@@ -9,6 +9,7 @@ import ast
 from collections import namedtuple
 import daterangeparser
 parse_daterange = daterangeparser.parse
+from yamoda.query.test.helpers import parse_expr
 from yamoda.query.representation import Interval, GreaterThan, SortParameter, TimeInterval, \
     LessThan, CalculatedParam
 
@@ -28,10 +29,12 @@ sort: omega P.desc
 """
 )
 
+
+
 expr_1_datas2 = "omega * P"
-calc_param_1_datas2 = CalculatedParam("X", ast.parse(expr_1_datas2).body[0])
+calc_param_1_datas2 = CalculatedParam("X", expr_1_datas2, parse_expr(expr_1_datas2))
 expr_2_datas2 = "exp(omega + P)"
-calc_param_2_datas2 = CalculatedParam("Y", ast.parse(expr_2_datas2).body[0])
+calc_param_2_datas2 = CalculatedParam("Y", expr_2_datas2, parse_expr(expr_2_datas2))
 
 testquery_datas2 = QueryPair({
              "context_name": "TestContext",

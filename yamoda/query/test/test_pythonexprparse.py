@@ -8,7 +8,7 @@ Created on 21.04.2013
 from __future__ import division, absolute_import
 import ast
 
-from yamoda.query.pythonexpr import scan_for_delimiter, PythonExpr
+from yamoda.query.pythonexprparse import scan_for_delimiter, PythonExpr
 
 
 def test_scan_for_delimiter_without_comment():
@@ -43,11 +43,10 @@ def test_parse_pythonexpr():
     # or should we trust the python parser (implementation detail ;)?
     res = parser.parse_string("1+5;")
     assert res[0] == "1+5"
-    assert isinstance(res[1], ast.Expr)
+    assert isinstance(res[1], ast.Expression)
     res = parser.parse_string("exp(1+5*a);")
     assert res[0] == "exp(1+5*a)"
-    assert isinstance(res[1], ast.Expr)
+    assert isinstance(res[1], ast.Expression)
     res = parser.parse_string("len('aa;');")
     assert res[0] == "len('aa;')"
-    assert isinstance(res[1], ast.Expr)
-
+    assert isinstance(res[1], ast.Expression)

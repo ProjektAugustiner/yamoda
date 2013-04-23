@@ -29,8 +29,7 @@ class _JSONAugQLEncoder(json.JSONEncoder):
         elif isinstance(obj, TimeInterval):
             return [obj.start.isoformat(), obj.end.isoformat()]
         elif isinstance(obj, CalculatedParam):
-            code = meta.asttools.dump_python_source(obj.expr_ast).replace("\n", "")
-            return [obj.name, code]
+            return [obj.name, obj.expr_str]
         else:
             logg.info("other: %s type %s", object, type(object))
             return json.JSONEncoder.default(self, object)

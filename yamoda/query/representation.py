@@ -73,10 +73,10 @@ class TimeInterval(object):
 
 @add_tup_method
 class CalculatedParam(object):
-    def __init__(self, name, expr_ast):
+    def __init__(self, name, expr_str, expr_ast):
         self.name = name
+        self.expr_str = expr_str
         self.expr_ast = expr_ast
-        self.expr_str = dump_python_source(expr_ast).replace("\n", "")
 
     def __eq__(self, other):
         """Equal when name and expr_ast the same.

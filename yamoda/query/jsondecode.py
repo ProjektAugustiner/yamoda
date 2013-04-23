@@ -53,8 +53,8 @@ def decode_time(isoformat_time):
 def decode_calculated_param(calc_params_in):
     calc_params_out = []
     for param_name, expr_str in calc_params_in:
-        expr_ast = ast.parse(expr_str).body[0]
-        c = CalculatedParam(param_name, expr_ast)
+        expr_ast = ast.parse(expr_str, "<expr>", "eval")
+        c = CalculatedParam(param_name, expr_str, expr_ast)
         calc_params_out.append(c)
     return calc_params_out
 

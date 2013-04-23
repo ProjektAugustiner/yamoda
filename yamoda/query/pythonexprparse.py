@@ -74,12 +74,8 @@ class PythonExpr(Parser):
         try:
             expected_end = scan_for_delimiter(text, ";", position, end)
             expr_str = text[position:expected_end]
-            result = ast.parse(expr_str)
-            expr_ast = result.body[0]
-            if not isinstance(expr_ast, ast.Expr):
-                raise Exception()
+            expr_ast = ast.parse(expr_str, "<expr>", "eval")
         except Exception:
             return failure([(position, PythonExprExpectation(text[position:end]))])
 
         return match(expected_end + 1, (expr_str, expr_ast), [(expected_end + 1, EUnsatisfiable())])
-
