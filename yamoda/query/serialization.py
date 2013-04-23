@@ -7,12 +7,13 @@ Created on 21.09.2012
 @author: dpausp (Tobias Stenzel)
 """
 from __future__ import division, absolute_import
+import cStringIO
 import logging as logg
 import json
-
+import meta.asttools
 from yamoda.query import jsondecode
 from yamoda.query.representation import Interval, GreaterThan, SortParameter, TimeInterval, \
-    LessThan
+    LessThan, CalculatedParam
 
 
 class _JSONAugQLEncoder(json.JSONEncoder):
@@ -27,6 +28,9 @@ class _JSONAugQLEncoder(json.JSONEncoder):
             return [obj.param_name, obj.sort_direction]
         elif isinstance(obj, TimeInterval):
             return [obj.start.isoformat(), obj.end.isoformat()]
+        elif isinstance(obj, CalculatedParam):
+            code = meta.asttools.dump_python_source(obj.expr_ast).replace("\n", "")
+            return [obj.name, code]
         else:
             logg.info("other: %s type %s", object, type(object))
             return json.JSONEncoder.default(self, object)

@@ -8,12 +8,13 @@ Created on 21.09.2012
 @author: dpausp (Tobias Stenzel)
 """
 from __future__ import division, absolute_import
-import logging as logg
-import json
+import ast
 import datetime
+import json
+import logging as logg
 
 from yamoda.query.representation import Interval, GreaterThan, SortParameter, TimeInterval, \
-    LessThan
+    LessThan, CalculatedParam
 
 
 def decode_sort(sort_list):
@@ -49,6 +50,15 @@ def decode_time(isoformat_time):
     return datetime.datetime.strptime(isoformat_time, '%Y-%m-%dT%H:%M:%S')
 
 
+def decode_calculated_param(calc_params_in):
+    calc_params_out = []
+    for param_name, expr_str in calc_params_in:
+        expr_ast = ast.parse(expr_str).body[0]
+        c = CalculatedParam(param_name, expr_ast)
+        calc_params_out.append(c)
+    return calc_params_out
+
+
 def obj_pairs_hook(pairs):
     result = {}
     for key, value in pairs:
@@ -59,6 +69,8 @@ def obj_pairs_hook(pairs):
             result["sort"] = decode_sort(value)
         elif key == "created":
             result["created"] = TimeInterval(*[decode_time(v) for v in value])
+        elif key == "calculated_params":
+            result["calculated_params"] = decode_calculated_param(value)
         else:
             result[key] = value
     return result

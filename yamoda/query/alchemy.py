@@ -22,7 +22,7 @@ def convert_dict_query_to_sqla(query_dict):
     Supports querying for `datas` (default) and `sets` at the moment.
     Returns what is queried for as first value
     :param query_dict: dict representation of an AugQL query
-    :returns (what_to_find, query)
+    :returns: (what_to_find, query)
 
     """
     what_to_find = query_dict.get("find", "sets")

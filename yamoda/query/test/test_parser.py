@@ -8,30 +8,14 @@ Created on 06.09.2012
 from __future__ import division, absolute_import
 import logging
 logging.basicConfig(level=logging.INFO)
+from pprint import pformat
+from parcon import ParseException
 from nose.tools import raises
 from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
 import yamoda.query.test.testqueries as tq
-from pprint import pformat
-from parcon import ParseException
+from yamoda.query.test.helpers import compare_dict_items
 
 logg = logging.getLogger(__name__)
-
-
-def compare_dict_items(left, right):
-    if sorted(left.keys()) != sorted(right.keys()):
-        return "keys are not the same!"
-
-    failures = []
-    for key, value in left.iteritems():
-        if value != right[key]:
-            failures.append("difference for key {}: left {}(: {}), right {}(: {})".format(key, value, type(value),
-                                                                                          right[key], type(right[key])))
-    return "\n".join(failures)
-
-
-def test_replace_newline_with_comma():
-    res = replace_newline_with_comma(tq.teststr_with_newlines)
-    assert res == tq.teststr_comma_separated, "got {}, expected {}".format(res, tq.teststr_comma_separated)
 
 
 def assert_correct_parse_result(query_pair):
@@ -41,6 +25,12 @@ def assert_correct_parse_result(query_pair):
                                                 format(pformat(parse_res),
                                                        pformat(expected),
                                                        compare_dict_items(parse_res, expected)))
+
+
+def test_replace_newline_with_comma():
+    res = replace_newline_with_comma(tq.teststr_with_newlines)
+    assert res == tq.teststr_comma_separated, "got {}, expected {}".format(res, tq.teststr_comma_separated)
+
 
 testqueries_datas = [tq.testquery_datas, tq.testquery_datas2]
 testqueries_sets = [tq.testquery_sets, tq.testquery_sets2]

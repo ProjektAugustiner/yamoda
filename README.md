@@ -1,8 +1,8 @@
 yamoda
 ======
 
-Dependencies
-------------
+Run Dependencies
+----------------
 
 * Python 2.7
 * SQLAlchemy
@@ -17,8 +17,13 @@ Dependencies
 * DateRangeParser
 * mimerender
 * Coffeescript compiler (on node.js)
-* nose (only for unit tests)
 * psycopg2 (for PostgresQL backend, can be disabled)
+* meta
+
+Test Dependencies
+-----------------
+
+* nose
 
 Licensing
 ---------

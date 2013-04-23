@@ -11,9 +11,12 @@ from optparse import OptionParser
 
 import numpy as np
 
-from yamoda.server import db, app  #
+from yamoda.server import make_app
+app = make_app()
+from yamoda.server import db
 from yamoda.server.database import User, Group, Context, Parameter, \
-    Set, Data, Entry, dbsettings
+    Set, Data, Entry
+from yamoda.server import example_dbsettings
 
 
 def init_db(argv=sys.argv):
@@ -24,7 +27,7 @@ def init_db(argv=sys.argv):
                       help='Select Database backend (sqlite | mysql | postgres)')
     options, args = parser.parse_args(argv[1:])
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = dbsettings.DATABASE_URIS[options.database]
+    app.config["SQLALCHEMY_DATABASE_URI"] = example_dbsettings.DATABASE_URIS[options.database]
 
     logg.info("using database URI: '%s'", app.config["SQLALCHEMY_DATABASE_URI"])
 

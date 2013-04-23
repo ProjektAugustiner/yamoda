@@ -41,8 +41,8 @@ def _concat_list(args):
 
 def _make_calculated_param(args):
     param_name = args[0]
-    expr_str, expr_ast = args[1:]
-    return CalculatedParam(param_name, expr_str, expr_ast)
+    _, expr_ast = args[1:]
+    return CalculatedParam(param_name, expr_ast)
 
 ##### parsers (rules)
 

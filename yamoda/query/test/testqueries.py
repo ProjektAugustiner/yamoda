@@ -29,9 +29,9 @@ sort: omega P.desc
 )
 
 expr_1_datas2 = "omega * P"
-calc_param_1_datas2 = CalculatedParam("X", expr_1_datas2, ast.parse(expr_1_datas2))
+calc_param_1_datas2 = CalculatedParam("X", ast.parse(expr_1_datas2).body[0])
 expr_2_datas2 = "exp(omega + P)"
-calc_param_2_datas2 = CalculatedParam("Y", expr_2_datas2, ast.parse(expr_2_datas2))
+calc_param_2_datas2 = CalculatedParam("Y", ast.parse(expr_2_datas2).body[0])
 
 testquery_datas2 = QueryPair({
              "context_name": "TestContext",
@@ -44,7 +44,7 @@ testquery_datas2 = QueryPair({
              "limit": 10,
              "view_options": {
                 "visible_params": ["omega", "P"],
-                "calculated_params": [calc_param_1_datas2]
+                "calculated_params": [calc_param_1_datas2, calc_param_2_datas2]
                 }
              },
 """
@@ -56,7 +56,8 @@ sort: T omega.desc
 limit: 10
 visible: omega
 visible: P
-calculate:  X = omega * P
+calculate:  X = omega * P;
+calculate: Y = exp(omega + P);
 """
 )
 

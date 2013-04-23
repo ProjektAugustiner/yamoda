@@ -9,6 +9,7 @@ Created on 19.08.2012
 Intermediate representation of AugQL queries.
 '''
 from __future__ import division, absolute_import
+from meta.asttools import cmp_ast, dump_python_source
 
 
 def add_tup_method(cls):
@@ -70,17 +71,18 @@ class TimeInterval(object):
         return self.start == other.start and self.end == other.end
 
 
+@add_tup_method
 class CalculatedParam(object):
-    def __init__(self, name, expr_str, expr_ast):
+    def __init__(self, name, expr_ast):
         self.name = name
-        self.expr_str = expr_str
         self.expr_ast = expr_ast
+        self.expr_str = dump_python_source(expr_ast).replace("\n", "")
 
     def __eq__(self, other):
-        ''' Equal when name and expr_str are the same.
-        TODO: compare ASTs
-        '''
-        return (self.name == other.name and self.expr_str == other.expr_str)
+        """Equal when name and expr_ast the same.
+        """
+        return (self.name == other.name
+                and cmp_ast(self.expr_ast, other.expr_ast))
 
     def __repr__(self):
         return "CalculatedParam: {} = {}".format(self.name, self.expr_str)
