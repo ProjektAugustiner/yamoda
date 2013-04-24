@@ -37,7 +37,7 @@ def make_function_from_ast(expr_ast):
     Check given AST against whitelist and compile it if it's valid.
     Compiled Expression is returned wrapped in a lambda function with arguments for all free variables in expr_ast.
     :param expr_ast: python AST for an expression (instance of ast.Expression)
-    :return: lambda function, may have arguments"
+    :return: (function, argument names)
     """
     VIS.visit(expr_ast)
     symbols = get_symbols(expr_ast)
@@ -47,4 +47,4 @@ def make_function_from_ast(expr_ast):
     expr = ast.Expression(lamb)
     ast.fix_missing_locations(expr)
     cc = compile(expr, "<expr_ast>", "eval")
-    return eval(cc)
+    return eval(cc), symbols

@@ -20,7 +20,8 @@ valid_expressions = [
      TestExpression("2 + 4", {}, 6),
      TestExpression("a + b * (c * 6)", dict(a=1, b=2, c=3), 37)
      ]
-# invalid_expressions = ["lambda b: 3 + b", "import os; os.system('echo')", "99**99"]
+
+invalid_expressions = ["lambda b: 3 + b", "import os; os.system('echo')", "99**99", "."]
 
 VIS = WhiteListVisitor()
 
@@ -32,8 +33,9 @@ def visit_ast(expr):
 
 def assert_created_function_is_valid(expr):
     expr_ast = parse_expr(expr.expr_str)
-    lamb = make_function_from_ast(expr_ast)
+    lamb, args = make_function_from_ast(expr_ast)
     result = lamb(**expr.args)
+    assert set(args) == set(expr.args.keys()), "result args were {}, expected {}".format(args, expr.args.keys())
     assert result == expr.expected, "result was {}, expected {}".format(result, expr.expected)
 
 
@@ -47,10 +49,10 @@ def test_whitelist_visitor_valid():
     for valid_expr in valid_expressions:
         yield visit_ast, valid_expr
 
-#
-# def test_whitelist_visitor_invalid():
-#     for invalid_expr in invalid_expressions:
-#         yield visit_invalid_ast, invalid_expr
+
+def test_whitelist_visitor_invalid():
+    for invalid_expr in invalid_expressions:
+        yield visit_invalid_ast, invalid_expr
 
 
 def test_make_function_from_ast():
