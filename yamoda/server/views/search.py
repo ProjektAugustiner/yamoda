@@ -30,6 +30,7 @@ from parcon import ParseException
 from yamoda.server import app, db, view_helpers
 from yamoda.query.alchemy import convert_dict_query_to_sqla
 from yamoda.query.parsing import parse_query_string, replace_newline_with_comma
+from yamoda.query.expr_ast import make_function_from_ast
 from yamoda.server.database import HistoricQuery
 from yamoda.query.serialization import to_json, from_json
 from flask_login import AnonymousUser
@@ -79,6 +80,26 @@ def _save_query(query_string, query_dict, query_name):
         return ("Query was not saved (duplicate).", "warn")
 
 
+def _process_calculated_params(calc_params, datas):
+    calc_param_names = [c.name for c in calc_params]
+    funcs, args = zip(*(make_function_from_ast(cp.expr_ast) for cp in calc_params))
+    # get params which are needed for the calculation
+    needed_param_names = set.union(*args)
+    # map param names to params
+    needed_params = filter(lambda p: p.name in needed_param_names, datas[0].context.parameters)
+    # fetch data from db
+    entries = view_helpers.get_entry_values_dict(datas, needed_params)
+    calc_param_values = []
+    for d, e in zip(datas, entries):
+        values_for_data = []
+        for func in funcs:
+            value = func(**e)
+            values_for_data.append(value)
+        calc_param_values.append(values_for_data)
+
+    return calc_param_names, calc_param_values
+
+
 def _render_search_result(result_type, sqla_query, query_string, view_options):
 
     if result_type == "sets":
@@ -107,10 +128,16 @@ def _render_search_result(result_type, sqla_query, query_string, view_options):
             common_param_set = set.intersection(*all_param_sets)
             entries = view_helpers.get_entries(datas, common_param_set)
             logg.info("intersected params %s", common_param_set)
+            if "calculated_params" in view_options:
+                calc_param_names, calc_param_values = _process_calculated_params(view_options["calculated_params"], datas)
+            else:
+                calc_param_names = []
+                calc_param_values = []
 
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
-        return render_template("dataresult.html", datas=datas, params=common_param_set, entries=entries)
+        return render_template("dataresult.html", datas=datas, params=common_param_set, entries=entries,
+                               calc_param_names=calc_param_names, calc_param_values=calc_param_values)
 
 ### view functions ###
 

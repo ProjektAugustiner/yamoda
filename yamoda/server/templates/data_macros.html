@@ -1,6 +1,6 @@
 {% from "entry_macros.html" import entryvalue %}
 {% from "set_macros.html" import create_set_modal %}
-{% macro datalist(datas, params, entries, parent_set=None) %}
+{% macro datalist(datas, params, entries, calc_param_names=[], calc_param_values=[], parent_set=None) %}
 <table id="datalist_table" class="table table-condensed table-bordered table-striped">
   <thead>
     <tr>
@@ -11,6 +11,9 @@
       <th class="header colresize" rel="tooltip" title="Click to sort, hold shift key to sort multiple columns">Created</th>
       {% for p in params %}
       <th class="header colresize" rel="tooltip" title="{{ p.brief }}">{{ p.name }} ({{ p.unit }})</th>
+      {% endfor %}
+      {% for name in calc_param_names %}
+      <th class="header colresize" rel="tooltip" title="{{ name }}">{{ name }}</th>
       {% endfor %}
       <th class="header"><input type="checkbox" class="select-invert" rel="tooltip" title="Click to invert row selection" /></th>
     </tr>
@@ -29,6 +32,9 @@
       <td>{{ data.created|dtformat }}</td>
       {% for entry in entries[loop.index0] %}
         {{ entryvalue(entry, 550 / (params|length)) }}
+      {% endfor %}
+      {% for value in calc_param_values[loop.index0] %}
+      <td>{{ value|dataformat }}</td>
       {% endfor %}
       <td><input type="checkbox" class="select-row" /></td>
     </tr>

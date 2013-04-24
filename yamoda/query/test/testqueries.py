@@ -60,7 +60,7 @@ limit: 10
 visible: omega
 visible: P
 calculate:  X = omega * P;
-calculate: Y = exp(omega + P);
+calc: Y = exp(omega + P);
 """
 )
 

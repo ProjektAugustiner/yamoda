@@ -100,7 +100,7 @@ creation_time_spec = (L("created") + ":" + date_interval)[lambda t: TimeInterval
 visible_params_spec = (L("visible")) + ":" + OneOrMore(param_name)
 
 # python expression
-calculated_param_spec = L("calculate") + ":" + (param_name + "=" + PythonExpr())[_make_calculated_param]
+calculated_param_spec = (L("calculate") | L("calc")) + ":" + (param_name + "=" + PythonExpr())[_make_calculated_param]
 
 query_clause = (context_spec["context_name"]
                 | user_spec["user_name"]
