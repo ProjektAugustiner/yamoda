@@ -41,6 +41,21 @@ This means that at least one of the conditions must be satisfied to include a da
 </ul>
 """,
 
+"calc-columns": """\
+<h3>Calculated Columns</h3>
+<p>Calculations specified by a (restricted) python expression can be shown as additional columns.</p>
+<p>Math Operators <code>*+-/**</code>, parentheses <code>()</code>, boolean operators <code>and or not</code> and conditional expressions can be used.
+Only calls to functions from the python math module are allowed.
+(Float) values for parameters can be inserted as variables by using the parameter name <code>;</code></p>
+
+<ul>
+<li>Create a calculated column named X which multiplies parameter T by 100:<code>calc: X = T * 100;</code>
+<li>Use log function from math:<code>calc: Y = log(T, 10);</code>
+<li>Conditional expression:<code>calc: T100 = T if T > 100 else "-";</code>
+<li>Nested expressions are possible:<code>calc: Z = log(exp(T)+(omega*T));</code>
+</ul>
+""",
+
 "sort": """\
 <h3>Sort By Value ('datas' only)</h3>
 <p>Data query results can be sorted by parameter values.</p>
@@ -71,6 +86,7 @@ omega: < 1e6
 sort: omega.desc
 limit: 20
 visible: T omega
+calc: Y = log(T);
 </pre>
 """,
 

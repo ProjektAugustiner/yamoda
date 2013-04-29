@@ -87,6 +87,7 @@ def _process_calculated_params(calc_params, datas):
     needed_param_names = set.union(*args)
     # map param names to params
     needed_params = filter(lambda p: p.name in needed_param_names, datas[0].context.parameters)
+    needed_params.sort(key=lambda p: p.id)
     # fetch data from db
     entries = view_helpers.get_entry_values_dict(datas, needed_params)
     calc_param_values = []
@@ -126,8 +127,9 @@ def _render_search_result(result_type, sqla_query, query_string, view_options):
                 all_param_sets = [{p for p in d.context.parameters if p.visible} for d in datas]
 
             common_param_set = set.intersection(*all_param_sets)
-            entries = view_helpers.get_entries(datas, common_param_set)
             logg.info("intersected params %s", common_param_set)
+            common_param_set_sorted = list(sorted(common_param_set, key=lambda p: p.id))
+            entries = view_helpers.get_entries(datas, common_param_set_sorted)
             if "calculated_params" in view_options:
                 calc_param_names, calc_param_values = _process_calculated_params(view_options["calculated_params"], datas)
             else:
@@ -136,7 +138,7 @@ def _render_search_result(result_type, sqla_query, query_string, view_options):
 
         formatted_data = pprint.pformat([(d, d.entries) for d in datas])
         logg.info("result datas and entries \n%s", formatted_data)
-        return render_template("dataresult.html", datas=datas, params=common_param_set, entries=entries,
+        return render_template("dataresult.html", datas=datas, params=common_param_set_sorted, entries=entries,
                                calc_param_names=calc_param_names, calc_param_values=calc_param_values)
 
 ### view functions ###

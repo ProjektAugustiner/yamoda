@@ -8,7 +8,8 @@ Process Python expression ASTs.
 '''
 from __future__ import division, absolute_import
 import ast
-from _ast import BinOp, Add, Sub, Mult, Div, Pow, Expression, Name, Num, Load, IfExp, BoolOp, Or, And, Not, Call
+from _ast import BinOp, Add, Sub, Mult, Div, Pow, Expression, Str, Name, Num, Load, IfExp, BoolOp, Or, And, Not, Call,\
+        Compare, Lt, Gt, GtE, LtE, Eq
 import logging
 import types
 from meta.asttools import get_symbols
@@ -61,7 +62,7 @@ class ExprVisitorWithMath(WhiteListExprVisitor):
     import math
     """Extended visitor which allows math calls and records all calls in self.found_calls.
     """
-    node_whitelist = {BinOp, Add, Sub, Mult, Div, Pow, Expression, Name, Num, Load, IfExp, BoolOp, Or, And, Not, Call}
+    node_whitelist = {BinOp, Add, Sub, Mult, Div, Pow, Expression, Str, Name, Num, Load, IfExp, BoolOp, Or, And, Not, Call, Compare, Lt, Gt, GtE, LtE, Eq}
     allowed_modules = {math}
 
     def __init__(self):
