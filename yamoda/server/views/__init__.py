@@ -1,7 +1,7 @@
 #  -*- coding: utf-8 -*-
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
-from flask.helpers import send_from_directory
+from flask import send_from_directory
 from flask_login import login_required
 
 """

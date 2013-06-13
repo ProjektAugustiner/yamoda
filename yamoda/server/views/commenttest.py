@@ -11,7 +11,7 @@ from urllib import unquote
 from urlparse import urlsplit
 from numpy import ndarray
 from werkzeug.exceptions import NotFound
-from flask.helpers import url_for
+from flask import url_for
 from flask import render_template, make_response, request, abort, jsonify, Response, escape, Markup
 from flask.ext.login import login_required, current_user
 from yamoda.server.mimerender import html_json_mimerender

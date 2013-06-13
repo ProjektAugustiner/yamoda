@@ -2,7 +2,7 @@
 #
 # yamoda, (c) 2012, see AUTHORS.  Licensed under the GNU GPL.
 from mimeparse import best_match
-from flask.helpers import make_response
+from flask import make_response
 from yamoda.server.mimerender import mimerender
 
 """

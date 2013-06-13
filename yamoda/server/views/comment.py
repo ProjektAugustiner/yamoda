@@ -8,7 +8,7 @@ Comment section for different entities like set or data.
 import logging
 import datetime
 import json
-from flask.helpers import url_for
+from flask import url_for
 from flask import render_template, make_response, request, abort, jsonify, Response, escape, Markup, redirect
 from flask.ext.login import login_required, current_user
 from yamoda.server.mimerender import html_json_mimerender, mimerender

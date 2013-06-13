@@ -4,7 +4,7 @@
 from yamoda.server.mimerender import html_json_mimerender
 import json
 from werkzeug.exceptions import NotFound
-from flask.helpers import jsonify
+from flask import jsonify
 
 """
 Functions:
