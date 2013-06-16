@@ -22,7 +22,7 @@ import time
 import json
 
 from flask import render_template, request, g
-from flask.helpers import flash
+from flask import flash
 from flask.ext.login import login_required, current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 from parcon import ParseException

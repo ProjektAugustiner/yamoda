@@ -28,7 +28,7 @@ from yamoda.server import app, db
 from yamoda.server.database import Data, Entry, Context, Parameter
 from yamoda.server.mimerender import html_json_mimerender, mimerender, mime_exceptions
 from werkzeug.exceptions import NotFound, UnsupportedMediaType, BadRequest
-from flask.helpers import send_from_directory
+from flask import send_from_directory
 import cStringIO
 
 GEN_IMAGE_DIR = app.config["GENERATED_DIR"]
