@@ -63,6 +63,7 @@ send_query_request = (save_query=true) ->
       logg.info("received query request answer")
       $("#query_results_content").html(query_result)
       change_to_query_results()
+      yamoda.datalist.setup_datalist()
       # refresh history in background
       yamoda.queryhistory.send_query_history_request()
       return

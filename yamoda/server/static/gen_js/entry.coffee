@@ -361,7 +361,7 @@ flot_setup = ($plot_div) ->
 
 sparkline_setup = ($target) ->
   # sparkline setup for a target containing data which can be plotted
-  logg.info("sparkline for target", $target.selector)
+  logg.info("sparkline for target", $target.selector, "length", $target.length)
   value_count = $target.attr("count")
   cell_width = $target.width()
   pixel_per_value = Math.max(Math.floor(cell_width / value_count), 1)

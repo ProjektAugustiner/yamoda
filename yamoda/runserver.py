@@ -16,6 +16,11 @@ from .server import make_app
 from .server.example_dbsettings import DATABASE_URIS
 
 logg = logging.getLogger()
+log_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+stream_log = logging.StreamHandler()
+stream_log.setFormatter(log_format)
+
+logg.addHandler(stream_log)
 
 
 def run_server(argv=sys.argv):

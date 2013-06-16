@@ -49,10 +49,10 @@ def data(data_id):
     logg.info("data, referrer is %s", request.referrer)
     path_parts = urlsplit(request.referrer).path.split("/") if request.referrer else None
     # TODO better way to determine if we are coming from the set view?!
+    search_path_part = url_for("search").split("/")[1]
     set_path_part = url_for("set", set_id="1").split("/")[1]
     date_path_part = url_for("data", data_id="1").split("/")[1]
-    if path_parts and path_parts[1] in (set_path_part, date_path_part):
-        # we came from a set
+    if path_parts[1] in (set_path_part, date_path_part, search_path_part):
         from_set_id = request.cookies.get("from_set", None, int)
         from_set = Set.query.get(from_set_id) if from_set_id else None
         # get data order given by client side

@@ -97,7 +97,7 @@ setup_datalist = ->
 $ ->
   # module def
   that = yamoda.datalist = yamoda.make_module(MODULE_NAME,
-    {}
+    {setup_datalist: setup_datalist}
   )
   # other stuff to do
   logg = that.logg

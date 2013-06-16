@@ -38,7 +38,7 @@ class Comment(db.Model, TimeStamp):
     id = db.Column(db.Integer, primary_key=True)
     author = db.relationship("User")
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    text = db.Column(db.String)
+    text = db.Column(db.Text)
 
     def __repr__(self):
         return '<Comment({})>'.format(self.id)
@@ -161,8 +161,8 @@ class HistoricQuery(AccessControl, db.Model, TimeStamp):
     Used to display a search history to the user"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), default="unnamed")
-    query_string = db.Column(db.String)
-    query_json = db.Column(db.String)
+    query_string = db.Column(db.Text)
+    query_json = db.Column(db.Text)
     favorite = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
