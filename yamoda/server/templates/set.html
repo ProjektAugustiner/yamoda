@@ -37,7 +37,7 @@
     $("#datatable_wrapper .datatables-top-left-bar").append($("#data_import_btn").remove())
   {% endcoffee %}
   </script>
-  {{ datalist(set.datas, params, entries, set) }}
+  {{ datalist(set.datas, params, entries, [], [], set) }}
 
   {% else %}
   <hr />

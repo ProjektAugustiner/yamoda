@@ -36,6 +36,8 @@ def get_all_entries(datas, params):
     :param params: Params to get entries for.
     :return: a list of entries, sorted first by Data.id, then Parameter.id 
     """
+    if not (datas and params):
+        return []
     data_ids = [d.id for d in datas]
     param_ids = [p.id for p in params]
     query = Entry.query.filter(Entry.data_id.in_(data_ids)).filter(Entry.parameter_id.in_(param_ids))\
